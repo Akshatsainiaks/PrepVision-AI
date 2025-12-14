@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:6
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - '27017:27017'
+  app:
+    build: .
+    restart: on-failure
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb+srv://akshatsaini336_db_user:QnixpSDGzYv6FEcn@cluster0.9vvgep4.mongodb.net/ai-interview-platform
+      - JWT_SECRET=supersecretdev
+      - BCRYPT_SALT_ROUNDS=10
+    ports:
+      - '4000:4000'
+    depends_on:
+      - mongo
+volumes:
+  mongo-data:
