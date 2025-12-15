@@ -1,10 +1,14 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const auth = require('../middlewares/auth');
-const qCtrl = require('../controllers/questionController');
+const auth = require("../middlewares/auth");
+const qCtrl = require("../controllers/questionController");
 
-router.post('/', auth, qCtrl.uploadQuestion);
-router.get('/', qCtrl.getByCompanyRole);
-router.post('/:id/upvote', auth, qCtrl.upvote);
+router.get("/companies/list", qCtrl.getCompanies);
+router.get("/company/:company/types", qCtrl.getCompanyTypes);
+
+router.post("/", auth, qCtrl.uploadQuestion);
+router.get("/", qCtrl.getByCompanyRole);
+router.post("/:id/upvote", auth, qCtrl.upvote);
+router.get("/:id", qCtrl.getQuestionById);
 
 module.exports = router;

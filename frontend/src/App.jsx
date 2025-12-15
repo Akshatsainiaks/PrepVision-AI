@@ -135,9 +135,10 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
-
+import QuestionDetails from "./pages/QuestionDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedLayout from "./components/layout/ProtectedLayout";
+import CompanyQuestions from "./pages/CompanyQuestions";
 
 export default function App() {
   return (
@@ -162,6 +163,9 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/questions" element={<Questions />} />
+          <Route path="/company/:company" element={<CompanyQuestions />} />
+          <Route path="/company/:company/:type" element={<CompanyQuestions />} />
+          <Route path="/question/:id" element={<QuestionDetails />} />          
           <Route path="/add-question" element={<AddQuestion />} />
           <Route path="/mock" element={<MockInterview />} />
           <Route path="/chat" element={<ChatPage />} />
