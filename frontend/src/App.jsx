@@ -139,7 +139,7 @@ import QuestionDetails from "./pages/QuestionDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedLayout from "./components/layout/ProtectedLayout";
 import CompanyQuestions from "./pages/CompanyQuestions";
-
+import Credits from "./pages/Credits";
 export default function App() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -171,6 +171,8 @@ export default function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/credits" element={<Credits />} />
+
         </Route>
 
       </Routes>

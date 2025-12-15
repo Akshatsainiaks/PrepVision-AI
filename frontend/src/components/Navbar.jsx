@@ -107,9 +107,11 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50
-      bg-gray-900/80 backdrop-blur-xl border-b border-white/10">
-
+    <nav
+      className="fixed top-0 left-0 w-full z-50
+      bg-gray-900/80 backdrop-blur-xl
+      border-b border-white/10"
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
 
         {/* LOGO */}
@@ -117,7 +119,11 @@ export default function Navbar() {
           onClick={() => navigate("/")}
           className="flex items-center gap-3 cursor-pointer"
         >
-          <img src={logo} className="w-11 h-11 object-contain" alt="PrepVision AI" />
+          <img
+            src={logo}
+            alt="PrepVision AI"
+            className="w-11 h-11 object-contain"
+          />
           <span className="text-2xl font-bold text-white">
             PrepVision AI
           </span>
@@ -140,23 +146,36 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* RIGHT */}
+        {/* RIGHT SECTION */}
         <div className="flex items-center gap-5">
-          <Link to="/notifications" className="relative hover:scale-110 transition">
-            <IoNotificationsOutline size={26} className="text-gray-300 hover:text-white" />
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-white/80" />
+
+          {/* 🔔 NOTIFICATIONS */}
+          <Link
+            to="/notifications"
+            className="relative hover:scale-110 transition"
+          >
+            <IoNotificationsOutline
+              size={26}
+              className="text-gray-300 hover:text-white"
+            />
+            <span
+              className="absolute top-0 right-0 w-2.5 h-2.5
+              bg-red-500 rounded-full border border-white/80"
+            />
           </Link>
 
+          {/* 👤 PROFILE */}
           <Link
             to="/profile"
-            className="w-9 h-9 rounded-full bg-gradient-to-r
-              from-purple-500 to-blue-500 flex items-center
-              justify-center text-white font-bold shadow-lg hover:scale-105 transition"
+            className="w-9 h-9 rounded-full
+            bg-gradient-to-r from-purple-500 to-blue-500
+            flex items-center justify-center
+            text-white font-bold shadow-lg
+            hover:scale-105 transition"
           >
             P
           </Link>
         </div>
-
       </div>
     </nav>
   );
