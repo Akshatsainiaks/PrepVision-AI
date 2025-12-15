@@ -270,3 +270,36 @@ exports.getCompanyTypes = async (req, res, next) => {
     next(err);
   }
 };
+
+
+// GET TYPES WITH COUNTS
+exports.getCompanyTypesWithCount = async (req, res, next) => {
+  try {
+    const { company } = req.params;
+
+    const result = await InterviewQuestion.aggregate([
+      {
+        $match: {
+          company: { $regex: new RegExp(`^${company}$`, "i") }
+        }
+      },
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          type: "$_id",
+          count: 1
+        }
+      }
+    ]);
+
+    res.json({ folders: result });
+  } catch (err) {
+    next(err);
+  }
+};
