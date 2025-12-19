@@ -121,37 +121,49 @@
 import { Routes, Route } from "react-router-dom";
 import React from "react";
 
+/* 🌐 Public Pages */
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Careers from "./pages/Careers";
 
+/* 🔐 Protected Pages */
 import Dashboard from "./pages/Dashboard";
 import Questions from "./pages/Questions";
 import AddQuestion from "./pages/AddQuestion";
-import MockInterview from "./pages/MockInterview";
 import ChatPage from "./pages/ChatPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import Profile from "./pages/Profile";
+import CreditHistory from "./pages/CreditHistory";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
+import Credits from "./pages/Credits";
+import CompanyQuestions from "./pages/CompanyQuestions";
 import QuestionDetails from "./pages/QuestionDetails";
+
+/* 🎯 Mock Interview Flow */
+import MockInterview from "./pages/MockInterview";
+import WrittenInterview from "./pages/WrittenInterview";
+import MockWrittenInterview from "./pages/MockWrittenInterview";
+import MockWrittenReport from "./pages/MockWrittenReport";
+import LiveInterview from "./pages/LiveInterview";
+
+/* 🔒 Layout & Auth */
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedLayout from "./components/layout/ProtectedLayout";
-import CompanyQuestions from "./pages/CompanyQuestions";
-import Credits from "./pages/Credits";
+
 export default function App() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Routes>
 
-        {/* 🌟 PUBLIC ROUTES (NO SIDEBAR) */}
+        {/* PUBLIC */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/careers" element={<Careers />} />
 
-        {/* 🔐 PROTECTED ROUTES (WITH SIDEBAR) */}
+        {/* PROTECTED */}
         <Route
           element={
             <ProtectedRoute>
@@ -161,18 +173,29 @@ export default function App() {
         >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/credit-history" element={<CreditHistory />} />
           <Route path="/settings" element={<Settings />} />
+
           <Route path="/questions" element={<Questions />} />
           <Route path="/company/:company" element={<CompanyQuestions />} />
           <Route path="/company/:company/:type" element={<CompanyQuestions />} />
-          <Route path="/question/:id" element={<QuestionDetails />} />          
+          <Route path="/question/:id" element={<QuestionDetails />} />
           <Route path="/add-question" element={<AddQuestion />} />
+
+          {/* MOCK INTERVIEW */}
           <Route path="/mock" element={<MockInterview />} />
+          <Route path="/mock/written" element={<WrittenInterview />} />
+          <Route path="/mock/written/interview/:sessionId" element={<MockWrittenInterview />} />
+          <Route path="/mock/written/report/:sessionId" element={<MockWrittenReport />} />
+
+          {/* ✅ LIVE INTERVIEW */}
+          <Route path="/mock/live/session/:sessionId" element={<LiveInterview />} />
+
+          {/* OTHER */}
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/credits" element={<Credits />} />
-
         </Route>
 
       </Routes>

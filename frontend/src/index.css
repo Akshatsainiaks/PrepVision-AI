@@ -1,10 +1,90 @@
 @import "tailwindcss";
 
+/* =========================
+   ANIMATIONS
+   ========================= */
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fadeIn {
   animation: fadeIn 0.7s ease-out;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+/* =========================
+   THEME VARIABLES
+   ========================= */
+
+/* LIGHT THEME (DEFAULT) */
+:root {
+  --bg-primary: #f9fafb;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+
+  --border-color: rgba(0, 0, 0, 0.08);
+
+  --accent: #7c3aed; /* purple */
+}
+
+/* DARK THEME */
+[data-theme="dark"] {
+  --bg-primary: #020617;
+  --bg-secondary: #020617;
+  --bg-card: rgba(255, 255, 255, 0.06);
+
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+
+  --border-color: rgba(255, 255, 255, 0.12);
+
+  --accent: #8b5cf6;
+}
+
+/* =========================
+   GLOBAL ELEMENT STYLES
+   ========================= */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
 }

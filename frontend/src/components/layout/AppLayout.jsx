@@ -7,7 +7,14 @@ export default function AppLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="bg-gray-950 min-h-screen text-white overflow-x-hidden">
+    <div
+      className="
+        min-h-screen
+        bg-[var(--bg-primary)]
+        text-[var(--text-primary)]
+        overflow-x-hidden
+      "
+    >
       {/* TOP NAVBAR */}
       <Navbar />
 
@@ -16,7 +23,8 @@ export default function AppLayout({ children }) {
 
       {/* MAIN CONTENT */}
       <main
-        className={`pt-20 transition-all duration-300 ease-in-out
+        className={`
+          pt-20 transition-all duration-300 ease-in-out
           ${collapsed ? "ml-20" : "ml-64"}
         `}
       >

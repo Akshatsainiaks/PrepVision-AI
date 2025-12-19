@@ -25,7 +25,7 @@ const analyticsRoutes = require("./routes/analytics");
 const weaknessRoutes = require("./routes/weaknessInsights");
 const learningRoadmapRoutes = require("./routes/learningRoadmap");
 const socketHandler = require("./socket/socketHandler");
-
+const writtenInterviewRoutes = require("./routes/writtenInterview");
 const PORT = process.env.PORT || 4000;
 const UPLOADS_PATH = path.join(__dirname, "uploads");
 
@@ -51,6 +51,9 @@ async function main() {
   app.use("/api/analytics", analyticsRoutes);
   app.use("/api/weakness-insights", weaknessRoutes);
   app.use("/api/learning-roadmap", learningRoadmapRoutes);
+  app.use("/api/written-interview", writtenInterviewRoutes);
+  app.use("/api/users", require("./routes/user"));
+  app.use("/api/live-interview", require("./routes/liveInterview"));
   app.get("/api/test-auth", auth, (req, res) =>
     res.json({ message: "Token working", user: req.user })
   );

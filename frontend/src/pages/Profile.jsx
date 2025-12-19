@@ -1,177 +1,255 @@
-// import { useEffect, useState } from "react";
-// import Navbar from "../components/Navbar";
-// import { API } from "../api/api";
-// import React from "react";
-// export default function Profile() {
-//   const [data, setData] = useState(null);
-
-//   useEffect(()=> {
-//     (async ()=> {
-//       try {
-//         const res = await API.get("/credits/me");
-//         setData(res.data);
-//       } catch (err) { console.error(err); }
-//     })();
-//   },[]);
-
-//   if (!data) return (<><Navbar /><div className="p-6">Loading...</div></>);
-
-//   return (
-//     <>
-//       <Navbar />
-//       <div className="p-6 max-w-3xl mx-auto">
-//         <h2 className="text-2xl font-bold">Profile</h2>
-//         <div className="mt-3 bg-white p-4 rounded shadow">
-//           <div className="font-semibold">{data.user.name}</div>
-//           <div className="text-sm">{data.user.email}</div>
-//           <div className="mt-2 text-lg font-bold">{data.user.credits} credits</div>
-//         </div>
-
-//         <div className="mt-6">
-//           <h3 className="font-semibold">Credit History</h3>
-//           <div className="mt-2 space-y-2">
-//             {data.logs.map(log => (
-//               <div key={log._id} className="p-3 border rounded bg-white">
-//                 <div className="text-sm">{log.source}</div>
-//                 <div className="text-xs text-gray-500">{new Date(log.createdAt).toLocaleString()}</div>
-//                 <div className="font-semibold">{log.value} credits</div>
-//                 {log.meta && <pre className="text-xs mt-1">{JSON.stringify(log.meta)}</pre>}
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-
-
-
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import Navbar from "../components/Navbar";
 import { API } from "../api/api";
 import { AuthContext } from "../context/AuthContext";
+import { ThemeContext } from "../context/ThemeContext";
 import { Link } from "react-router-dom";
+import ProfileSkeleton from "../components/skeletons/ProfileSkeleton";
 import React from "react";
 
 export default function Profile() {
   const [data, setData] = useState(null);
-  const { logout } = useContext(AuthContext);
+  const [uploading, setUploading] = useState(false);
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+  const [showAvatarPreview, setShowAvatarPreview] = useState(false);
 
+  const fileInputRef = useRef(null);
+  const avatarMenuRef = useRef(null);
+
+  const { logout } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
+
+  /* ================= FETCH PROFILE ================= */
   useEffect(() => {
+    let mounted = true;
+
     (async () => {
       try {
         const res = await API.get("/credits/me");
-        setData(res.data);
+        if (mounted) setData(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("Profile fetch error:", err);
       }
     })();
+
+    return () => (mounted = false);
   }, []);
 
-  if (!data)
-    return (
-      <>
-        <Navbar />
-        <div className="p-6 text-white">Loading...</div>
-      </>
-    );
+  /* ================= CLOSE AVATAR MENU ================= */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        avatarMenuRef.current &&
+        !avatarMenuRef.current.contains(e.target)
+      ) {
+        setShowAvatarMenu(false);
+      }
+    };
+
+    if (showAvatarMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, [showAvatarMenu]);
+
+  if (!data || !data.user) return <ProfileSkeleton />;
+
+  /* ================= AVATAR UPLOAD ================= */
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      setUploading(true);
+      const res = await API.post("/users/avatar", formData);
+      setData((prev) => ({
+        ...prev,
+        user: { ...prev.user, avatar: res.data.avatar },
+      }));
+    } catch {
+      alert("Avatar upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <Navbar />
 
-      <div className="max-w-3xl mx-auto p-8">
+      <div className="max-w-5xl mx-auto p-8 space-y-12">
+        {/* ================= HEADER ================= */}
+        <div>
+          <h2 className="text-4xl font-extrabold text-[var(--accent)]">
+            Profile
+          </h2>
+          <p className="text-secondary mt-1">
+            Manage your personal information and account preferences
+          </p>
+        </div>
 
-        {/* Page Title */}
-        <h2 className="text-4xl font-extrabold mb-6 bg-gradient-to-r 
-           from-purple-400 to-blue-400 text-transparent bg-clip-text">
-          Profile
-        </h2>
+        {/* ================= PROFILE OVERVIEW ================= */}
+        <div className="card rounded-3xl p-8">
+          <div className="flex items-center gap-6">
+            {/* Avatar */}
+            <div className="relative" ref={avatarMenuRef}>
+              <div
+                onClick={() => setShowAvatarMenu((p) => !p)}
+                className="w-20 h-20 rounded-full overflow-hidden
+                bg-gradient-to-r from-purple-500 to-blue-500
+                flex items-center justify-center
+                text-4xl font-bold cursor-pointer"
+              >
+                {data.user.avatar ? (
+                  <img
+                    src={data.user.avatar}
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  data.user.name?.charAt(0)
+                )}
+              </div>
 
-        {/* Profile Card */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 
-            rounded-2xl p-6 shadow-[0_0_20px_rgba(120,64,255,0.2)]">
+              {showAvatarMenu && (
+                <div
+                  className="absolute left-1/2 -translate-x-1/2 mt-2 w-40
+                  rounded-xl shadow-lg z-50"
+                  style={{
+                    backgroundColor: "var(--bg-secondary)",
+                    border: "1px solid var(--border-color)",
+                  }}
+                >
+                  <button
+                    className="menu-btn"
+                    onClick={() => {
+                      setShowAvatarPreview(true);
+                      setShowAvatarMenu(false);
+                    }}
+                  >
+                    👁 View avatar
+                  </button>
+                  <button
+                    className="menu-btn"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                      setShowAvatarMenu(false);
+                    }}
+                  >
+                    ⬆ Change avatar
+                  </button>
+                </div>
+              )}
 
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r 
-                from-purple-500 to-blue-500 flex items-center justify-center 
-                text-3xl font-bold">
-              {data.user.name.charAt(0)}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
             </div>
 
+            {/* User info */}
             <div>
-              <div className="text-xl font-semibold">{data.user.name}</div>
-              <div className="text-gray-300 text-sm">{data.user.email}</div>
+              <h3 className="text-2xl font-semibold">{data.user.name}</h3>
+              <p className="text-secondary">{data.user.email}</p>
+              {uploading && (
+                <p className="text-xs text-[var(--accent)] mt-1">
+                  Uploading avatar…
+                </p>
+              )}
             </div>
           </div>
+        </div>
 
-          {/* Credits */}
-          <div className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
-            <div className="text-gray-300 text-sm">Credits Available</div>
-            <div className="text-3xl font-bold text-purple-400">
-              {data.user.credits}
-            </div>
+        {/* ================= QUICK ACTIONS ================= */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <ActionCard
+            title="Account Settings"
+            desc="Manage password, theme & preferences"
+            link="/settings"
+          />
+          <ActionCard
+            title="Credit History"
+            desc="View usage and transactions"
+            link="/credit-history"
+          />
+          <ActionCard
+            title="Edit Profile"
+            desc="Update name & personal details"
+            link="/settings"
+          />
+        </div>
+
+        {/* ================= PREFERENCES ================= */}
+        <div className="card rounded-3xl p-6">
+          <h3 className="text-xl font-semibold mb-4">
+            Preferences
+          </h3>
+          <div className="flex flex-col gap-2 text-sm">
+            <p>
+              <span className="text-secondary">Theme:</span>{" "}
+              <strong className="capitalize">{theme}</strong>
+            </p>
+            <p>
+              <span className="text-secondary">Email notifications:</span>{" "}
+              Enabled
+            </p>
           </div>
+        </div>
 
-          {/* Profile Actions */}
-          <div className="flex gap-4 mt-6">
-            <Link
-              to="/settings"
-              className="px-4 py-2 rounded-lg bg-gradient-to-r 
-                from-purple-500 to-blue-500 shadow hover:scale-105 transition"
-            >
-              Settings
-            </Link>
+        {/* ================= SECURITY ================= */}
+        <div className="border border-red-500/30 bg-red-500/10 rounded-3xl p-6">
+          <h3 className="text-red-400 font-semibold mb-3">
+            Security
+          </h3>
+          <button
+            onClick={logout}
+            className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
 
+      {/* ================= AVATAR PREVIEW ================= */}
+      {showAvatarPreview && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="relative animate-fadeIn">
+            <img
+              src={data.user.avatar}
+              alt="avatar preview"
+              className="max-w-sm rounded-2xl"
+            />
             <button
-              onClick={logout}
-              className="px-4 py-2 rounded-lg bg-gradient-to-r 
-                from-red-500 to-pink-600 shadow hover:scale-105 transition"
+              onClick={() => setShowAvatarPreview(false)}
+              className="absolute -top-3 -right-3 bg-red-600 rounded-full px-3 py-1 text-white"
             >
-              Logout
+              ✕
             </button>
           </div>
         </div>
-
-        {/* Credit History */}
-        <div className="mt-10">
-          <h3 className="text-2xl font-semibold mb-4">Credit History</h3>
-
-          <div className="space-y-4">
-            {data.logs.length === 0 && (
-              <p className="text-gray-500">No transactions yet.</p>
-            )}
-
-            {data.logs.map((log) => (
-              <div
-                key={log._id}
-                className="backdrop-blur-xl bg-white/10 border border-white/20 
-                  p-4 rounded-xl shadow"
-              >
-                <div className="flex justify-between">
-                  <div>
-                    <div className="font-semibold">{log.source}</div>
-                    <div className="text-xs text-gray-400">
-                      {new Date(log.createdAt).toLocaleString()}
-                    </div>
-                  </div>
-
-                  <div className="text-purple-400 text-lg font-bold">
-                    {log.value} credits
-                  </div>
-                </div>
-
-                {log.meta && (
-                  <pre className="text-xs mt-2 bg-black/20 p-2 rounded">
-                    {JSON.stringify(log.meta, null, 2)}
-                  </pre>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
+  );
+}
+
+/* ================= SUB COMPONENT ================= */
+function ActionCard({ title, desc, link }) {
+  return (
+    <Link
+      to={link}
+      className="card rounded-2xl p-6 hover:border-[var(--accent)] transition"
+    >
+      <h4 className="font-semibold mb-1">{title}</h4>
+      <p className="text-sm text-secondary">{desc}</p>
+    </Link>
   );
 }
