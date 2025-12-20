@@ -2,7 +2,6 @@ import { useEffect, useState, useContext, useRef } from "react";
 import Navbar from "../components/Navbar";
 import { API } from "../api/api";
 import { AuthContext } from "../context/AuthContext";
-import { ThemeContext } from "../context/ThemeContext";
 import { Link } from "react-router-dom";
 import ProfileSkeleton from "../components/skeletons/ProfileSkeleton";
 import React from "react";
@@ -17,7 +16,6 @@ export default function Profile() {
   const avatarMenuRef = useRef(null);
 
   const { logout } = useContext(AuthContext);
-  const { theme } = useContext(ThemeContext);
 
   /* ================= FETCH PROFILE ================= */
   useEffect(() => {
@@ -173,7 +171,7 @@ export default function Profile() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <ActionCard
             title="Account Settings"
-            desc="Manage password, theme & preferences"
+            desc="Manage password and security"
             link="/settings"
           />
           <ActionCard
@@ -188,15 +186,15 @@ export default function Profile() {
           />
         </div>
 
-        {/* ================= PREFERENCES ================= */}
+        {/* ================= ACCOUNT INFO ================= */}
         <div className="card rounded-3xl p-6">
           <h3 className="text-xl font-semibold mb-4">
-            Preferences
+            Account Information
           </h3>
           <div className="flex flex-col gap-2 text-sm">
             <p>
-              <span className="text-secondary">Theme:</span>{" "}
-              <strong className="capitalize">{theme}</strong>
+              <span className="text-secondary">Role:</span>{" "}
+              <strong>User</strong>
             </p>
             <p>
               <span className="text-secondary">Email notifications:</span>{" "}

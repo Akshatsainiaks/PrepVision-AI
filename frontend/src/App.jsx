@@ -129,6 +129,9 @@ import Careers from "./pages/Careers";
 
 /* 🔐 Protected Pages */
 import Dashboard from "./pages/Dashboard";
+import Activity from "./pages/Activity"
+import History from "./pages/History";
+import InterviewDetail from "./pages/InterviewDetail";
 import Questions from "./pages/Questions";
 import AddQuestion from "./pages/AddQuestion";
 import ChatPage from "./pages/ChatPage";
@@ -172,6 +175,9 @@ export default function App() {
           }
         >
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/activity" element={<Activity />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/history/:id" element={<InterviewDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/credit-history" element={<CreditHistory />} />
           <Route path="/settings" element={<Settings />} />
