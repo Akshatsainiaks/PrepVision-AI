@@ -1,6 +1,10 @@
 {
-  "name": "ai-interview-backend",
+  "name": "meet",
   "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

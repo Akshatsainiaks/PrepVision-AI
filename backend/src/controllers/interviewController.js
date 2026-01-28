@@ -3,8 +3,16 @@ const InterviewQuestion = require("../models/InterviewQuestion");
 const OpenAI = require("openai");
 
 // OpenAI Client
+const USE_GROQ = Boolean(process.env.GROQ_API_KEY);
+const MODEL =
+  process.env.AI_MODEL ||
+  (USE_GROQ ? "llama-3.1-8b-instant" : "gpt-4o-mini");
+
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: USE_GROQ ? process.env.GROQ_API_KEY : process.env.OPENAI_API_KEY,
+  ...(USE_GROQ && {
+    baseURL: process.env.GROQ_BASE_URL || "https://api.groq.com/openai/v1",
+  }),
 });
 
 // --------------------------
@@ -94,13 +102,13 @@ Respond in this format:
     let output;
     try {
       const response = await client.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: MODEL,
         messages: [{ role: "user", content: prompt }],
       });
 
       output = response.choices[0].message.content;
     } catch (err) {
-      console.error("OpenAI API Error:", err);
+      console.error("AI API Error:", err);
       return res.status(500).json({
         message: "AI evaluation failed",
         error: err.error?.message || err.message,
