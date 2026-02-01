@@ -153,11 +153,180 @@
 // }
 
 
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar";
+// import { useQuery } from "@tanstack/react-query";
+// // import { API } from "../api/api";
+// import API from "../api/api";
+// import { useNavigate } from "react-router-dom";
+// import React from "react";
+
+// export default function Questions() {
+//   const navigate = useNavigate();
+
+//   const {
+//     data: companies = [],
+//     isLoading,
+//     isError,
+//   } = useQuery({
+//     queryKey: ["companies"],
+//     queryFn: async () => {
+//       const res = await API.get("/questions/companies/list");
+//       return res.data.companies;
+//     },
+//   });
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <div className="max-w-6xl mx-auto px-6 py-10 text-white">
+//         <h2 className="text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
+//           Interview Questions
+//         </h2>
+
+//         <p className="mt-2 text-gray-400">
+//           Browse questions by company
+//         </p>
+
+//         {/* STATES */}
+//         {isLoading && (
+//           <p className="mt-10 text-gray-400">Loading companies...</p>
+//         )}
+
+//         {isError && (
+//           <p className="mt-10 text-red-400">
+//             Failed to load companies
+//           </p>
+//         )}
+
+//         {!isLoading && companies.length === 0 && (
+//           <p className="mt-10 text-gray-400">
+//             No companies found yet
+//           </p>
+//         )}
+
+//         {/* COMPANY FOLDERS */}
+//         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+//           {companies.map((company) => (
+//             <div
+//               key={company}
+//               onClick={() =>
+//                 navigate(`/company/${encodeURIComponent(company)}`)
+//               }
+//               className="cursor-pointer p-6 rounded-2xl bg-white/10 
+//                          border border-white/20 hover:bg-white/20 
+//                          transition shadow-lg"
+//             >
+//               <div className="flex items-center gap-4">
+//                 <span className="text-4xl">📁</span>
+//                 <div>
+//                   <h3 className="text-xl font-semibold text-purple-300">
+//                     {company}
+//                   </h3>
+//                   <p className="text-sm text-gray-400">
+//                     View all interview questions
+//                   </p>
+//                 </div>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </>
+//   );
+// }
+
+
+// src/pages/Questions.jsx
+// import { useQuery } from "@tanstack/react-query";
+// import API from "../api/api";
+// import { useNavigate } from "react-router-dom";
+// import React from "react";
+
+// export default function Questions() {
+//   const navigate = useNavigate();
+
+//   const {
+//     data: companies = [],
+//     isLoading,
+//     isError,
+//   } = useQuery({
+//     queryKey: ["companies"],
+//     queryFn: async () => {
+//       const res = await API.get("/questions/companies/list");
+//       return res.data.companies;
+//     },
+//   });
+
+//   return (
+//     <>
+//       {/* HEADER */}
+//       <header className="mb-8">
+//         <h2 className="text-3xl lg:text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
+//           Interview Questions
+//         </h2>
+//         <p className="mt-1 text-gray-400">
+//           Browse questions by company
+//         </p>
+//       </header>
+
+//       {/* STATES */}
+//       {isLoading && (
+//         <p className="text-gray-400 mt-6">Loading companies...</p>
+//       )}
+
+//       {isError && (
+//         <p className="text-red-400 mt-6">
+//           Failed to load companies
+//         </p>
+//       )}
+
+//       {!isLoading && companies.length === 0 && (
+//         <p className="text-gray-400 mt-6">
+//           No companies found yet
+//         </p>
+//       )}
+
+//       {/* COMPANY LIST */}
+//       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+//         {companies.map((company) => (
+//           <div
+//             key={company}
+//             onClick={() =>
+//               navigate(`/company/${encodeURIComponent(company)}`)
+//             }
+//             className="
+//               cursor-pointer p-5 rounded-xl
+//               bg-white/10 border border-white/10
+//               hover:bg-white/20 hover:border-white/20
+//               transition
+//             "
+//           >
+//             <div className="flex items-center gap-4">
+//               <span className="text-3xl">📁</span>
+//               <div>
+//                 <h3 className="text-lg font-semibold text-purple-300">
+//                   {company}
+//                 </h3>
+//                 <p className="text-xs text-gray-400">
+//                   View interview questions
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </section>
+//     </>
+//   );
+// }
+
+
+//new final
 import { useQuery } from "@tanstack/react-query";
-import { API } from "../api/api";
+import API from "../api/api";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { FiSearch, FiFolder, FiArrowRight, FiLoader } from "react-icons/fi";
 
 export default function Questions() {
   const navigate = useNavigate();
@@ -175,62 +344,92 @@ export default function Questions() {
   });
 
   return (
-    <>
-      <Navbar />
+    <div className="animate-fadeIn pb-12">
+      {/* HEADER */}
+      <header className="mb-10 pt-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h2 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900">
+              Interview <span className="text-indigo-600">Questions</span>
+            </h2>
+            <p className="mt-2 text-slate-500 text-lg font-medium">
+              Targeted practice for top-tier companies.
+            </p>
+          </div>
+          
+          {/* Quick Search Decoration (Non-functional as requested) */}
+          <div className="relative group max-w-sm w-full">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+            <input 
+              type="text" 
+              placeholder="Filter companies..." 
+              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+            />
+          </div>
+        </div>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-10 text-white">
-        <h2 className="text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-          Interview Questions
-        </h2>
+      {/* LOADING STATE */}
+      {isLoading && (
+        <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-slate-100 shadow-sm">
+          <FiLoader className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Fetching Companies...</p>
+        </div>
+      )}
 
-        <p className="mt-2 text-gray-400">
-          Browse questions by company
-        </p>
+      {/* ERROR STATE */}
+      {isError && (
+        <div className="p-12 text-center bg-rose-50 border border-rose-100 rounded-3xl">
+          <p className="text-rose-600 font-bold">Failed to load companies. Please check your connection.</p>
+        </div>
+      )}
 
-        {/* STATES */}
-        {isLoading && (
-          <p className="mt-10 text-gray-400">Loading companies...</p>
-        )}
+      {/* EMPTY STATE */}
+      {!isLoading && !isError && companies.length === 0 && (
+        <div className="p-20 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
+          <FiFolder className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+          <p className="text-slate-500 font-medium">No companies found in the bank yet.</p>
+        </div>
+      )}
 
-        {isError && (
-          <p className="mt-10 text-red-400">
-            Failed to load companies
-          </p>
-        )}
-
-        {!isLoading && companies.length === 0 && (
-          <p className="mt-10 text-gray-400">
-            No companies found yet
-          </p>
-        )}
-
-        {/* COMPANY FOLDERS */}
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {companies.map((company) => (
-            <div
-              key={company}
-              onClick={() =>
-                navigate(`/company/${encodeURIComponent(company)}`)
-              }
-              className="cursor-pointer p-6 rounded-2xl bg-white/10 
-                         border border-white/20 hover:bg-white/20 
-                         transition shadow-lg"
-            >
-              <div className="flex items-center gap-4">
-                <span className="text-4xl">📁</span>
+      {/* COMPANY LIST */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+        {companies.map((company) => (
+          <div
+            key={company}
+            onClick={() =>
+              navigate(`/company/${encodeURIComponent(company)}`)
+            }
+            className="
+              group cursor-pointer p-6 rounded-3xl
+              bg-white border border-slate-200
+              hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/5
+              transition-all duration-300 transform hover:-translate-y-1
+            "
+          >
+            <div className="flex flex-col gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:border-indigo-100 group-hover:text-indigo-600 transition-colors">
+                <FiFolder size={28} />
+              </div>
+              
+              <div className="flex items-end justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold text-purple-300">
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors">
                     {company}
                   </h3>
-                  <p className="text-sm text-gray-400">
-                    View all interview questions
+                  <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                    Questions Available
                   </p>
+                </div>
+                
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                  <FiArrowRight />
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </>
+          </div>
+        ))}
+      </section>
+    </div>
   );
 }

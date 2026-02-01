@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { API } from "../api/api";
+// import { API } from "../api/api";
+import API from "../api/api";
 
 export default function LiveInterview() {
   const { sessionId } = useParams();

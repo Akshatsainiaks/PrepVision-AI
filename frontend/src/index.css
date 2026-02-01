@@ -1,90 +1,122 @@
 @import "tailwindcss";
 
 /* =========================
-   ANIMATIONS
+   GLOBAL BASE STYLES
    ========================= */
+html, body, #root {
+  height: 100%;
+}
 
+body {
+  /* Soft, neutral background instead of pure white to reduce eye strain */
+  background-color: #f8fafc; 
+  color: #0f172a; /* Slate 900 for high readability */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================
+   UI HELPERS - MODERN LIGHT CARDS
+   ========================= */
+.card {
+  background-color: #ffffff;
+  /* Very soft shadow to give depth without looking "dirty" */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0; /* Slate 200 */
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  /* Subtle lift effect and brand-colored border */
+  transform: translateY(-2px);
+  border-color: #6366f1; /* Indigo 500 */
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1), 0 4px 6px -2px rgba(99, 102, 241, 0.05);
+}
+
+.card-padding {
+  padding: 1.5rem;
+}
+
+/* =========================
+   ANIMATION
+   ========================= */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+  from { 
+    opacity: 0; 
+    transform: translateY(8px); 
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
   }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.7s ease-out;
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Shimmer animation */
+/* =========================
+   SCROLLBAR (LIGHT THEME)
+   ========================= */
+::-webkit-scrollbar { 
+  width: 8px; 
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* Slate 300 */
+  border-radius: 20px;
+  border: 2px solid #f8fafc; /* Match body bg for "floating" effect */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* Slate 400 */
+}
+
+/* =========================
+   LAYOUT UTILITIES
+   ========================= */
+.main-content-area {
+  padding-top: 5rem; /* Space for fixed navbar (h-16 + extra) */
+  min-height: 100vh;
+}
+
 @keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
   100% {
     transform: translateX(100%);
   }
 }
 
-.shimmer {
-  animation: shimmer 1.5s infinite;
+.animate-shimmer {
+  animation: shimmer 2s infinite;
 }
 
-/* =========================
-   THEME VARIABLES
-   ========================= */
-
-/* LIGHT THEME (DEFAULT) */
-:root {
-  --bg-primary: #f9fafb;
-  --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-
-  --border-color: rgba(0, 0, 0, 0.08);
-
-  --accent: #7c3aed; /* purple */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
-/* DARK THEME */
-[data-theme="dark"] {
-  --bg-primary: #020617;
-  --bg-secondary: #020617;
-  --bg-card: rgba(255, 255, 255, 0.06);
-
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-
-  --border-color: rgba(255, 255, 255, 0.12);
-
-  --accent: #8b5cf6;
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
-/* =========================
-   GLOBAL ELEMENT STYLES
-   ========================= */
-
-html,
-body {
-  height: 100%;
+.animate-shimmer {
+  animation: shimmer 2s infinite;
 }
 
-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  transition: background-color 0.25s ease, color 0.25s ease;
-}
-
-.card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-}
-
-.text-secondary {
-  color: var(--text-secondary);
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
 }

@@ -1,7 +1,8 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { API } from "../api/api";
+// import { API } from "../api/api";
+import API from "../api/api";
 
 export default function InterviewDetail() {
   const { id } = useParams();

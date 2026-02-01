@@ -6,7 +6,8 @@ import {
   submitWrittenAnswer,
   finishWrittenInterview,
 } from "../api/writtenInterviewApi";
-import { API } from "../api/api";
+// import { API } from "../api/api";
+import API from "../api/api";
 
 export default function MockWrittenInterview() {
   const navigate = useNavigate();

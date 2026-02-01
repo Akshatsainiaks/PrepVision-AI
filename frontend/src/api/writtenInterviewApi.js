@@ -1,4 +1,5 @@
-import { API } from "./api";
+// import { API } from "./api";
+import API from "../api/api";
 
 export const startWrittenInterview = async (topic, level) => {
   const res = await API.post("/written-interview/start", { topic, level });

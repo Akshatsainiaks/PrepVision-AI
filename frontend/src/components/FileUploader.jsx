@@ -1,6 +1,7 @@
 // src/components/FileUploader.jsx
 import React, { useRef, useState } from "react";
-import { API } from "../api/api";
+// import { API } from "../api/api";
+import API from "../api/api";
 
 export default function FileUploader({ onUploaded }) {
   const ref = useRef();
