@@ -152,21 +152,67 @@ export default function Register() {
 
   const navigate = useNavigate();
 
+  // const handleSubmit = async () => {
+  //   try {
+  //     const res = await API.post("/auth/register", {
+  //       name, email, password, phone
+  //     });
+
+  //     localStorage.setItem("token", res.data.token);
+  //     localStorage.setItem("userId", res.data.user.id);
+  //     localStorage.setItem("name", res.data.user.name);
+
+  //     navigate("/dashboard");
+  //   } catch (err) {
+  //     alert(err.response?.data?.message || "Registration error");
+  //   }
+  // };
   const handleSubmit = async () => {
-    try {
-      const res = await API.post("/auth/register", {
-        name, email, password, phone
-      });
+  // ✅ Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("userId", res.data.user.id);
-      localStorage.setItem("name", res.data.user.name);
+  // ✅ Phone validation (10 digits only)
+  const phoneRegex = /^[0-9]{10}$/;
 
-      navigate("/dashboard");
-    } catch (err) {
-      alert(err.response?.data?.message || "Registration error");
-    }
-  };
+  // ✅ Password validation (all combinations)
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-={}[\]|\\:;"'<>,./]).{8,}$/;
+
+  if (!emailRegex.test(email)) {
+    alert("Please enter a valid email address");
+    return;
+  }
+
+  if (!phoneRegex.test(phone)) {
+    alert("Phone number must be exactly 10 digits");
+    return;
+  }
+
+  if (!passwordRegex.test(password)) {
+    alert(
+      "Password must contain uppercase, lowercase, number, special character and be at least 8 characters long"
+    );
+    return;
+  }
+
+  try {
+    const res = await API.post("/auth/register", {
+      name,
+      email,
+      password,
+      phone,
+    });
+
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("userId", res.data.user.id);
+    localStorage.setItem("name", res.data.user.name);
+
+    navigate("/dashboard");
+  } catch (err) {
+    alert(err.response?.data?.message || "Registration error");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-blue-50 text-slate-900 overflow-hidden font-sans">
