@@ -319,9 +319,120 @@
 // }
 
 //new final
+// import { useEffect, useState } from "react";
+// import { X, ArrowRight } from "lucide-react";
+// import { useNavigate } from "react-router-dom";
+// import React from "react";
+
+// const announcements = [
+//   {
+//     tag: "Content",
+//     text: "New questions added! Explore fresh DSA & System Design problems.",
+//     link: "/questions",
+//     color: "text-blue-600",
+//     bg: "bg-blue-50",
+//     border: "border-blue-100"
+//   },
+//   {
+//     tag: "Streak",
+//     text: "Don’t break your streak! Practice today & earn more credits.",
+//     link: "/mock",
+//     color: "text-orange-600",
+//     bg: "bg-orange-50",
+//     border: "border-orange-100"
+//   },
+//   {
+//     tag: "Update",
+//     text: "AI Voice Practice improved — get clearer feedback now.",
+//     link: "/mock",
+//     color: "text-indigo-600",
+//     bg: "bg-indigo-50",
+//     border: "border-indigo-100"
+//   },
+// ];
+
+// export default function AnnouncementBar() {
+//   const navigate = useNavigate();
+//   const [visible, setVisible] = useState(
+//     () => localStorage.getItem("announcement_closed") !== "true"
+//   );
+//   const [index, setIndex] = useState(0);
+//   const [fade, setFade] = useState(true);
+
+//   useEffect(() => {
+//     if (!visible) return;
+
+//     const timer = setInterval(() => {
+//       setFade(false);
+//       setTimeout(() => {
+//         setIndex((prev) => (prev + 1) % announcements.length);
+//         setFade(true);
+//       }, 500); 
+//     }, 5000);
+
+//     return () => clearInterval(timer);
+//   }, [visible]);
+
+//   if (!visible) return null;
+
+//   const current = announcements[index];
+
+//   return (
+//     <div className="sticky top-[72px] z-30 mx-0 mt-2 group animate-fadeIn">
+//       {/* Container - Light theme with soft tint based on category */}
+//       <div className={`relative overflow-hidden rounded-2xl border transition-all duration-500 shadow-sm ${current.bg} ${current.border} px-5 py-3`}>
+        
+//         {/* Subtle Decorative Background Element */}
+//         <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-white/40 to-transparent pointer-events-none"></div>
+
+//         <div className="relative flex items-center justify-between gap-4">
+//           <div className="flex items-center gap-4 flex-1 overflow-hidden">
+            
+//             {/* Live Indicator - Refined for Light Mode */}
+//             <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white shadow-sm border border-slate-200/60">
+//                <span className="relative flex h-2 w-2">
+//                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+//                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+//               </span>
+//               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Live</span>
+//             </div>
+
+//             {/* Announcement Text */}
+//             <button
+//               onClick={() => navigate(current.link)}
+//               className={`flex items-center gap-2 text-sm transition-all duration-500 transform ${
+//                 fade ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+//               }`}
+//             >
+//               <span className={`font-black text-[11px] uppercase tracking-wider ${current.color}`}>
+//                 {current.tag}
+//               </span>
+//               <span className="truncate font-semibold text-slate-700">{current.text}</span>
+//               <ArrowRight size={14} className={`shrink-0 transition-all ${current.color} opacity-0 group-hover:opacity-100 group-hover:translate-x-1`} />
+//             </button>
+//           </div>
+
+//           {/* Close Button */}
+//           <button
+//             onClick={() => {
+//               localStorage.setItem("announcement_closed", "true");
+//               setVisible(false);
+//             }}
+//             className="p-1.5 rounded-lg hover:bg-white/60 text-slate-400 hover:text-slate-600 transition-colors"
+//             aria-label="Close"
+//           >
+//             <X size={16} />
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+//dark mode
 import { useEffect, useState } from "react";
 import { X, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 import React from "react";
 
 const announcements = [
@@ -329,36 +440,43 @@ const announcements = [
     tag: "Content",
     text: "New questions added! Explore fresh DSA & System Design problems.",
     link: "/questions",
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    border: "border-blue-100"
+    color: "var(--accent)", 
+    glow: "rgba(99, 102, 241, 0.15)"
   },
   {
     tag: "Streak",
     text: "Don’t break your streak! Practice today & earn more credits.",
     link: "/mock",
-    color: "text-orange-600",
-    bg: "bg-orange-50",
-    border: "border-orange-100"
+    color: "#f59e0b", 
+    glow: "rgba(245, 158, 11, 0.15)"
   },
   {
     tag: "Update",
     text: "AI Voice Practice improved — get clearer feedback now.",
     link: "/mock",
-    color: "text-indigo-600",
-    bg: "bg-indigo-50",
-    border: "border-indigo-100"
+    color: "#10b981", 
+    glow: "rgba(16, 185, 129, 0.15)"
   },
 ];
 
 export default function AnnouncementBar() {
   const navigate = useNavigate();
+  const location = useLocation(); // Hook to listen for URL changes
+  
   const [visible, setVisible] = useState(
-    () => localStorage.getItem("announcement_closed") !== "true"
+    () => sessionStorage.getItem("announcement_closed") !== "true"
   );
+  
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(true);
 
+  // EFFECT 1: Re-check visibility whenever the user navigates
+  useEffect(() => {
+    const isClosed = sessionStorage.getItem("announcement_closed") === "true";
+    setVisible(!isClosed);
+  }, [location]); // Re-run this check every time the URL changes
+
+  // EFFECT 2: Handle the rotation animation
   useEffect(() => {
     if (!visible) return;
 
@@ -378,47 +496,63 @@ export default function AnnouncementBar() {
   const current = announcements[index];
 
   return (
-    <div className="sticky top-[72px] z-30 mx-0 mt-2 group animate-fadeIn">
-      {/* Container - Light theme with soft tint based on category */}
-      <div className={`relative overflow-hidden rounded-2xl border transition-all duration-500 shadow-sm ${current.bg} ${current.border} px-5 py-3`}>
-        
-        {/* Subtle Decorative Background Element */}
-        <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-white/40 to-transparent pointer-events-none"></div>
+    <div className="sticky top-[72px] z-30 mx-6 mt-4 group animate-fadeIn">
+      <div 
+        className="relative overflow-hidden rounded-2xl border transition-all duration-700 shadow-2xl px-5 py-2.5"
+        style={{ 
+          backgroundColor: "var(--bg-card)", 
+          borderColor: "var(--border-color)",
+          boxShadow: `0 10px 30px -10px ${current.glow}` 
+        }}
+      >
+        <div 
+          className="absolute inset-0 opacity-10 transition-all duration-700" 
+          style={{ background: `linear-gradient(90deg, ${current.color}, transparent 40%)` }}
+        />
 
         <div className="relative flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 flex-1 overflow-hidden">
-            
-            {/* Live Indicator - Refined for Light Mode */}
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white shadow-sm border border-slate-200/60">
-               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+          <div className="flex items-center gap-5 flex-1 overflow-hidden">
+            <div 
+              className="flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all"
+              style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: current.color }}></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ backgroundColor: current.color }}></span>
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Live</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-secondary)" }}>Live</span>
             </div>
 
-            {/* Announcement Text */}
             <button
               onClick={() => navigate(current.link)}
-              className={`flex items-center gap-2 text-sm transition-all duration-500 transform ${
-                fade ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+              className={`flex items-center gap-3 text-sm transition-all duration-500 transform ${
+                fade ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
               }`}
             >
-              <span className={`font-black text-[11px] uppercase tracking-wider ${current.color}`}>
+              <span 
+                className="font-black text-[10px] uppercase tracking-[0.2em] px-2 py-0.5 rounded-md border"
+                style={{ 
+                  backgroundColor: current.glow, 
+                  color: current.color, 
+                  borderColor: `${current.color}20` 
+                }}
+              >
                 {current.tag}
               </span>
-              <span className="truncate font-semibold text-slate-700">{current.text}</span>
-              <ArrowRight size={14} className={`shrink-0 transition-all ${current.color} opacity-0 group-hover:opacity-100 group-hover:translate-x-1`} />
+              <span className="truncate font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+                {current.text}
+              </span>
+              <ArrowRight size={14} className="shrink-0 transition-all group-hover:translate-x-1" style={{ color: current.color }} />
             </button>
           </div>
 
-          {/* Close Button */}
           <button
             onClick={() => {
-              localStorage.setItem("announcement_closed", "true");
+              sessionStorage.setItem("announcement_closed", "true");
               setVisible(false);
             }}
-            className="p-1.5 rounded-lg hover:bg-white/60 text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+            style={{ color: "var(--text-secondary)" }}
             aria-label="Close"
           >
             <X size={16} />

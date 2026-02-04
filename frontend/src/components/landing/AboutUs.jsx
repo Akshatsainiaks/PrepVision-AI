@@ -63,6 +63,98 @@
 
 
 // new final
+// import React from "react";
+// import { motion } from "framer-motion";
+// import { FiCpu, FiTarget, FiTrendingUp } from "react-icons/fi";
+
+// export default function AboutUs() {
+//   const features = [
+//     { 
+//       title: "AI Driven", 
+//       desc: "Smart evaluations & real-time insights.", 
+//       icon: <FiCpu className="text-indigo-600" />,
+//       bg: "bg-indigo-50",
+//       border: "border-indigo-100"
+//     },
+//     { 
+//       title: "Real Practice", 
+//       desc: "Simulation of high-stakes interviews.", 
+//       icon: <FiTarget className="text-emerald-600" />,
+//       bg: "bg-emerald-50",
+//       border: "border-emerald-100"
+//     },
+//     { 
+//       title: "Personalized", 
+//       desc: "Custom AI improvement roadmaps.", 
+//       icon: <FiTrendingUp className="text-amber-600" />,
+//       bg: "bg-amber-50",
+//       border: "border-amber-100"
+//     },
+//   ];
+
+//   return (
+//     <section
+//       id="about"
+//       className="min-h-screen flex items-center justify-center px-6 bg-white relative overflow-hidden"
+//     >
+//       {/* Subtle Background Decoration */}
+//       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
+//         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-50 rounded-full blur-[120px] opacity-60" />
+//         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-50 rounded-full blur-[120px] opacity-40" />
+//       </div>
+
+//       <motion.div
+//         initial={{ opacity: 0, y: 40 }}
+//         whileInView={{ opacity: 1, y: 0 }}
+//         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+//         viewport={{ once: true }}
+//         className="max-w-5xl mx-auto text-center relative z-10"
+//       >
+//         {/* Badge - Polished for Light Mode */}
+//         <span className="inline-flex items-center mb-6 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] bg-indigo-50 text-indigo-600 border border-indigo-100">
+//           Our Identity
+//         </span>
+
+//         {/* Heading - High Contrast Slate */}
+//         <h2 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1]">
+//           Redefining Interview <br />
+//           <span className="text-indigo-600">Preparation with AI</span>
+//         </h2>
+
+//         {/* Description - Slate Typography */}
+//         <p className="text-slate-500 mt-8 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto font-medium">
+//           PrepVision AI helps learners master real-world interviews through
+//           <span className="text-slate-900 font-bold"> AI-powered simulations</span>, 
+//           instant scoring, and professional voice analysis.
+//           <br className="hidden md:block" />
+//           <br className="hidden md:block" />
+//           Our mission is to make career growth 
+//           <span className="text-indigo-600 font-bold"> smarter, accessible, </span>
+//           and tailored for every professional journey.
+//         </p>
+
+//         {/* Feature Cards - Bento Grid Style */}
+//         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16">
+//           {features.map((item, i) => (
+//             <motion.div
+//               key={i}
+//               whileHover={{ y: -10 }}
+//               className="p-8 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 transition-all duration-300 group"
+//             >
+//               <div className={`w-14 h-14 rounded-2xl ${item.bg} border ${item.border} flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform`}>
+//                 {React.cloneElement(item.icon, { size: 24 })}
+//               </div>
+//               <h4 className="font-black text-xl text-slate-900 mb-3 tracking-tight">{item.title}</h4>
+//               <p className="text-sm font-bold text-slate-400 leading-relaxed uppercase tracking-tighter">{item.desc}</p>
+//             </motion.div>
+//           ))}
+//         </div>
+//       </motion.div>
+//     </section>
+//   );
+// }
+
+//dark mode
 import React from "react";
 import { motion } from "framer-motion";
 import { FiCpu, FiTarget, FiTrendingUp } from "react-icons/fi";
@@ -72,35 +164,36 @@ export default function AboutUs() {
     { 
       title: "AI Driven", 
       desc: "Smart evaluations & real-time insights.", 
-      icon: <FiCpu className="text-indigo-600" />,
-      bg: "bg-indigo-50",
-      border: "border-indigo-100"
+      icon: <FiCpu />,
+      accent: "rgba(99, 102, 241, 0.15)", // Indigo Glow
+      color: "text-indigo-400"
     },
     { 
       title: "Real Practice", 
       desc: "Simulation of high-stakes interviews.", 
-      icon: <FiTarget className="text-emerald-600" />,
-      bg: "bg-emerald-50",
-      border: "border-emerald-100"
+      icon: <FiTarget />,
+      accent: "rgba(16, 185, 129, 0.15)", // Emerald Glow
+      color: "text-emerald-400"
     },
     { 
       title: "Personalized", 
       desc: "Custom AI improvement roadmaps.", 
-      icon: <FiTrendingUp className="text-amber-600" />,
-      bg: "bg-amber-50",
-      border: "border-amber-100"
+      icon: <FiTrendingUp />,
+      accent: "rgba(245, 158, 11, 0.15)", // Amber Glow
+      color: "text-amber-400"
     },
   ];
 
   return (
     <section
       id="about"
-      className="min-h-screen flex items-center justify-center px-6 bg-white relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center px-6 transition-colors duration-500 relative overflow-hidden"
+      style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}
     >
-      {/* Subtle Background Decoration */}
+      {/* BACKGROUND NEON AURAS */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-50 rounded-full blur-[120px] opacity-60" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-50 rounded-full blur-[120px] opacity-40" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[140px] opacity-60" />
+        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[140px] opacity-40" />
       </div>
 
       <motion.div
@@ -110,42 +203,55 @@ export default function AboutUs() {
         viewport={{ once: true }}
         className="max-w-5xl mx-auto text-center relative z-10"
       >
-        {/* Badge - Polished for Light Mode */}
-        <span className="inline-flex items-center mb-6 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] bg-indigo-50 text-indigo-600 border border-indigo-100">
+        {/* Badge - Obsidian Style */}
+        <span className="inline-flex items-center mb-6 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] border shadow-lg"
+              style={{ 
+                backgroundColor: "rgba(99, 102, 241, 0.1)", 
+                color: "var(--accent)", 
+                borderColor: "rgba(99, 102, 241, 0.2)" 
+              }}>
           Our Identity
         </span>
 
-        {/* Heading - High Contrast Slate */}
-        <h2 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1]">
-          Redefining Interview <br />
-          <span className="text-indigo-600">Preparation with AI</span>
+        {/* Heading - Stark White & Indigo */}
+        <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-10">
+          Redefining Preparation <br />
+          <span style={{ color: "var(--accent)" }}>with Intelligence</span>
         </h2>
 
-        {/* Description - Slate Typography */}
-        <p className="text-slate-500 mt-8 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto font-medium">
-          PrepVision AI helps learners master real-world interviews through
-          <span className="text-slate-900 font-bold"> AI-powered simulations</span>, 
-          instant scoring, and professional voice analysis.
+        {/* Description - Muted Slate */}
+        <p className="mt-8 text-lg md:text-2xl leading-relaxed max-w-3xl mx-auto font-medium opacity-80"
+           style={{ color: "var(--text-secondary)" }}>
+          PrepVision AI helps learners master interviews through
+          <span className="text-white font-bold"> high-fidelity simulations</span>, 
+          instant scoring, and behavioral analysis.
           <br className="hidden md:block" />
           <br className="hidden md:block" />
           Our mission is to make career growth 
-          <span className="text-indigo-600 font-bold"> smarter, accessible, </span>
-          and tailored for every professional journey.
+          <span style={{ color: "var(--accent)" }} className="font-bold"> accessible, data-driven, </span>
+          and tailored for the 2026 job market.
         </p>
 
-        {/* Feature Cards - Bento Grid Style */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16">
+        {/* Feature Cards - Obsidian Bento Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20">
           {features.map((item, i) => (
             <motion.div
               key={i}
-              whileHover={{ y: -10 }}
-              className="p-8 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 transition-all duration-300 group"
+              whileHover={{ y: -12, borderColor: "var(--accent)" }}
+              className="p-10 rounded-[3rem] border transition-all duration-500 group shadow-2xl"
+              style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
             >
-              <div className={`w-14 h-14 rounded-2xl ${item.bg} border ${item.border} flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform`}>
-                {React.cloneElement(item.icon, { size: 24 })}
+              <div 
+                className={`w-16 h-16 rounded-[1.25rem] border flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-all duration-500 ${item.color}`}
+                style={{ backgroundColor: item.accent, borderColor: "rgba(255,255,255,0.05)" }}
+              >
+                {React.cloneElement(item.icon, { size: 28 })}
               </div>
-              <h4 className="font-black text-xl text-slate-900 mb-3 tracking-tight">{item.title}</h4>
-              <p className="text-sm font-bold text-slate-400 leading-relaxed uppercase tracking-tighter">{item.desc}</p>
+              <h4 className="font-black text-xl mb-3 tracking-tight text-white">{item.title}</h4>
+              <p className="text-xs font-bold leading-relaxed uppercase tracking-widest opacity-50"
+                 style={{ color: "var(--text-secondary)" }}>
+                {item.desc}
+              </p>
             </motion.div>
           ))}
         </div>

@@ -1,122 +1,33 @@
 @import "tailwindcss";
 
-/* =========================
-   GLOBAL BASE STYLES
-   ========================= */
-html, body, #root {
-  height: 100%;
+:root {
+  /* Permanent Dark Theme - Professional Slate */
+  --bg-primary: #020617;     /* Deepest Navy */
+  --bg-card: #0f172a;        /* Slate 900 */
+  --text-primary: #f1f5f9;   /* Slate 100 */
+  --text-secondary: #94a3b8; /* Slate 400 */
+  --border-color: #1e293b;   /* Slate 800 */
+  --accent: #818cf8;         /* Indigo 400 */
 }
 
 body {
-  /* Soft, neutral background instead of pure white to reduce eye strain */
-  background-color: #f8fafc; 
-  color: #0f172a; /* Slate 900 for high readability */
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
 }
 
-/* =========================
-   UI HELPERS - MODERN LIGHT CARDS
-   ========================= */
+/* Reusable card class */
 .card {
-  background-color: #ffffff;
-  /* Very soft shadow to give depth without looking "dirty" */
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0; /* Slate 200 */
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
 }
 
-.card:hover {
-  /* Subtle lift effect and brand-colored border */
-  transform: translateY(-2px);
-  border-color: #6366f1; /* Indigo 500 */
-  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1), 0 4px 6px -2px rgba(99, 102, 241, 0.05);
+@keyframes progressLoad {
+  0% { width: 0%; }
+  100% { width: 100%; }
 }
 
-.card-padding {
-  padding: 1.5rem;
-}
-
-/* =========================
-   ANIMATION
-   ========================= */
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(8px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* =========================
-   SCROLLBAR (LIGHT THEME)
-   ========================= */
-::-webkit-scrollbar { 
-  width: 8px; 
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1; /* Slate 300 */
-  border-radius: 20px;
-  border: 2px solid #f8fafc; /* Match body bg for "floating" effect */
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; /* Slate 400 */
-}
-
-/* =========================
-   LAYOUT UTILITIES
-   ========================= */
-.main-content-area {
-  padding-top: 5rem; /* Space for fixed navbar (h-16 + extra) */
-  min-height: 100vh;
-}
-
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes bounce-slow {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite;
-}
-
-.animate-bounce-slow {
-  animation: bounce-slow 3s ease-in-out infinite;
+.animate-progressLoad {
+  animation: progressLoad linear forwards;
 }

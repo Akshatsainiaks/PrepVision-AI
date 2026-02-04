@@ -173,6 +173,166 @@
 
 // new final
 // src/components/landing/Pricing.jsx
+// import React from "react";
+// import { motion } from "framer-motion";
+// import { FiCheck, FiArrowRight, FiZap, FiStar } from "react-icons/fi";
+
+// export default function Pricing() {
+//   return (
+//     <section
+//       id="pricing"
+//       className="min-h-screen flex items-center justify-center px-6 bg-white py-24 animate-fadeIn"
+//     >
+//       <div className="max-w-7xl w-full mx-auto">
+
+//         {/* Header Section */}
+//         <div className="text-center mb-20">
+//           <span className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-[11px] font-black uppercase tracking-[0.2em] rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+//             <FiZap className="text-sm" />
+//             Flexible Investment
+//           </span>
+
+//           <h3 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+//             Choose the plan <br />
+//             <span className="text-indigo-600">that fits you</span>
+//           </h3>
+
+//           <p className="text-slate-500 mt-6 text-lg font-medium max-w-xl mx-auto leading-relaxed">
+//             Start for free and scale your interview mastery as you grow. No hidden fees, just pure growth.
+//           </p>
+//         </div>
+
+//         {/* Pricing Cards - Crystal Light Aesthetic */}
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+//           {/* FREE PLAN */}
+//           <motion.div
+//             whileHover={{ y: -10 }}
+//             className="p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 flex flex-col group transition-all duration-300 hover:border-slate-300"
+//           >
+//             <div className="mb-8">
+//               <h4 className="text-2xl font-black text-slate-900 mb-1">Free</h4>
+//               <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Trial Account</p>
+//             </div>
+
+//             <div className="flex items-baseline gap-1 mb-8">
+//               <span className="text-5xl font-black text-slate-900 tracking-tighter">₹0</span>
+//               <span className="text-slate-400 font-bold text-sm">/ forever</span>
+//             </div>
+
+//             <ul className="space-y-4 text-slate-600 font-medium text-sm flex-1 mb-10">
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
+//                 10 practice questions / month
+//               </li>
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
+//                 Basic AI evaluation reports
+//               </li>
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
+//                 Community forum access
+//               </li>
+//             </ul>
+
+//             <button className="w-full py-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600 font-black text-sm uppercase tracking-widest hover:bg-slate-100 hover:border-slate-300 transition-all active:scale-95">
+//               Get Started
+//             </button>
+//           </motion.div>
+
+//           {/* PRO PLAN (MOST POPULAR) */}
+//           <motion.div
+//             whileHover={{ y: -12 }}
+//             className="relative p-10 rounded-[2.5rem] bg-indigo-600 text-white shadow-2xl shadow-indigo-200 flex flex-col transform md:scale-105 z-10 overflow-hidden"
+//           >
+//             {/* Background Pattern Decoration */}
+//             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl -mr-16 -mt-16 rounded-full" />
+            
+//             {/* Popular Badge */}
+//             <div className="absolute top-6 right-10 flex items-center gap-1.5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-full bg-white text-indigo-600 shadow-lg">
+//               <FiStar />
+//               Most Popular
+//             </div>
+
+//             <div className="mb-8">
+//               <h4 className="text-2xl font-black text-white mb-1">Pro</h4>
+//               <p className="text-indigo-100 font-bold uppercase tracking-widest text-[10px]">For Career Seekers</p>
+//             </div>
+
+//             <div className="flex items-baseline gap-1 mb-8">
+//               <span className="text-5xl font-black text-white tracking-tighter">₹499</span>
+//               <span className="text-indigo-100 font-bold text-sm">/ month</span>
+//             </div>
+
+//             <ul className="space-y-4 text-indigo-50 font-medium text-sm flex-1 mb-10">
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-white/20 rounded-md border border-white/10"><FiCheck /></div>
+//                 Unlimited interview practice
+//               </li>
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-white/20 rounded-md border border-white/10"><FiCheck /></div>
+//                 Premium Gemini evaluations
+//               </li>
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-white/20 rounded-md border border-white/10"><FiCheck /></div>
+//                 Full personalized roadmaps
+//               </li>
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-white/20 rounded-md border border-white/10"><FiCheck /></div>
+//                 Voice & confidence analysis
+//               </li>
+//             </ul>
+
+//             <button className="w-full py-4 rounded-2xl bg-white text-indigo-600 font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-900/20 hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2">
+//               Start Masterclass <FiArrowRight />
+//             </button>
+//           </motion.div>
+
+//           {/* PREMIUM PLAN */}
+//           <motion.div
+//             whileHover={{ y: -10 }}
+//             className="p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 flex flex-col group transition-all duration-300 hover:border-slate-300"
+//           >
+//             <div className="mb-8">
+//               <h4 className="text-2xl font-black text-slate-900 mb-1">Premium</h4>
+//               <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Enterprise Edition</p>
+//             </div>
+
+//             <div className="flex items-baseline gap-1 mb-8">
+//               <span className="text-5xl font-black text-slate-900 tracking-tighter">Custom</span>
+//             </div>
+
+//             <ul className="space-y-4 text-slate-600 font-medium text-sm flex-1 mb-10">
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
+//                 Multi-user team access
+//               </li>
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
+//                 Custom grading rubrics
+//               </li>
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
+//                 Enterprise analytics & reports
+//               </li>
+//               <li className="flex items-center gap-3">
+//                 <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
+//                 Dedicated account manager
+//               </li>
+//             </ul>
+
+//             <button className="w-full py-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600 font-black text-sm uppercase tracking-widest hover:bg-slate-100 hover:border-slate-300 transition-all active:scale-95">
+//               Contact Sales
+//             </button>
+//           </motion.div>
+
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
+
+//dark mode
 import React from "react";
 import { motion } from "framer-motion";
 import { FiCheck, FiArrowRight, FiZap, FiStar } from "react-icons/fi";
@@ -181,61 +341,76 @@ export default function Pricing() {
   return (
     <section
       id="pricing"
-      className="min-h-screen flex items-center justify-center px-6 bg-white py-24 animate-fadeIn"
+      className="min-h-screen flex items-center justify-center px-6 py-24 transition-colors duration-500"
+      style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}
     >
-      <div className="max-w-7xl w-full mx-auto">
+      <div className="max-w-7xl w-full mx-auto relative">
+        {/* Ambient background glows */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 blur-[120px] -z-10" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 blur-[120px] -z-10" />
 
         {/* Header Section */}
         <div className="text-center mb-20">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-[11px] font-black uppercase tracking-[0.2em] rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+          <motion.span 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border shadow-lg"
+            style={{ 
+              backgroundColor: "rgba(99, 102, 241, 0.1)", 
+              color: "var(--accent)", 
+              borderColor: "rgba(99, 102, 241, 0.2)" 
+            }}
+          >
             <FiZap className="text-sm" />
             Flexible Investment
-          </span>
+          </motion.span>
 
-          <h3 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            Choose the plan <br />
-            <span className="text-indigo-600">that fits you</span>
+          <h3 className="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-6">
+            Choose Your <br />
+            <span style={{ color: "var(--accent)" }}>Career Fuel</span>
           </h3>
 
-          <p className="text-slate-500 mt-6 text-lg font-medium max-w-xl mx-auto leading-relaxed">
-            Start for free and scale your interview mastery as you grow. No hidden fees, just pure growth.
+          <p className="mt-6 text-lg font-medium max-w-xl mx-auto leading-relaxed opacity-70" style={{ color: "var(--text-secondary)" }}>
+            Start for free and scale your interview mastery as you grow. No hidden fees, just pure technical evolution.
           </p>
         </div>
 
-        {/* Pricing Cards - Crystal Light Aesthetic */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Pricing Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
 
           {/* FREE PLAN */}
           <motion.div
-            whileHover={{ y: -10 }}
-            className="p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 flex flex-col group transition-all duration-300 hover:border-slate-300"
+            whileHover={{ y: -8 }}
+            className="p-10 rounded-[3rem] border flex flex-col group transition-all duration-500 shadow-2xl shadow-black/40"
+            style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
           >
             <div className="mb-8">
-              <h4 className="text-2xl font-black text-slate-900 mb-1">Free</h4>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Trial Account</p>
+              <h4 className="text-2xl font-black mb-1">Free</h4>
+              <p className="font-bold uppercase tracking-widest text-[10px] opacity-40">Entry Level</p>
             </div>
 
-            <div className="flex items-baseline gap-1 mb-8">
-              <span className="text-5xl font-black text-slate-900 tracking-tighter">₹0</span>
-              <span className="text-slate-400 font-bold text-sm">/ forever</span>
+            <div className="flex items-baseline gap-1 mb-10">
+              <span className="text-5xl font-black tracking-tighter">₹0</span>
+              <span className="font-bold text-sm opacity-40">/ forever</span>
             </div>
 
-            <ul className="space-y-4 text-slate-600 font-medium text-sm flex-1 mb-10">
+            <ul className="space-y-5 text-sm font-medium flex-1 mb-12">
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
-                10 practice questions / month
+                <FiCheck className="text-emerald-500 shrink-0" />
+                <span style={{ color: "var(--text-secondary)" }}>10 practice questions / month</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
-                Basic AI evaluation reports
+                <FiCheck className="text-emerald-500 shrink-0" />
+                <span style={{ color: "var(--text-secondary)" }}>Basic AI logic reports</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
-                Community forum access
+                <FiCheck className="text-emerald-500 shrink-0" />
+                <span style={{ color: "var(--text-secondary)" }}>Community forum access</span>
               </li>
             </ul>
 
-            <button className="w-full py-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600 font-black text-sm uppercase tracking-widest hover:bg-slate-100 hover:border-slate-300 transition-all active:scale-95">
+            <button className="w-full py-4 rounded-2xl border font-black text-xs uppercase tracking-widest transition-all hover:bg-white/5"
+                    style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}>
               Get Started
             </button>
           </motion.div>
@@ -243,85 +418,88 @@ export default function Pricing() {
           {/* PRO PLAN (MOST POPULAR) */}
           <motion.div
             whileHover={{ y: -12 }}
-            className="relative p-10 rounded-[2.5rem] bg-indigo-600 text-white shadow-2xl shadow-indigo-200 flex flex-col transform md:scale-105 z-10 overflow-hidden"
+            className="relative p-10 rounded-[3.5rem] text-white shadow-[0_30px_60px_-15px_rgba(79,70,229,0.4)] flex flex-col transform md:scale-110 z-10 overflow-hidden"
+            style={{ backgroundColor: "var(--accent)" }}
           >
-            {/* Background Pattern Decoration */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl -mr-16 -mt-16 rounded-full" />
+            {/* Glossy Overlay */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[60px] -mr-32 -mt-32 rounded-full" />
             
             {/* Popular Badge */}
-            <div className="absolute top-6 right-10 flex items-center gap-1.5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-full bg-white text-indigo-600 shadow-lg">
+            <div className="absolute top-6 right-8 flex items-center gap-1.5 px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full bg-white text-indigo-600 shadow-xl">
               <FiStar />
-              Most Popular
+              Recommended
             </div>
 
             <div className="mb-8">
-              <h4 className="text-2xl font-black text-white mb-1">Pro</h4>
-              <p className="text-indigo-100 font-bold uppercase tracking-widest text-[10px]">For Career Seekers</p>
+              <h4 className="text-2xl font-black mb-1">Pro</h4>
+              <p className="font-bold uppercase tracking-widest text-[10px] text-indigo-100">For Active Seekers</p>
             </div>
 
-            <div className="flex items-baseline gap-1 mb-8">
-              <span className="text-5xl font-black text-white tracking-tighter">₹499</span>
+            <div className="flex items-baseline gap-1 mb-10">
+              <span className="text-6xl font-black tracking-tighter">₹499</span>
               <span className="text-indigo-100 font-bold text-sm">/ month</span>
             </div>
 
-            <ul className="space-y-4 text-indigo-50 font-medium text-sm flex-1 mb-10">
+            <ul className="space-y-5 text-indigo-50 font-semibold text-sm flex-1 mb-12">
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-white/20 rounded-md border border-white/10"><FiCheck /></div>
+                <div className="p-1 bg-white/20 rounded-lg"><FiCheck size={14} /></div>
                 Unlimited interview practice
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-white/20 rounded-md border border-white/10"><FiCheck /></div>
-                Premium Gemini evaluations
+                <div className="p-1 bg-white/20 rounded-lg"><FiCheck size={14} /></div>
+                Premium Gemini analysis
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-white/20 rounded-md border border-white/10"><FiCheck /></div>
-                Full personalized roadmaps
+                <div className="p-1 bg-white/20 rounded-lg"><FiCheck size={14} /></div>
+                Dynamic skill roadmaps
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-white/20 rounded-md border border-white/10"><FiCheck /></div>
-                Voice & confidence analysis
+                <div className="p-1 bg-white/20 rounded-lg"><FiCheck size={14} /></div>
+                Real-time voice analysis
               </li>
             </ul>
 
-            <button className="w-full py-4 rounded-2xl bg-white text-indigo-600 font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-900/20 hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2">
+            <button className="w-full py-5 rounded-2xl bg-white text-indigo-600 font-black text-sm uppercase tracking-widest shadow-2xl hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-3">
               Start Masterclass <FiArrowRight />
             </button>
           </motion.div>
 
           {/* PREMIUM PLAN */}
           <motion.div
-            whileHover={{ y: -10 }}
-            className="p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 flex flex-col group transition-all duration-300 hover:border-slate-300"
+            whileHover={{ y: -8 }}
+            className="p-10 rounded-[3rem] border flex flex-col group transition-all duration-500 shadow-2xl shadow-black/40"
+            style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
           >
             <div className="mb-8">
-              <h4 className="text-2xl font-black text-slate-900 mb-1">Premium</h4>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Enterprise Edition</p>
+              <h4 className="text-2xl font-black mb-1">Premium</h4>
+              <p className="font-bold uppercase tracking-widest text-[10px] opacity-40">Enterprise Access</p>
             </div>
 
-            <div className="flex items-baseline gap-1 mb-8">
-              <span className="text-5xl font-black text-slate-900 tracking-tighter">Custom</span>
+            <div className="flex items-baseline gap-1 mb-10 min-h-[60px]">
+              <span className="text-4xl font-black tracking-tighter leading-tight">Custom Quota</span>
             </div>
 
-            <ul className="space-y-4 text-slate-600 font-medium text-sm flex-1 mb-10">
+            <ul className="space-y-5 text-sm font-medium flex-1 mb-12">
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
-                Multi-user team access
+                <FiCheck className="text-emerald-500 shrink-0" />
+                <span style={{ color: "var(--text-secondary)" }}>Multi-user team dashboard</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
-                Custom grading rubrics
+                <FiCheck className="text-emerald-500 shrink-0" />
+                <span style={{ color: "var(--text-secondary)" }}>Custom grading rubrics</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
-                Enterprise analytics & reports
+                <FiCheck className="text-emerald-500 shrink-0" />
+                <span style={{ color: "var(--text-secondary)" }}>Advanced hiring analytics</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100"><FiCheck /></div>
-                Dedicated account manager
+                <FiCheck className="text-emerald-500 shrink-0" />
+                <span style={{ color: "var(--text-secondary)" }}>Priority 1:1 support</span>
               </li>
             </ul>
 
-            <button className="w-full py-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600 font-black text-sm uppercase tracking-widest hover:bg-slate-100 hover:border-slate-300 transition-all active:scale-95">
+            <button className="w-full py-4 rounded-2xl border font-black text-xs uppercase tracking-widest transition-all hover:bg-white/5"
+                    style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}>
               Contact Sales
             </button>
           </motion.div>

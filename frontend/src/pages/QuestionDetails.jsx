@@ -137,6 +137,168 @@
 
 //new final
 
+// import { useParams } from "react-router-dom";
+// import { useQuery, useMutation } from "@tanstack/react-query";
+// import API from "../api/api";
+// import React from "react";
+// import { FiThumbsUp, FiCpu, FiUser, FiBarChart2, FiLoader, FiCheckCircle } from "react-icons/fi";
+
+// export default function QuestionDetails() {
+//   const { id } = useParams();
+
+//   const { data, isLoading, refetch } = useQuery({
+//     queryKey: ["question", id],
+//     queryFn: async () => {
+//       const res = await API.get(`/questions/${id}`);
+//       return res.data;
+//     }
+//   });
+
+//   const upvoteMutation = useMutation({
+//     mutationFn: async () => {
+//       await API.post(`/questions/${id}/upvote`);
+//     },
+//     onSuccess: refetch
+//   });
+
+//   const aiMutation = useMutation({
+//     mutationFn: async () => {
+//       const res = await API.post(`/questions/${id}/ai-answer`);
+//       return res.data;
+//     }
+//   });
+
+//   if (isLoading) {
+//     return (
+//       <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fadeIn">
+//         <FiLoader className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
+//         <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading Question...</p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn pb-12">
+      
+//       {/* HEADER SECTION */}
+//       <header>
+//         <div className="flex items-center gap-2 mb-3">
+//           <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-100">
+//             {data.type}
+//           </span>
+//           <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${
+//             data.difficulty?.toLowerCase() === 'hard' 
+//             ? 'bg-rose-50 text-rose-600 border-rose-100' 
+//             : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+//           }`}>
+//             {data.difficulty}
+//           </span>
+//         </div>
+        
+//         <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+//           {data.company} <span className="text-slate-400 font-light">Interview</span>
+//         </h1>
+        
+//         <div className="flex flex-wrap items-center gap-6 mt-4 text-sm font-bold text-slate-500">
+//           <div className="flex items-center gap-2">
+//             <FiBarChart2 className="text-indigo-500" />
+//             <span>Role: <span className="text-slate-900">{data.role}</span></span>
+//           </div>
+//           <div className="flex items-center gap-2">
+//             <FiUser className="text-indigo-500" />
+//             <span>Added by: <span className="text-slate-900">{data.addedBy?.name || "Community"}</span></span>
+//           </div>
+//           <div className="flex items-center gap-2">
+//             <FiThumbsUp className="text-indigo-500" />
+//             <span>{data.upvotes} <span className="text-slate-400">Upvotes</span></span>
+//           </div>
+//         </div>
+//       </header>
+
+//       {/* QUESTION CARD */}
+//       <section className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xl shadow-indigo-100/20 relative overflow-hidden">
+//         <div className="absolute top-0 left-0 w-2 h-full bg-indigo-600"></div>
+//         <p className="text-xl leading-relaxed text-slate-700 font-medium">
+//           {data.question}
+//         </p>
+//       </section>
+
+//       {/* ACTION BUTTONS */}
+//       <section className="flex flex-wrap gap-4">
+//         <button
+//           onClick={() => upvoteMutation.mutate()}
+//           disabled={upvoteMutation.isLoading}
+//           className="flex items-center gap-2 px-6 py-3 rounded-2xl
+//           bg-white border border-slate-200 text-slate-700 font-bold
+//           hover:bg-slate-50 hover:border-indigo-300 hover:text-indigo-600 transition-all
+//           disabled:opacity-50 shadow-sm active:scale-95"
+//         >
+//           <FiThumbsUp />
+//           Upvote
+//         </button>
+
+//         <button
+//           onClick={() => aiMutation.mutate()}
+//           disabled={aiMutation.isLoading}
+//           className="flex items-center gap-2 px-6 py-3 rounded-2xl
+//           bg-indigo-600 text-white font-bold
+//           hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all
+//           disabled:opacity-50 active:scale-95"
+//         >
+//           {aiMutation.isLoading ? (
+//             <>
+//               <FiLoader className="animate-spin" />
+//               Thinking...
+//             </>
+//           ) : (
+//             <>
+//               <FiCpu />
+//               Get AI Answer
+//             </>
+//           )}
+//         </button>
+//       </section>
+
+//       {/* AI ANSWER SECTION */}
+//       {aiMutation.data && (
+//         <section className="rounded-3xl border border-indigo-100 bg-white shadow-2xl shadow-indigo-100/50 overflow-hidden animate-fadeIn">
+//           <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+//             <div className="flex items-center gap-3">
+//               <div className="p-2 bg-indigo-600 rounded-xl text-white">
+//                 <FiCpu size={20} />
+//               </div>
+//               <h3 className="text-xl font-black text-slate-900">
+//                 AI <span className="text-indigo-600">Response</span>
+//               </h3>
+//             </div>
+//             {aiMutation.data.cached && (
+//               <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-[10px] font-black uppercase tracking-widest">
+//                 <FiCheckCircle />
+//                 Cached
+//               </div>
+//             )}
+//           </div>
+
+//           <div className="p-8">
+//             <div className="prose prose-slate max-w-none">
+//               <pre className="whitespace-pre-wrap text-slate-700 leading-relaxed font-sans text-base">
+//                 {aiMutation.data.answer}
+//               </pre>
+//             </div>
+
+//             {aiMutation.data.cached && (
+//               <p className="mt-6 text-xs text-slate-400 font-bold italic">
+//                 * This response was previously generated and did not consume extra credits.
+//               </p>
+//             )}
+//           </div>
+//         </section>
+//       )}
+//     </div>
+//   );
+// }
+
+//dark mode
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import API from "../api/api";
@@ -171,54 +333,56 @@ export default function QuestionDetails() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fadeIn">
-        <FiLoader className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading Question...</p>
+        <FiLoader className="w-10 h-10 animate-spin mb-4" style={{ color: "var(--accent)" }} />
+        <p className="font-bold uppercase tracking-widest text-xs" style={{ color: "var(--text-secondary)" }}>Loading Question...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn pb-12">
+    <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn pb-12 transition-colors duration-300">
       
       {/* HEADER SECTION */}
       <header>
         <div className="flex items-center gap-2 mb-3">
-          <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-100">
+          <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border"
+                style={{ backgroundColor: "rgba(129, 140, 248, 0.1)", color: "var(--accent)", borderColor: "rgba(129, 140, 248, 0.2)" }}>
             {data.type}
           </span>
           <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${
             data.difficulty?.toLowerCase() === 'hard' 
-            ? 'bg-rose-50 text-rose-600 border-rose-100' 
-            : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+            ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' 
+            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
           }`}>
             {data.difficulty}
           </span>
         </div>
         
-        <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-          {data.company} <span className="text-slate-400 font-light">Interview</span>
+        <h1 className="text-4xl lg:text-5xl font-black tracking-tight leading-tight" style={{ color: "var(--text-primary)" }}>
+          {data.company} <span className="font-light opacity-40">Interview</span>
         </h1>
         
-        <div className="flex flex-wrap items-center gap-6 mt-4 text-sm font-bold text-slate-500">
+        <div className="flex flex-wrap items-center gap-6 mt-4 text-sm font-bold" style={{ color: "var(--text-secondary)" }}>
           <div className="flex items-center gap-2">
-            <FiBarChart2 className="text-indigo-500" />
-            <span>Role: <span className="text-slate-900">{data.role}</span></span>
+            <FiBarChart2 style={{ color: "var(--accent)" }} />
+            <span>Role: <span style={{ color: "var(--text-primary)" }}>{data.role}</span></span>
           </div>
           <div className="flex items-center gap-2">
-            <FiUser className="text-indigo-500" />
-            <span>Added by: <span className="text-slate-900">{data.addedBy?.name || "Community"}</span></span>
+            <FiUser style={{ color: "var(--accent)" }} />
+            <span>Added by: <span style={{ color: "var(--text-primary)" }}>{data.addedBy?.name || "Community"}</span></span>
           </div>
           <div className="flex items-center gap-2">
-            <FiThumbsUp className="text-indigo-500" />
-            <span>{data.upvotes} <span className="text-slate-400">Upvotes</span></span>
+            <FiThumbsUp style={{ color: "var(--accent)" }} />
+            <span>{data.upvotes} <span className="opacity-50">Upvotes</span></span>
           </div>
         </div>
       </header>
 
       {/* QUESTION CARD */}
-      <section className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xl shadow-indigo-100/20 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-2 h-full bg-indigo-600"></div>
-        <p className="text-xl leading-relaxed text-slate-700 font-medium">
+      <section className="card p-8 relative overflow-hidden shadow-2xl shadow-black/20" 
+               style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+        <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: "var(--accent)" }}></div>
+        <p className="text-xl leading-relaxed font-medium" style={{ color: "var(--text-primary)" }}>
           {data.question}
         </p>
       </section>
@@ -228,10 +392,8 @@ export default function QuestionDetails() {
         <button
           onClick={() => upvoteMutation.mutate()}
           disabled={upvoteMutation.isLoading}
-          className="flex items-center gap-2 px-6 py-3 rounded-2xl
-          bg-white border border-slate-200 text-slate-700 font-bold
-          hover:bg-slate-50 hover:border-indigo-300 hover:text-indigo-600 transition-all
-          disabled:opacity-50 shadow-sm active:scale-95"
+          className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all border active:scale-95 disabled:opacity-50"
+          style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
         >
           <FiThumbsUp />
           Upvote
@@ -240,10 +402,8 @@ export default function QuestionDetails() {
         <button
           onClick={() => aiMutation.mutate()}
           disabled={aiMutation.isLoading}
-          className="flex items-center gap-2 px-6 py-3 rounded-2xl
-          bg-indigo-600 text-white font-bold
-          hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all
-          disabled:opacity-50 active:scale-95"
+          className="flex items-center gap-2 px-6 py-3 rounded-2xl text-white font-black shadow-lg shadow-indigo-500/10 transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
+          style={{ backgroundColor: "var(--accent)" }}
         >
           {aiMutation.isLoading ? (
             <>
@@ -261,18 +421,21 @@ export default function QuestionDetails() {
 
       {/* AI ANSWER SECTION */}
       {aiMutation.data && (
-        <section className="rounded-3xl border border-indigo-100 bg-white shadow-2xl shadow-indigo-100/50 overflow-hidden animate-fadeIn">
-          <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+        <section className="card rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/40 animate-fadeIn border"
+                 style={{ backgroundColor: "var(--bg-card)", borderColor: "rgba(129, 140, 248, 0.2)" }}>
+          <div className="px-8 py-5 flex items-center justify-between border-b" 
+               style={{ backgroundColor: "rgba(255, 255, 255, 0.02)", borderColor: "var(--border-color)" }}>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-600 rounded-xl text-white">
+              <div className="p-2 rounded-xl text-white shadow-lg shadow-indigo-500/20" style={{ backgroundColor: "var(--accent)" }}>
                 <FiCpu size={20} />
               </div>
-              <h3 className="text-xl font-black text-slate-900">
-                AI <span className="text-indigo-600">Response</span>
+              <h3 className="text-xl font-black" style={{ color: "var(--text-primary)" }}>
+                AI <span style={{ color: "var(--accent)" }}>Response</span>
               </h3>
             </div>
             {aiMutation.data.cached && (
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-[10px] font-black uppercase tracking-widest">
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest"
+                   style={{ backgroundColor: "rgba(16, 185, 129, 0.1)", color: "#10b981", borderColor: "rgba(16, 185, 129, 0.2)" }}>
                 <FiCheckCircle />
                 Cached
               </div>
@@ -280,14 +443,14 @@ export default function QuestionDetails() {
           </div>
 
           <div className="p-8">
-            <div className="prose prose-slate max-w-none">
-              <pre className="whitespace-pre-wrap text-slate-700 leading-relaxed font-sans text-base">
+            <div className="prose prose-invert max-w-none">
+              <pre className="whitespace-pre-wrap leading-relaxed font-sans text-base" style={{ color: "var(--text-secondary)" }}>
                 {aiMutation.data.answer}
               </pre>
             </div>
 
             {aiMutation.data.cached && (
-              <p className="mt-6 text-xs text-slate-400 font-bold italic">
+              <p className="mt-6 text-xs font-bold italic opacity-40" style={{ color: "var(--text-secondary)" }}>
                 * This response was previously generated and did not consume extra credits.
               </p>
             )}

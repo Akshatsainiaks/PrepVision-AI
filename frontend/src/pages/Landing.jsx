@@ -608,6 +608,151 @@
 // }
 
 // src/pages/Landing.jsx
+// import React, { useEffect } from "react";
+// import { Link, useNavigate } from "react-router-dom";
+// import LandingNavbar from "../components/LandingNavbar";
+// import { motion } from "framer-motion";
+// import { FiArrowRight, FiPlay } from "react-icons/fi";
+
+// // landing sections
+// import AboutUs from "../components/landing/AboutUs";
+// import Features from "../components/landing/Features";
+// import HowItWorks from "../components/landing/HowItWorks";
+// import Testimonials from "../components/landing/Testimonials";
+// import Pricing from "../components/landing/Pricing";
+// import VideoDemo from "../components/landing/VideoDemo";
+// import FAQ from "../components/landing/FAQ";
+// import Footer from "../components/landing/Footer";
+
+// export default function Landing() {
+//   const navigate = useNavigate();
+
+//   // FIX: Force a global style reset to purge dashboard "dark-mode" remnants
+//   useEffect(() => {
+//     // Explicitly override body styles that might persist from the dashboard
+//     document.body.style.backgroundColor = "#ffffff";
+//     document.body.className = "bg-white antialiased";
+    
+//     // Cleanup on unmount if navigating back to dashboard
+//     return () => {
+//       document.body.style.backgroundColor = "";
+//     };
+//   }, []);
+
+//   const handleStartExplore = () => {
+//     const token = localStorage.getItem("token");
+//     token ? navigate("/dashboard") : navigate("/login");
+//   };
+
+//   return (
+//     /**
+//      * MAIN WRAPPER - Forced high-contrast Crystal Light theme
+//      * explicitly declared to prevent background bleed from dashboard states.
+//      */
+//     <div className="relative min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
+      
+//       {/* NAVBAR */}
+//       <LandingNavbar />
+
+//       {/* ================= HERO SECTION ================= */}
+//       {/* Increased padding-top (pt-32) and bg-white ensures visibility against light navbar */}
+//       <section className="min-h-[90vh] relative flex flex-col items-center justify-center text-center px-6 bg-white overflow-hidden pt-32">
+        
+//         {/* Background Decorative Blurs - Refined opacity for light mode */}
+//         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none -z-10">
+//           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-50/60 blur-[120px] rounded-full" />
+//           <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-blue-50/40 blur-[100px] rounded-full" />
+//         </div>
+
+//         <div className="relative z-10 max-w-5xl mx-auto">
+//           {/* Main Heading: High-contrast Slate-900 */}
+//           <motion.h1 
+//             initial={{ opacity: 0, y: 20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+//             className="text-6xl md:text-[5.5rem] font-black tracking-tight text-slate-900 leading-[1.05]"
+//           >
+//             Ace Your Interviews <br />
+//             <span className="text-indigo-600">with Real-time AI</span>
+//           </motion.h1>
+
+//           <motion.p 
+//             initial={{ opacity: 0, y: 20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+//             className="text-slate-500 max-w-2xl mx-auto mt-10 text-lg md:text-xl font-medium leading-relaxed"
+//           >
+//             Real-time AI interviews, instant feedback, voice analysis & personalized 
+//             improvement plans designed to land you the job.
+//           </motion.p>
+
+//           <motion.div 
+//             initial={{ opacity: 0, y: 20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+//             className="flex flex-col sm:flex-row justify-center items-center gap-5 mt-14"
+//           >
+//             <button
+//               onClick={handleStartExplore}
+//               className="group flex items-center gap-3 px-10 py-5 rounded-[2rem] bg-indigo-600 text-white font-black text-lg shadow-2xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95"
+//             >
+//               Start Exploring
+//               <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+//             </button>
+
+//             <Link
+//               to="/register"
+//               className="flex items-center gap-3 px-10 py-5 rounded-[2rem] bg-white border-2 border-slate-100 text-slate-700 font-black text-lg hover:bg-slate-50 transition-all shadow-sm"
+//             >
+//               <FiPlay className="text-indigo-600" />
+//               Watch Demo
+//             </Link>
+//           </motion.div>
+//         </div>
+//       </section>
+
+//       {/* ================= CONTENT MAIN ================= 
+//           Wrapping sections in a solid bg-white main container to prevent "half-and-half" gaps 
+//       */}
+//       <main className="bg-white">
+//         <section id="about" className="py-24">
+//           <AboutUs />
+//         </section>
+
+//         <section id="features" className="py-24">
+//           <Features />
+//         </section>
+
+//         <section className="py-24 bg-white">
+//           <HowItWorks />
+//         </section>
+
+//         {/* Subtle section tint for visual separation without breaking Crystal Light theme */}
+//         <section className="py-24 bg-slate-50/50">
+//           <Testimonials />
+//         </section>
+
+//         <section id="pricing" className="py-24">
+//           <Pricing />
+//         </section>
+
+//         <section className="py-24 bg-white">
+//           <VideoDemo />
+//         </section>
+
+//         <section className="py-24">
+//           <FAQ />
+//         </section>
+//       </main>
+
+//       {/* ================= FOOTER ================= */}
+//       <Footer />
+//     </div>
+//   );
+// }
+
+
+//dark mode
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LandingNavbar from "../components/LandingNavbar";
@@ -627,13 +772,11 @@ import Footer from "../components/landing/Footer";
 export default function Landing() {
   const navigate = useNavigate();
 
-  // FIX: Force a global style reset to purge dashboard "dark-mode" remnants
+  // Updated to ensure the body stays dark for the whole project
   useEffect(() => {
-    // Explicitly override body styles that might persist from the dashboard
-    document.body.style.backgroundColor = "#ffffff";
-    document.body.className = "bg-white antialiased";
+    document.body.style.backgroundColor = "var(--bg-primary)";
+    document.body.className = "antialiased selection:bg-indigo-500/30";
     
-    // Cleanup on unmount if navigating back to dashboard
     return () => {
       document.body.style.backgroundColor = "";
     };
@@ -645,45 +788,54 @@ export default function Landing() {
   };
 
   return (
-    /**
-     * MAIN WRAPPER - Forced high-contrast Crystal Light theme
-     * explicitly declared to prevent background bleed from dashboard states.
-     */
-    <div className="relative min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
+    <div className="relative min-h-screen font-sans overflow-x-hidden transition-colors duration-500" 
+         style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
       
       {/* NAVBAR */}
       <LandingNavbar />
 
       {/* ================= HERO SECTION ================= */}
-      {/* Increased padding-top (pt-32) and bg-white ensures visibility against light navbar */}
-      <section className="min-h-[90vh] relative flex flex-col items-center justify-center text-center px-6 bg-white overflow-hidden pt-32">
+      <section className="min-h-[95vh] relative flex flex-col items-center justify-center text-center px-6 overflow-hidden pt-32">
         
-        {/* Background Decorative Blurs - Refined opacity for light mode */}
+        {/* Background Decorative Blurs - Optimized for Dark UI */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-50/60 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-blue-50/40 blur-[100px] rounded-full" />
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[140px] rounded-full" />
+          <div className="absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto">
-          {/* Main Heading: High-contrast Slate-900 */}
+        <div className="relative z-10 max-w-6xl mx-auto">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-indigo-400 text-xs font-bold uppercase tracking-widest mb-8"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </span>
+            Next-Gen AI Interview Prep
+          </motion.div>
+
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-6xl md:text-[5.5rem] font-black tracking-tight text-slate-900 leading-[1.05]"
+            className="text-6xl md:text-[6.5rem] font-black tracking-tighter leading-[0.95] text-[var(--text-primary)]"
           >
             Ace Your Interviews <br />
-            <span className="text-indigo-600">with Real-time AI</span>
+            <span style={{ color: "var(--accent)" }}>with Real-time AI</span>
           </motion.h1>
 
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-slate-500 max-w-2xl mx-auto mt-10 text-lg md:text-xl font-medium leading-relaxed"
+            className="max-w-2xl mx-auto mt-10 text-lg md:text-xl font-medium leading-relaxed"
+            style={{ color: "var(--text-secondary)" }}
           >
-            Real-time AI interviews, instant feedback, voice analysis & personalized 
-            improvement plans designed to land you the job.
+            Simulate real pressure, receive instant feedback, and refine your voice analysis with the 
+            AI-driven prep tool designed to land you at your dream company.
           </motion.p>
 
           <motion.div 
@@ -694,55 +846,63 @@ export default function Landing() {
           >
             <button
               onClick={handleStartExplore}
-              className="group flex items-center gap-3 px-10 py-5 rounded-[2rem] bg-indigo-600 text-white font-black text-lg shadow-2xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95"
+              className="group flex items-center gap-3 px-10 py-5 rounded-2xl text-white font-black text-lg transition-all active:scale-95 shadow-2xl shadow-indigo-500/20"
+              style={{ backgroundColor: "var(--accent)" }}
             >
-              Start Exploring
+              Get Started Now
               <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>
 
             <Link
               to="/register"
-              className="flex items-center gap-3 px-10 py-5 rounded-[2rem] bg-white border-2 border-slate-100 text-slate-700 font-black text-lg hover:bg-slate-50 transition-all shadow-sm"
+              className="flex items-center gap-3 px-10 py-5 rounded-2xl border font-black text-lg transition-all shadow-lg"
+              style={{ 
+                backgroundColor: "var(--bg-card)", 
+                borderColor: "var(--border-color)",
+                color: "var(--text-primary)" 
+              }}
             >
-              <FiPlay className="text-indigo-600" />
+              <FiPlay style={{ color: "var(--accent)" }} />
               Watch Demo
             </Link>
           </motion.div>
         </div>
       </section>
 
-      {/* ================= CONTENT MAIN ================= 
-          Wrapping sections in a solid bg-white main container to prevent "half-and-half" gaps 
-      */}
-      <main className="bg-white">
-        <section id="about" className="py-24">
-          <AboutUs />
-        </section>
+      {/* ================= CONTENT MAIN ================= */}
+      <main>
+        <div className="space-y-32 pb-32">
+          <section id="about">
+            <AboutUs />
+          </section>
 
-        <section id="features" className="py-24">
-          <Features />
-        </section>
+          <section id="features" className="relative">
+             {/* Section glow */}
+            <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-600/5 blur-[120px] -z-10" />
+            <Features />
+          </section>
 
-        <section className="py-24 bg-white">
-          <HowItWorks />
-        </section>
+          <section>
+            <HowItWorks />
+          </section>
 
-        {/* Subtle section tint for visual separation without breaking Crystal Light theme */}
-        <section className="py-24 bg-slate-50/50">
-          <Testimonials />
-        </section>
+          <section className="py-24 rounded-[4rem] border-y" 
+                   style={{ backgroundColor: "rgba(15, 23, 42, 0.3)", borderColor: "var(--border-color)" }}>
+            <Testimonials />
+          </section>
 
-        <section id="pricing" className="py-24">
-          <Pricing />
-        </section>
+          <section id="pricing">
+            <Pricing />
+          </section>
 
-        <section className="py-24 bg-white">
-          <VideoDemo />
-        </section>
+          <section>
+            <VideoDemo />
+          </section>
 
-        <section className="py-24">
-          <FAQ />
-        </section>
+          <section>
+            <FAQ />
+          </section>
+        </div>
       </main>
 
       {/* ================= FOOTER ================= */}

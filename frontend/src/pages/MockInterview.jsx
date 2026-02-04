@@ -272,6 +272,142 @@
 
 //new final
 
+// import React from "react";
+// import { useNavigate } from "react-router-dom";
+// import { FaKeyboard, FaVideo } from "react-icons/fa";
+// import { motion } from "framer-motion";
+// import API from "../api/api";
+// import { FiCheckCircle, FiInfo } from "react-icons/fi";
+
+// export default function MockInterviewHome() {
+//   const navigate = useNavigate();
+
+//   const startLiveInterview = async () => {
+//     try {
+//       const res = await API.post("/live-interview/start", {
+//         topic: "General",
+//         role: "SDE",
+//       });
+
+//       navigate(`/mock/live/session/${res.data._id}`);
+//     } catch (err) {
+//       alert("Failed to start live interview");
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 px-6 py-12 animate-fadeIn">
+//       <div className="max-w-5xl mx-auto">
+
+//         {/* TITLE SECTION */}
+//         <div className="text-center mb-16">
+//           <motion.h1
+//             initial={{ opacity: 0, y: -20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             className="text-5xl md:text-6xl font-black tracking-tight text-slate-900"
+//           >
+//             Mock <span className="text-indigo-600">Interview</span>
+//           </motion.h1>
+
+//           <p className="text-slate-500 mt-6 text-lg max-w-2xl mx-auto font-medium">
+//             Master your delivery with AI-powered simulations. 
+//             Choose the style that fits your current goals.
+//           </p>
+//         </div>
+
+//         {/* INTERVIEW MODE CARDS */}
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+
+//           {/* WRITTEN INTERVIEW */}
+//           <motion.div
+//             whileHover={{ y: -8, scale: 1.01 }}
+//             whileTap={{ scale: 0.98 }}
+//             onClick={() => navigate("/mock/written")}
+//             className="group cursor-pointer relative p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 hover:border-purple-300 hover:shadow-purple-100 transition-all duration-300"
+//           >
+//             <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-8 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+//               <FaKeyboard size={30} className="text-purple-600 group-hover:text-white" />
+//             </div>
+
+//             <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+//               Written <br /> Interview
+//             </h2>
+
+//             <p className="text-slate-500 mt-4 font-medium leading-relaxed">
+//               Perfect your technical articulation. Type your answers and let AI evaluate your logic and depth.
+//             </p>
+
+//             <div className="mt-8 space-y-3">
+//               {[
+//                 "Topic-based questions",
+//                 "Logical evaluation",
+//                 "Detailed feedback report"
+//               ].map((item) => (
+//                 <div key={item} className="flex items-center gap-3 text-slate-600 font-bold text-sm">
+//                   <FiCheckCircle className="text-purple-500" />
+//                   {item}
+//                 </div>
+//               ))}
+//             </div>
+
+//             <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full bg-purple-50 text-purple-600 border border-purple-100">
+//               Beginner Friendly
+//             </span>
+//           </motion.div>
+
+//           {/* LIVE AI INTERVIEW */}
+//           <motion.div
+//             whileHover={{ y: -8, scale: 1.01 }}
+//             whileTap={{ scale: 0.98 }}
+//             onClick={startLiveInterview}
+//             className="group cursor-pointer relative p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 hover:border-indigo-300 hover:shadow-indigo-100 transition-all duration-300"
+//           >
+//             <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+//               <FaVideo size={30} className="text-indigo-600 group-hover:text-white" />
+//             </div>
+
+//             <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+//               Live AI <br /> Interview
+//             </h2>
+
+//             <p className="text-slate-500 mt-4 font-medium leading-relaxed">
+//               The ultimate simulation. Practice with camera, mic, and real-time AI voice interaction.
+//             </p>
+
+//             <div className="mt-8 space-y-3">
+//               {[
+//                 "Voice-based interaction",
+//                 "Gesture & Eye-contact feedback",
+//                 "Advanced confidence analysis"
+//               ].map((item) => (
+//                 <div key={item} className="flex items-center gap-3 text-slate-600 font-bold text-sm">
+//                   <FiCheckCircle className="text-indigo-500" />
+//                   {item}
+//                 </div>
+//               ))}
+//             </div>
+
+//             <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-100">
+//               ⭐ Recommended
+//             </span>
+//           </motion.div>
+
+//         </div>
+
+//         {/* FOOTER NOTE */}
+//         <div className="mt-16 flex items-center justify-center gap-3 text-slate-400 bg-white/50 border border-slate-100 py-3 px-6 rounded-2xl max-w-fit mx-auto shadow-sm">
+//           <FiInfo className="text-indigo-500" />
+//           <p className="text-sm font-bold uppercase tracking-tight">
+//             Live interview requires camera & microphone access
+//           </p>
+//         </div>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+//dark mode
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaKeyboard, FaVideo } from "react-icons/fa";
@@ -288,7 +424,6 @@ export default function MockInterviewHome() {
         topic: "General",
         role: "SDE",
       });
-
       navigate(`/mock/live/session/${res.data._id}`);
     } catch (err) {
       alert("Failed to start live interview");
@@ -296,20 +431,24 @@ export default function MockInterviewHome() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 px-6 py-12 animate-fadeIn">
+    <div className="min-h-screen px-6 py-12 animate-fadeIn transition-colors duration-500"
+         style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
       <div className="max-w-5xl mx-auto">
 
         {/* TITLE SECTION */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 relative">
+          {/* Subtle background glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-indigo-500/10 blur-[100px] -z-10" />
+          
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-black tracking-tight text-slate-900"
+            className="text-5xl md:text-6xl font-black tracking-tighter"
           >
-            Mock <span className="text-indigo-600">Interview</span>
+            Mock <span style={{ color: "var(--accent)" }}>Interview</span>
           </motion.h1>
 
-          <p className="text-slate-500 mt-6 text-lg max-w-2xl mx-auto font-medium">
+          <p className="mt-6 text-lg max-w-2xl mx-auto font-medium" style={{ color: "var(--text-secondary)" }}>
             Master your delivery with AI-powered simulations. 
             Choose the style that fits your current goals.
           </p>
@@ -323,17 +462,19 @@ export default function MockInterviewHome() {
             whileHover={{ y: -8, scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate("/mock/written")}
-            className="group cursor-pointer relative p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 hover:border-purple-300 hover:shadow-purple-100 transition-all duration-300"
+            className="group cursor-pointer relative p-10 rounded-[2.5rem] border transition-all duration-300 shadow-2xl"
+            style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
           >
-            <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-8 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
-              <FaKeyboard size={30} className="text-purple-600 group-hover:text-white" />
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-300 border"
+                 style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)", color: "#a855f7" }}>
+              <FaKeyboard size={30} className="group-hover:scale-110 transition-transform" />
             </div>
 
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
               Written <br /> Interview
             </h2>
 
-            <p className="text-slate-500 mt-4 font-medium leading-relaxed">
+            <p className="mt-4 font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               Perfect your technical articulation. Type your answers and let AI evaluate your logic and depth.
             </p>
 
@@ -343,14 +484,15 @@ export default function MockInterviewHome() {
                 "Logical evaluation",
                 "Detailed feedback report"
               ].map((item) => (
-                <div key={item} className="flex items-center gap-3 text-slate-600 font-bold text-sm">
-                  <FiCheckCircle className="text-purple-500" />
+                <div key={item} className="flex items-center gap-3 font-bold text-sm">
+                  <FiCheckCircle style={{ color: "#a855f7" }} />
                   {item}
                 </div>
               ))}
             </div>
 
-            <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full bg-purple-50 text-purple-600 border border-purple-100">
+            <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border"
+                  style={{ backgroundColor: "rgba(168, 85, 247, 0.1)", color: "#a855f7", borderColor: "rgba(168, 85, 247, 0.2)" }}>
               Beginner Friendly
             </span>
           </motion.div>
@@ -360,17 +502,23 @@ export default function MockInterviewHome() {
             whileHover={{ y: -8, scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             onClick={startLiveInterview}
-            className="group cursor-pointer relative p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/40 hover:border-indigo-300 hover:shadow-indigo-100 transition-all duration-300"
+            className="group cursor-pointer relative p-10 rounded-[2.5rem] border transition-all duration-300 shadow-2xl"
+            style={{ 
+                backgroundColor: "var(--bg-card)", 
+                borderColor: "var(--accent)", // Highlighted border for recommendation
+                boxShadow: "0 20px 40px -15px rgba(99, 102, 241, 0.15)"
+            }}
           >
-            <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-              <FaVideo size={30} className="text-indigo-600 group-hover:text-white" />
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 text-white transition-all duration-300 shadow-lg"
+                 style={{ backgroundColor: "var(--accent)", boxShadow: "0 10px 20px -5px rgba(99, 102, 241, 0.4)" }}>
+              <FaVideo size={30} className="group-hover:rotate-6 transition-transform" />
             </div>
 
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
               Live AI <br /> Interview
             </h2>
 
-            <p className="text-slate-500 mt-4 font-medium leading-relaxed">
+            <p className="mt-4 font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               The ultimate simulation. Practice with camera, mic, and real-time AI voice interaction.
             </p>
 
@@ -380,14 +528,15 @@ export default function MockInterviewHome() {
                 "Gesture & Eye-contact feedback",
                 "Advanced confidence analysis"
               ].map((item) => (
-                <div key={item} className="flex items-center gap-3 text-slate-600 font-bold text-sm">
-                  <FiCheckCircle className="text-indigo-500" />
+                <div key={item} className="flex items-center gap-3 font-bold text-sm">
+                  <FiCheckCircle style={{ color: "var(--accent)" }} />
                   {item}
                 </div>
               ))}
             </div>
 
-            <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-100">
+            <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full text-white shadow-lg"
+                  style={{ backgroundColor: "var(--accent)" }}>
               ⭐ Recommended
             </span>
           </motion.div>
@@ -395,8 +544,9 @@ export default function MockInterviewHome() {
         </div>
 
         {/* FOOTER NOTE */}
-        <div className="mt-16 flex items-center justify-center gap-3 text-slate-400 bg-white/50 border border-slate-100 py-3 px-6 rounded-2xl max-w-fit mx-auto shadow-sm">
-          <FiInfo className="text-indigo-500" />
+        <div className="mt-16 flex items-center justify-center gap-3 py-3 px-6 rounded-2xl max-w-fit mx-auto shadow-sm border"
+             style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
+          <FiInfo style={{ color: "var(--accent)" }} />
           <p className="text-sm font-bold uppercase tracking-tight">
             Live interview requires camera & microphone access
           </p>

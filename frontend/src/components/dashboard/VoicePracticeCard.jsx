@@ -221,6 +221,137 @@
 // }
 
 //new final
+// import React, { useState } from "react";
+// import { FaMicrophone, FaStop, FaWaveSquare } from "react-icons/fa";
+
+// export default function VoicePracticeCard() {
+//   const [recording, setRecording] = useState(false);
+//   const [transcript, setTranscript] = useState("");
+
+//   let mediaRecorder;
+//   let audioChunks = [];
+
+//   const startRecording = async () => {
+//     try {
+//       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+//       mediaRecorder = new MediaRecorder(stream);
+//       audioChunks = [];
+//       mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+//       mediaRecorder.onstop = async () => {
+//         const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+//         const reader = new FileReader();
+//         reader.onload = () => {
+//           setTranscript("🎤 Voice captured! AI is processing your tone and clarity...");
+//         };
+//         reader.readAsArrayBuffer(audioBlob);
+//       };
+//       mediaRecorder.start();
+//       setRecording(true);
+//     } catch (err) {
+//       console.error("Mic error:", err);
+//       alert("Microphone access is required for voice practice.");
+//     }
+//   };
+
+//   const stopRecording = () => {
+//     if (mediaRecorder) {
+//       mediaRecorder.stop();
+//     }
+//     setRecording(false);
+//   };
+
+//   return (
+//     <div className="relative mt-8 p-8 rounded-3xl bg-white border border-slate-200 shadow-xl shadow-indigo-100/40 transition-all duration-500 hover:border-indigo-300">
+      
+//       {/* Decorative Light Glow */}
+//       <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full blur-[100px] transition-colors duration-1000 ${recording ? 'bg-rose-500/10' : 'bg-indigo-600/5'}`}></div>
+
+//       <div className="flex items-center justify-between gap-4 relative z-10">
+//         <div className="flex items-center gap-4">
+//           <div className={`p-4 rounded-2xl transition-all duration-500 ${recording ? 'bg-rose-50 shadow-lg shadow-rose-100 scale-110' : 'bg-indigo-50'}`}>
+//             <FaMicrophone size={24} className={`${recording ? 'text-rose-500' : 'text-indigo-600'} ${recording ? 'animate-pulse' : ''}`} />
+//           </div>
+
+//           <div>
+//             <h3 className="text-xl font-bold tracking-tight text-slate-900">AI Voice Coach</h3>
+//             <p className="text-slate-500 text-sm font-medium">Analyze your verbal clarity & tone.</p>
+//           </div>
+//         </div>
+
+//         {recording && (
+//           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100">
+//             <span className="relative flex h-2 w-2">
+//               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+//               <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+//             </span>
+//             <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Listening</span>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* WAVEFORM VISUALIZER (Updated for Light Theme) */}
+//       <div className="mt-10 flex items-end justify-center gap-1.5 h-16">
+//         {[...Array(18)].map((_, i) => (
+//           <div
+//             key={i}
+//             className={`w-2 rounded-full transition-all duration-500 ${
+//               recording 
+//               ? 'bg-gradient-to-t from-indigo-600 to-indigo-400 animate-waveform' 
+//               : 'bg-slate-100 h-2'
+//             }`}
+//             style={{ 
+//               animationDelay: `${i * 0.05}s`,
+//               height: recording ? `${Math.random() * 80 + 20}%` : '8px'
+//             }}
+//           ></div>
+//         ))}
+//       </div>
+
+//       <div className="mt-10">
+//         {!recording ? (
+//           <button
+//             onClick={startRecording}
+//             className="group w-full py-4 rounded-2xl bg-indigo-600 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3"
+//           >
+//             <FaMicrophone className="group-hover:rotate-12 transition-transform" /> 
+//             Start Practice Session
+//           </button>
+//         ) : (
+//           <button
+//             onClick={stopRecording}
+//             className="w-full py-4 rounded-2xl bg-white border-2 border-rose-200 text-rose-600 font-bold shadow-sm transition-all duration-300 hover:bg-rose-50 flex items-center justify-center gap-3"
+//           >
+//             <FaStop /> Stop Recording
+//           </button>
+//         )}
+//       </div>
+
+//       {transcript && (
+//         <div className="mt-6 p-5 bg-slate-50 rounded-2xl border border-slate-100 relative overflow-hidden animate-fadeIn">
+//           <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
+//           <div className="flex items-start gap-3">
+//              <div className="mt-1"><FaWaveSquare className="text-indigo-500" /></div>
+//              <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
+//                "{transcript}"
+//              </p>
+//           </div>
+//         </div>
+//       )}
+
+//       <style dangerouslySetInnerHTML={{ __html: `
+//         @keyframes waveform {
+//           0%, 100% { height: 25%; }
+//           50% { height: 100%; }
+//         }
+//         .animate-waveform {
+//           animation: waveform 0.7s ease-in-out infinite;
+//         }
+//       `}} />
+//     </div>
+//   );
+// }
+
+// dark mode
 import React, { useState } from "react";
 import { FaMicrophone, FaStop, FaWaveSquare } from "react-icons/fa";
 
@@ -261,57 +392,69 @@ export default function VoicePracticeCard() {
   };
 
   return (
-    <div className="relative mt-8 p-8 rounded-3xl bg-white border border-slate-200 shadow-xl shadow-indigo-100/40 transition-all duration-500 hover:border-indigo-300">
+    <div className="relative mt-8 p-8 rounded-[2.5rem] card shadow-2xl transition-all duration-500 overflow-hidden">
       
-      {/* Decorative Light Glow */}
-      <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full blur-[100px] transition-colors duration-1000 ${recording ? 'bg-rose-500/10' : 'bg-indigo-600/5'}`}></div>
+      {/* Dynamic Background Glow - Crimson for recording, Indigo for idle */}
+      <div 
+        className={`absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[120px] transition-all duration-1000 
+        ${recording ? 'bg-rose-500/20' : 'bg-indigo-600/10'}`}
+      ></div>
 
       <div className="flex items-center justify-between gap-4 relative z-10">
         <div className="flex items-center gap-4">
-          <div className={`p-4 rounded-2xl transition-all duration-500 ${recording ? 'bg-rose-50 shadow-lg shadow-rose-100 scale-110' : 'bg-indigo-50'}`}>
-            <FaMicrophone size={24} className={`${recording ? 'text-rose-500' : 'text-indigo-600'} ${recording ? 'animate-pulse' : ''}`} />
+          <div 
+            className={`p-4 rounded-2xl transition-all duration-500 border ${
+              recording 
+              ? 'bg-rose-500/10 border-rose-500/30 shadow-[0_0_20px_rgba(244,63,94,0.2)] scale-110' 
+              : 'bg-[var(--bg-primary)] border-[var(--border-color)]'
+            }`}
+          >
+            <FaMicrophone 
+              size={24} 
+              className={`${recording ? 'text-rose-500' : 'text-[var(--accent)]'} ${recording ? 'animate-pulse' : ''}`} 
+            />
           </div>
 
           <div>
-            <h3 className="text-xl font-bold tracking-tight text-slate-900">AI Voice Coach</h3>
-            <p className="text-slate-500 text-sm font-medium">Analyze your verbal clarity & tone.</p>
+            <h3 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">AI Voice Coach</h3>
+            <p className="text-[var(--text-secondary)] text-sm font-medium">Analyze your verbal clarity & tone.</p>
           </div>
         </div>
 
         {recording && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
             </span>
-            <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Listening</span>
+            <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Live Session</span>
           </div>
         )}
       </div>
 
-      {/* WAVEFORM VISUALIZER (Updated for Light Theme) */}
+      {/* WAVEFORM VISUALIZER (Permanent Dark Look) */}
       <div className="mt-10 flex items-end justify-center gap-1.5 h-16">
-        {[...Array(18)].map((_, i) => (
+        {[...Array(24)].map((_, i) => (
           <div
             key={i}
-            className={`w-2 rounded-full transition-all duration-500 ${
+            className={`w-1.5 rounded-full transition-all duration-500 ${
               recording 
-              ? 'bg-gradient-to-t from-indigo-600 to-indigo-400 animate-waveform' 
-              : 'bg-slate-100 h-2'
+              ? 'bg-gradient-to-t from-[var(--accent)] to-indigo-300 animate-waveform' 
+              : 'bg-[var(--border-color)] h-2'
             }`}
             style={{ 
-              animationDelay: `${i * 0.05}s`,
+              animationDelay: `${i * 0.04}s`,
               height: recording ? `${Math.random() * 80 + 20}%` : '8px'
             }}
           ></div>
         ))}
       </div>
 
-      <div className="mt-10">
+      <div className="mt-10 relative z-10">
         {!recording ? (
           <button
             onClick={startRecording}
-            className="group w-full py-4 rounded-2xl bg-indigo-600 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3"
+            className="group w-full py-4 rounded-2xl bg-[var(--accent)] font-bold text-white shadow-lg shadow-indigo-900/20 hover:brightness-110 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3"
           >
             <FaMicrophone className="group-hover:rotate-12 transition-transform" /> 
             Start Practice Session
@@ -319,7 +462,7 @@ export default function VoicePracticeCard() {
         ) : (
           <button
             onClick={stopRecording}
-            className="w-full py-4 rounded-2xl bg-white border-2 border-rose-200 text-rose-600 font-bold shadow-sm transition-all duration-300 hover:bg-rose-50 flex items-center justify-center gap-3"
+            className="w-full py-4 rounded-2xl bg-transparent border-2 border-rose-500/40 text-rose-500 font-bold shadow-sm transition-all duration-300 hover:bg-rose-500/10 flex items-center justify-center gap-3"
           >
             <FaStop /> Stop Recording
           </button>
@@ -327,11 +470,14 @@ export default function VoicePracticeCard() {
       </div>
 
       {transcript && (
-        <div className="mt-6 p-5 bg-slate-50 rounded-2xl border border-slate-100 relative overflow-hidden animate-fadeIn">
-          <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
+        <div 
+          className="mt-6 p-5 rounded-2xl border relative overflow-hidden animate-fadeIn"
+          style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}
+        >
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-[var(--accent)]"></div>
           <div className="flex items-start gap-3">
-             <div className="mt-1"><FaWaveSquare className="text-indigo-500" /></div>
-             <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
+             <div className="mt-1"><FaWaveSquare className="text-[var(--accent)]" /></div>
+             <p className="text-[var(--text-secondary)] text-sm leading-relaxed font-medium italic">
                "{transcript}"
              </p>
           </div>

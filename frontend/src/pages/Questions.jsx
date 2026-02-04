@@ -322,6 +322,119 @@
 
 
 //new final
+// import { useQuery } from "@tanstack/react-query";
+// import API from "../api/api";
+// import { useNavigate } from "react-router-dom";
+// import React from "react";
+// import { FiSearch, FiFolder, FiArrowRight, FiLoader } from "react-icons/fi";
+
+// export default function Questions() {
+//   const navigate = useNavigate();
+
+//   const {
+//     data: companies = [],
+//     isLoading,
+//     isError,
+//   } = useQuery({
+//     queryKey: ["companies"],
+//     queryFn: async () => {
+//       const res = await API.get("/questions/companies/list");
+//       return res.data.companies;
+//     },
+//   });
+
+//   return (
+//     <div className="animate-fadeIn pb-12">
+//       {/* HEADER */}
+//       <header className="mb-10 pt-4">
+//         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+//           <div>
+//             <h2 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900">
+//               Interview <span className="text-indigo-600">Questions</span>
+//             </h2>
+//             <p className="mt-2 text-slate-500 text-lg font-medium">
+//               Targeted practice for top-tier companies.
+//             </p>
+//           </div>
+          
+//           {/* Quick Search Decoration (Non-functional as requested) */}
+//           <div className="relative group max-w-sm w-full">
+//             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+//             <input 
+//               type="text" 
+//               placeholder="Filter companies..." 
+//               className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+//             />
+//           </div>
+//         </div>
+//       </header>
+
+//       {/* LOADING STATE */}
+//       {isLoading && (
+//         <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-slate-100 shadow-sm">
+//           <FiLoader className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
+//           <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Fetching Companies...</p>
+//         </div>
+//       )}
+
+//       {/* ERROR STATE */}
+//       {isError && (
+//         <div className="p-12 text-center bg-rose-50 border border-rose-100 rounded-3xl">
+//           <p className="text-rose-600 font-bold">Failed to load companies. Please check your connection.</p>
+//         </div>
+//       )}
+
+//       {/* EMPTY STATE */}
+//       {!isLoading && !isError && companies.length === 0 && (
+//         <div className="p-20 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
+//           <FiFolder className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+//           <p className="text-slate-500 font-medium">No companies found in the bank yet.</p>
+//         </div>
+//       )}
+
+//       {/* COMPANY LIST */}
+//       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+//         {companies.map((company) => (
+//           <div
+//             key={company}
+//             onClick={() =>
+//               navigate(`/company/${encodeURIComponent(company)}`)
+//             }
+//             className="
+//               group cursor-pointer p-6 rounded-3xl
+//               bg-white border border-slate-200
+//               hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/5
+//               transition-all duration-300 transform hover:-translate-y-1
+//             "
+//           >
+//             <div className="flex flex-col gap-4">
+//               <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:border-indigo-100 group-hover:text-indigo-600 transition-colors">
+//                 <FiFolder size={28} />
+//               </div>
+              
+//               <div className="flex items-end justify-between">
+//                 <div>
+//                   <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors">
+//                     {company}
+//                   </h3>
+//                   <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+//                     Questions Available
+//                   </p>
+//                 </div>
+                
+//                 <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+//                   <FiArrowRight />
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </section>
+//     </div>
+//   );
+// }
+
+//dark mode
 import { useQuery } from "@tanstack/react-query";
 import API from "../api/api";
 import { useNavigate } from "react-router-dom";
@@ -344,26 +457,33 @@ export default function Questions() {
   });
 
   return (
-    <div className="animate-fadeIn pb-12">
+    <div className="animate-fadeIn pb-12 transition-colors duration-500"
+         style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
       {/* HEADER */}
       <header className="mb-10 pt-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h2 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900">
-              Interview <span className="text-indigo-600">Questions</span>
+            <h2 className="text-4xl lg:text-5xl font-black tracking-tighter" style={{ color: "var(--text-primary)" }}>
+              Interview <span style={{ color: "var(--accent)" }}>Questions</span>
             </h2>
-            <p className="mt-2 text-slate-500 text-lg font-medium">
+            <p className="mt-2 text-lg font-medium" style={{ color: "var(--text-secondary)" }}>
               Targeted practice for top-tier companies.
             </p>
           </div>
           
-          {/* Quick Search Decoration (Non-functional as requested) */}
+          {/* Quick Search Decoration */}
           <div className="relative group max-w-sm w-full">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors" 
+                      style={{ color: "var(--text-secondary)" }} />
             <input 
               type="text" 
               placeholder="Filter companies..." 
-              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+              className="w-full pl-11 pr-4 py-3 rounded-2xl outline-none transition-all border shadow-lg"
+              style={{ 
+                backgroundColor: "var(--bg-card)", 
+                borderColor: "var(--border-color)",
+                color: "var(--text-primary)" 
+              }}
             />
           </div>
         </div>
@@ -371,24 +491,27 @@ export default function Questions() {
 
       {/* LOADING STATE */}
       {isLoading && (
-        <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-slate-100 shadow-sm">
-          <FiLoader className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
-          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Fetching Companies...</p>
+        <div className="flex flex-col items-center justify-center py-24 card rounded-3xl border animate-pulse"
+             style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+          <FiLoader className="w-10 h-10 animate-spin mb-4" style={{ color: "var(--accent)" }} />
+          <p className="font-bold uppercase tracking-widest text-xs" style={{ color: "var(--text-secondary)" }}>Fetching Companies...</p>
         </div>
       )}
 
       {/* ERROR STATE */}
       {isError && (
-        <div className="p-12 text-center bg-rose-50 border border-rose-100 rounded-3xl">
-          <p className="text-rose-600 font-bold">Failed to load companies. Please check your connection.</p>
+        <div className="p-12 text-center rounded-3xl border"
+             style={{ backgroundColor: "rgba(225, 29, 72, 0.05)", borderColor: "rgba(225, 29, 72, 0.2)" }}>
+          <p className="text-rose-400 font-bold">Failed to load companies. Please check your connection.</p>
         </div>
       )}
 
       {/* EMPTY STATE */}
       {!isLoading && !isError && companies.length === 0 && (
-        <div className="p-20 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
-          <FiFolder className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-          <p className="text-slate-500 font-medium">No companies found in the bank yet.</p>
+        <div className="p-20 text-center border-2 border-dashed rounded-3xl"
+             style={{ backgroundColor: "rgba(15, 23, 42, 0.3)", borderColor: "var(--border-color)" }}>
+          <FiFolder className="w-12 h-12 mx-auto mb-4 opacity-20" style={{ color: "var(--text-secondary)" }} />
+          <p className="font-medium" style={{ color: "var(--text-secondary)" }}>No companies found in the bank yet.</p>
         </div>
       )}
 
@@ -397,33 +520,29 @@ export default function Questions() {
         {companies.map((company) => (
           <div
             key={company}
-            onClick={() =>
-              navigate(`/company/${encodeURIComponent(company)}`)
-            }
-            className="
-              group cursor-pointer p-6 rounded-3xl
-              bg-white border border-slate-200
-              hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/5
-              transition-all duration-300 transform hover:-translate-y-1
-            "
+            onClick={() => navigate(`/company/${encodeURIComponent(company)}`)}
+            className="group cursor-pointer p-6 rounded-3xl border transition-all duration-300 transform hover:-translate-y-1 shadow-xl shadow-black/20"
+            style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
           >
             <div className="flex flex-col gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:border-indigo-100 group-hover:text-indigo-600 transition-colors">
-                <FiFolder size={28} />
+              <div className="w-14 h-14 rounded-2xl border flex items-center justify-center transition-colors"
+                   style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
+                <FiFolder size={28} className="group-hover:text-[var(--accent)] group-hover:scale-110 transition-transform" />
               </div>
               
               <div className="flex items-end justify-between">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-xl font-black tracking-tight transition-colors" style={{ color: "var(--text-primary)" }}>
                     {company}
                   </h3>
-                  <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                  <p className="text-sm font-bold mt-1 uppercase tracking-tighter" style={{ color: "var(--text-secondary)" }}>
                     Questions Available
                   </p>
                 </div>
                 
-                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                  <FiArrowRight />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
+                     style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-secondary)" }}>
+                  <FiArrowRight className="group-hover:text-[var(--accent)] group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </div>

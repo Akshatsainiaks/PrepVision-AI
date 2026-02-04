@@ -113,6 +113,85 @@
 // }
 
 //new final
+// import React from "react";
+
+// export default function CreditProgressBar({ credits = 0, max = 100 }) {
+//   // Auto-scale max credits dynamically
+//   const computedMax = Math.max(max, credits);
+//   const percent = Math.min(
+//     Math.round((credits / computedMax) * 100),
+//     100
+//   );
+
+//   // Determine color based on credit health (Updated for light mode visibility)
+//   const getStatusColor = () => {
+//     if (percent < 20) return "from-red-500 to-rose-500 shadow-red-100";
+//     if (percent < 50) return "from-amber-400 to-orange-400 shadow-orange-100";
+//     return "from-indigo-500 to-blue-500 shadow-indigo-100";
+//   };
+
+//   return (
+//     <div className="space-y-4">
+//       {/* LABEL & PERCENTAGE */}
+//       <div className="flex items-end justify-between">
+//         <div className="space-y-1">
+//           <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
+//             Resource Usage
+//           </p>
+//           <div className="flex items-baseline gap-1">
+//             <span className="text-2xl font-black text-slate-900">{credits}</span>
+//             <span className="text-xs font-bold text-slate-400">/ {computedMax}</span>
+//           </div>
+//         </div>
+//         <div className="text-right">
+//           <span className={`text-sm font-black ${percent < 20 ? 'text-red-500' : 'text-indigo-600'}`}>
+//             {percent}%
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* REFINED BAR */}
+//       <div className="relative">
+//         {/* Track - Now a light slate instead of transparent black */}
+//         <div className="w-full h-3.5 rounded-full bg-slate-100 border border-slate-200 p-[2px] overflow-hidden shadow-inner">
+//           {/* Progress Fill */}
+//           <div
+//             className={`
+//               h-full rounded-full bg-gradient-to-r transition-all duration-1000 ease-out shadow-lg
+//               ${getStatusColor()}
+//             `}
+//             style={{ width: `${percent}%` }}
+//           >
+//             {/* Animated Shine Effect */}
+//             <div className="w-full h-full relative overflow-hidden">
+//                 <div className="absolute inset-0 bg-white/30 skew-x-[-20deg] animate-[shimmer_2s_infinite] w-1/2" />
+//             </div>
+//           </div>
+//         </div>
+        
+//         {/* Segment Markers - Softened for light theme */}
+//         <div className="absolute inset-0 flex justify-between px-2 pointer-events-none">
+//           {[...Array(4)].map((_, i) => (
+//             <div key={i} className="w-px h-full bg-white/30"></div>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* REFINED FOOTER - Now using Indigo/Slate tint */}
+//       <div className="flex items-start gap-3 bg-indigo-50 border border-indigo-100 p-3 rounded-xl">
+//         <div className="mt-1">
+//            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+//         </div>
+//         <p className="text-[11px] text-slate-600 leading-snug">
+//           Practice interviews to <span className="text-indigo-700 font-bold uppercase tracking-tight">recharge</span> your credits.
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+//dark mode
 import React from "react";
 
 export default function CreditProgressBar({ credits = 0, max = 100 }) {
@@ -123,11 +202,11 @@ export default function CreditProgressBar({ credits = 0, max = 100 }) {
     100
   );
 
-  // Determine color based on credit health (Updated for light mode visibility)
+  // Determine color based on credit health (Updated for Dark Mode Glow)
   const getStatusColor = () => {
-    if (percent < 20) return "from-red-500 to-rose-500 shadow-red-100";
-    if (percent < 50) return "from-amber-400 to-orange-400 shadow-orange-100";
-    return "from-indigo-500 to-blue-500 shadow-indigo-100";
+    if (percent < 20) return "from-rose-500 to-red-600 shadow-rose-900/40";
+    if (percent < 50) return "from-amber-400 to-orange-500 shadow-orange-900/40";
+    return "from-indigo-400 to-blue-500 shadow-indigo-900/40";
   };
 
   return (
@@ -135,16 +214,16 @@ export default function CreditProgressBar({ credits = 0, max = 100 }) {
       {/* LABEL & PERCENTAGE */}
       <div className="flex items-end justify-between">
         <div className="space-y-1">
-          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--text-secondary)]">
             Resource Usage
           </p>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-black text-slate-900">{credits}</span>
-            <span className="text-xs font-bold text-slate-400">/ {computedMax}</span>
+            <span className="text-2xl font-black text-[var(--text-primary)]">{credits}</span>
+            <span className="text-xs font-bold text-[var(--text-secondary)]">/ {computedMax}</span>
           </div>
         </div>
         <div className="text-right">
-          <span className={`text-sm font-black ${percent < 20 ? 'text-red-500' : 'text-indigo-600'}`}>
+          <span className={`text-sm font-black ${percent < 20 ? 'text-rose-500' : 'text-[var(--accent)]'}`}>
             {percent}%
           </span>
         </div>
@@ -152,8 +231,8 @@ export default function CreditProgressBar({ credits = 0, max = 100 }) {
 
       {/* REFINED BAR */}
       <div className="relative">
-        {/* Track - Now a light slate instead of transparent black */}
-        <div className="w-full h-3.5 rounded-full bg-slate-100 border border-slate-200 p-[2px] overflow-hidden shadow-inner">
+        {/* Track - Deep Slate with subtle inset shadow */}
+        <div className="w-full h-3.5 rounded-full bg-[var(--bg-primary)] border border-[var(--border-color)] p-[2px] overflow-hidden">
           {/* Progress Fill */}
           <div
             className={`
@@ -164,26 +243,26 @@ export default function CreditProgressBar({ credits = 0, max = 100 }) {
           >
             {/* Animated Shine Effect */}
             <div className="w-full h-full relative overflow-hidden">
-                <div className="absolute inset-0 bg-white/30 skew-x-[-20deg] animate-[shimmer_2s_infinite] w-1/2" />
+                <div className="absolute inset-0 bg-white/20 skew-x-[-20deg] animate-[shimmer_2s_infinite] w-1/2" />
             </div>
           </div>
         </div>
         
-        {/* Segment Markers - Softened for light theme */}
-        <div className="absolute inset-0 flex justify-between px-2 pointer-events-none">
+        {/* Segment Markers - Darkened for high-end look */}
+        <div className="absolute inset-0 flex justify-between px-2 pointer-events-none opacity-20">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="w-px h-full bg-white/30"></div>
+            <div key={i} className="w-px h-full bg-black"></div>
           ))}
         </div>
       </div>
 
-      {/* REFINED FOOTER - Now using Indigo/Slate tint */}
-      <div className="flex items-start gap-3 bg-indigo-50 border border-indigo-100 p-3 rounded-xl">
+      {/* REFINED FOOTER - Indigo tint on dark bg */}
+      <div className="flex items-start gap-3 bg-indigo-500/5 border border-indigo-500/10 p-3 rounded-xl">
         <div className="mt-1">
-           <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+           <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
         </div>
-        <p className="text-[11px] text-slate-600 leading-snug">
-          Practice interviews to <span className="text-indigo-700 font-bold uppercase tracking-tight">recharge</span> your credits.
+        <p className="text-[11px] text-[var(--text-secondary)] leading-snug">
+          Practice interviews to <span className="text-[var(--accent)] font-bold uppercase tracking-tight">recharge</span> your credits.
         </p>
       </div>
     </div>

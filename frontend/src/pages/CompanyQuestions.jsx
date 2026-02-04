@@ -470,6 +470,265 @@
 // }
 
 //new final
+// import { useParams, useNavigate } from "react-router-dom";
+// import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+// import API from "../api/api";
+// import React, { useState, useRef, useEffect } from "react";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { 
+//   Folder, 
+//   ChevronRight, 
+//   Search, 
+//   Filter, 
+//   ArrowLeft, 
+//   CircleDot, 
+//   LayoutGrid,
+//   Loader2,
+//   BookOpen
+// } from "lucide-react";
+
+// export default function CompanyQuestions() {
+//   const { company, type } = useParams();
+//   const navigate = useNavigate();
+
+//   const [search, setSearch] = useState("");
+//   const [sort, setSort] = useState("newest");
+//   const loaderRef = useRef(null);
+
+//   /* --------------------------------
+//      FETCH FOLDERS
+//   --------------------------------- */
+//   const { data: folders = [], isLoading: loadingFolders } = useQuery({
+//     queryKey: ["company-folders", company],
+//     queryFn: async () => {
+//       const res = await API.get(`/questions/company/${company}/types-with-count`);
+//       return res.data.folders;
+//     }
+//   });
+
+//   /* --------------------------------
+//      FETCH QUESTIONS
+//   --------------------------------- */
+//   const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
+//     queryKey: ["company-questions", company, type, search, sort],
+//     enabled: !!type,
+//     queryFn: async ({ pageParam = 1 }) => {
+//       const params = new URLSearchParams();
+//       params.append("company", company);
+//       params.append("type", type);
+//       params.append("page", pageParam);
+//       params.append("limit", 6);
+//       params.append("sort", sort);
+//       if (search) params.append("search", search);
+
+//       const res = await API.get(`/questions?${params.toString()}`);
+//       return res.data;
+//     },
+//     getNextPageParam: (lastPage) =>
+//       lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined
+//   });
+
+//   const questions = data?.pages.flatMap((p) => p.questions) || [];
+
+//   useEffect(() => {
+//     if (!loaderRef.current || !hasNextPage) return;
+//     const observer = new IntersectionObserver(([entry]) => {
+//       if (entry.isIntersecting) fetchNextPage();
+//     }, { threshold: 0.1 });
+//     observer.observe(loaderRef.current);
+//     return () => observer.disconnect();
+//   }, [fetchNextPage, hasNextPage]);
+
+//   return (
+//     // Changed to Light Mode Gradient
+//     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 text-slate-900 selection:bg-indigo-100">
+
+//       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+//         {/* HEADER SECTION */}
+//         <header className="mb-12">
+//           <motion.div 
+//             initial={{ opacity: 0, x: -20 }}
+//             animate={{ opacity: 1, x: 0 }}
+//             className="flex items-center gap-5"
+//           >
+//             {type && (
+//               <button 
+//                 onClick={() => navigate(`/company/${company}`)}
+//                 className="p-3 rounded-2xl bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all shadow-sm"
+//               >
+//                 <ArrowLeft size={20} />
+//               </button>
+//             )}
+//             <div className="p-4 rounded-3xl bg-indigo-600 text-white shadow-xl shadow-indigo-200">
+//               <LayoutGrid size={28} />
+//             </div>
+//             <div>
+//               <h2 className="text-5xl font-black tracking-tight text-slate-900 uppercase">
+//                 {company}
+//               </h2>
+//               <p className="text-indigo-600 text-sm font-bold tracking-widest uppercase mt-1">
+//                 {type ? `${type} Repository` : "Specialized Interview Tracks"}
+//               </p>
+//             </div>
+//           </motion.div>
+//         </header>
+
+//         {/* =================================================
+//             ROOT FOLDER VIEW (Grid of Categories)
+//         ================================================== */}
+//         {!type && (
+//           <motion.div 
+//             initial={{ opacity: 0, y: 20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+//           >
+//             {loadingFolders ? (
+//               [...Array(6)].map((_, i) => (
+//                 <div key={i} className="h-48 rounded-[2.5rem] bg-white border border-slate-100 animate-pulse" />
+//               ))
+//             ) : (
+//               folders.map((f, idx) => (
+//                 <motion.div
+//                   key={f.type}
+//                   whileHover={{ y: -8, scale: 1.02 }}
+//                   whileTap={{ scale: 0.98 }}
+//                   onClick={() => navigate(`/company/${company}/${f.type}`)}
+//                   className="group cursor-pointer relative p-10 rounded-[2.5rem] bg-white border border-slate-200 hover:border-indigo-300 transition-all shadow-sm hover:shadow-2xl hover:shadow-indigo-100/50 overflow-hidden"
+//                 >
+//                   {/* Subtle Background Icon */}
+//                   <div className="absolute -top-4 -right-4 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
+//                     <Folder size={120} className="text-indigo-600" />
+//                   </div>
+                  
+//                   <div className="relative z-10">
+//                     <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+//                       <Folder size={26} className="text-indigo-600 group-hover:text-white" />
+//                     </div>
+//                     <h3 className="text-2xl font-black text-slate-900 mb-2">
+//                       {f.type}
+//                     </h3>
+//                     <div className="flex items-center gap-2">
+//                         <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+//                         <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+//                             {f.count} Modules
+//                         </p>
+//                     </div>
+//                   </div>
+//                 </motion.div>
+//               ))
+//             )}
+//           </motion.div>
+//         )}
+
+//         {/* =================================================
+//             FOLDER OPEN VIEW (Question List)
+//         ================================================== */}
+//         {type && (
+//           <div className="space-y-10">
+//             {/* Search & Filter Bar */}
+//             <motion.div 
+//               initial={{ opacity: 0, y: -10 }}
+//               animate={{ opacity: 1, y: 0 }}
+//               className="flex flex-col md:flex-row gap-4 p-3 bg-white border border-slate-200 rounded-[2.5rem] shadow-xl shadow-slate-200/40"
+//             >
+//               <div className="relative flex-1 group">
+//                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
+//                 <input
+//                   type="text"
+//                   placeholder="Filter questions by keywords..."
+//                   value={search}
+//                   onChange={(e) => setSearch(e.target.value)}
+//                   className="w-full pl-16 pr-8 py-4 rounded-[2rem] bg-slate-50 border border-transparent focus:bg-white focus:border-indigo-100 outline-none text-slate-700 placeholder:text-slate-400 font-semibold transition-all"
+//                 />
+//               </div>
+
+//               <div className="flex items-center gap-3 px-4 border-l border-slate-100">
+//                 <Filter size={18} className="text-slate-400" />
+//                 <select
+//                   value={sort}
+//                   onChange={(e) => setSort(e.target.value)}
+//                   className="py-2 px-4 rounded-xl bg-white text-slate-600 font-bold text-sm outline-none cursor-pointer hover:text-indigo-600 transition-colors"
+//                 >
+//                   <option value="newest">Newest First</option>
+//                   <option value="upvotes">High Impact</option>
+//                   <option value="difficulty">Complexity</option>
+//                 </select>
+//               </div>
+//             </motion.div>
+
+//             {/* QUESTIONS LIST */}
+//             <div className="space-y-5">
+//               <AnimatePresence mode="popLayout">
+//                 {questions.map((q, idx) => (
+//                   <motion.div
+//                     layout
+//                     initial={{ opacity: 0, y: 20 }}
+//                     animate={{ opacity: 1, y: 0 }}
+//                     transition={{ delay: idx * 0.05 }}
+//                     key={q._id}
+//                     onClick={() => navigate(`/question/${q._id}`)}
+//                     className="group cursor-pointer p-8 rounded-[2rem] bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/30 transition-all flex items-start gap-8 relative overflow-hidden"
+//                   >
+//                     <div className="hidden sm:flex flex-col items-center pt-2">
+//                       <div className="w-3 h-3 rounded-full bg-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.4)]" />
+//                       <div className="w-px h-full bg-slate-100 mt-4" />
+//                     </div>
+
+//                     <div className="flex-1">
+//                       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+//                         <div className="flex items-center gap-3">
+//                           <span className="px-4 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 text-[11px] font-black uppercase tracking-widest border border-indigo-100">
+//                             {q.role}
+//                           </span>
+//                           <span className={`text-[11px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl border ${
+//                             q.difficulty === 'Hard' ? 'text-rose-600 bg-rose-50 border-rose-100' : 
+//                             q.difficulty === 'Medium' ? 'text-amber-600 bg-amber-50 border-amber-100' : 
+//                             'text-emerald-600 bg-emerald-50 border-emerald-100'
+//                           }`}>
+//                             {q.difficulty}
+//                           </span>
+//                         </div>
+//                         <div className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+//                             <ChevronRight size={20} />
+//                         </div>
+//                       </div>
+
+//                       <p className="text-slate-800 text-xl font-bold leading-relaxed group-hover:text-indigo-600 transition-colors">
+//                         {q.question}
+//                       </p>
+//                     </div>
+//                   </motion.div>
+//                 ))}
+//               </AnimatePresence>
+
+//               {/* Infinite Scroll Loader */}
+//               {hasNextPage && (
+//                 <div ref={loaderRef} className="flex justify-center py-16">
+//                   <div className="flex items-center gap-3 text-slate-400 font-bold">
+//                     <Loader2 className="animate-spin text-indigo-600" size={24} />
+//                     <span>Fetching more content...</span>
+//                   </div>
+//                 </div>
+//               )}
+
+//               {!hasNextPage && !isLoading && questions.length > 0 && (
+//                 <div className="text-center py-16">
+//                    <div className="inline-flex items-center gap-3 px-8 py-3 rounded-full bg-slate-100 text-slate-500 text-sm font-bold border border-slate-200">
+//                      <CircleDot size={16} className="text-emerald-500" />
+//                      Repository Fully Synced
+//                    </div>
+//                 </div>
+//               )}
+//             </div>
+//           </div>
+//         )}
+//       </main>
+//     </div>
+//   );
+// }
+
+//dark mode
 import { useParams, useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import API from "../api/api";
@@ -483,8 +742,7 @@ import {
   ArrowLeft, 
   CircleDot, 
   LayoutGrid,
-  Loader2,
-  BookOpen
+  Loader2
 } from "lucide-react";
 
 export default function CompanyQuestions() {
@@ -495,9 +753,7 @@ export default function CompanyQuestions() {
   const [sort, setSort] = useState("newest");
   const loaderRef = useRef(null);
 
-  /* --------------------------------
-     FETCH FOLDERS
-  --------------------------------- */
+  /* FETCH FOLDERS */
   const { data: folders = [], isLoading: loadingFolders } = useQuery({
     queryKey: ["company-folders", company],
     queryFn: async () => {
@@ -506,9 +762,7 @@ export default function CompanyQuestions() {
     }
   });
 
-  /* --------------------------------
-     FETCH QUESTIONS
-  --------------------------------- */
+  /* FETCH QUESTIONS */
   const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ["company-questions", company, type, search, sort],
     enabled: !!type,
@@ -540,8 +794,7 @@ export default function CompanyQuestions() {
   }, [fetchNextPage, hasNextPage]);
 
   return (
-    // Changed to Light Mode Gradient
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 text-slate-900 selection:bg-indigo-100">
+    <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
@@ -555,28 +808,27 @@ export default function CompanyQuestions() {
             {type && (
               <button 
                 onClick={() => navigate(`/company/${company}`)}
-                className="p-3 rounded-2xl bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all shadow-sm"
+                className="p-3 rounded-2xl transition-all border shadow-sm"
+                style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
               >
                 <ArrowLeft size={20} />
               </button>
             )}
-            <div className="p-4 rounded-3xl bg-indigo-600 text-white shadow-xl shadow-indigo-200">
+            <div className="p-4 rounded-3xl text-white shadow-xl shadow-indigo-900/40" style={{ backgroundColor: "var(--accent)" }}>
               <LayoutGrid size={28} />
             </div>
             <div>
-              <h2 className="text-5xl font-black tracking-tight text-slate-900 uppercase">
+              <h2 className="text-5xl font-black tracking-tight uppercase" style={{ color: "var(--text-primary)" }}>
                 {company}
               </h2>
-              <p className="text-indigo-600 text-sm font-bold tracking-widest uppercase mt-1">
+              <p className="text-sm font-bold tracking-widest uppercase mt-1" style={{ color: "var(--accent)" }}>
                 {type ? `${type} Repository` : "Specialized Interview Tracks"}
               </p>
             </div>
           </motion.div>
         </header>
 
-        {/* =================================================
-            ROOT FOLDER VIEW (Grid of Categories)
-        ================================================== */}
+        {/* ROOT FOLDER VIEW */}
         {!type && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -585,7 +837,7 @@ export default function CompanyQuestions() {
           >
             {loadingFolders ? (
               [...Array(6)].map((_, i) => (
-                <div key={i} className="h-48 rounded-[2.5rem] bg-white border border-slate-100 animate-pulse" />
+                <div key={i} className="h-48 rounded-[2.5rem] animate-pulse" style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-color)" }} />
               ))
             ) : (
               folders.map((f, idx) => (
@@ -594,23 +846,24 @@ export default function CompanyQuestions() {
                   whileHover={{ y: -8, scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => navigate(`/company/${company}/${f.type}`)}
-                  className="group cursor-pointer relative p-10 rounded-[2.5rem] bg-white border border-slate-200 hover:border-indigo-300 transition-all shadow-sm hover:shadow-2xl hover:shadow-indigo-100/50 overflow-hidden"
+                  className="group cursor-pointer relative p-10 rounded-[2.5rem] transition-all border shadow-lg overflow-hidden"
+                  style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
                 >
-                  {/* Subtle Background Icon */}
-                  <div className="absolute -top-4 -right-4 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
-                    <Folder size={120} className="text-indigo-600" />
+                  <div className="absolute -top-4 -right-4 p-6 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">
+                    <Folder size={120} style={{ color: "var(--accent)" }} />
                   </div>
                   
                   <div className="relative z-10">
-                    <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                      <Folder size={26} className="text-indigo-600 group-hover:text-white" />
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-all duration-300 border"
+                         style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)", color: "var(--accent)" }}>
+                      <Folder size={26} className="group-hover:scale-110 transition-transform" />
                     </div>
-                    <h3 className="text-2xl font-black text-slate-900 mb-2">
+                    <h3 className="text-2xl font-black mb-2" style={{ color: "var(--text-primary)" }}>
                       {f.type}
                     </h3>
                     <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                        <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
                             {f.count} Modules
                         </p>
                     </div>
@@ -621,34 +874,35 @@ export default function CompanyQuestions() {
           </motion.div>
         )}
 
-        {/* =================================================
-            FOLDER OPEN VIEW (Question List)
-        ================================================== */}
+        {/* FOLDER OPEN VIEW */}
         {type && (
           <div className="space-y-10">
             {/* Search & Filter Bar */}
             <motion.div 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col md:flex-row gap-4 p-3 bg-white border border-slate-200 rounded-[2.5rem] shadow-xl shadow-slate-200/40"
+              className="flex flex-col md:flex-row gap-4 p-3 rounded-[2.5rem] shadow-2xl border"
+              style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
             >
               <div className="relative flex-1 group">
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 transition-colors" size={20} style={{ color: "var(--text-secondary)" }} />
                 <input
                   type="text"
                   placeholder="Filter questions by keywords..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-16 pr-8 py-4 rounded-[2rem] bg-slate-50 border border-transparent focus:bg-white focus:border-indigo-100 outline-none text-slate-700 placeholder:text-slate-400 font-semibold transition-all"
+                  className="w-full pl-16 pr-8 py-4 rounded-[2rem] outline-none font-semibold transition-all border"
+                  style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
                 />
               </div>
 
-              <div className="flex items-center gap-3 px-4 border-l border-slate-100">
-                <Filter size={18} className="text-slate-400" />
+              <div className="flex items-center gap-3 px-4 border-l" style={{ borderColor: "var(--border-color)" }}>
+                <Filter size={18} style={{ color: "var(--text-secondary)" }} />
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="py-2 px-4 rounded-xl bg-white text-slate-600 font-bold text-sm outline-none cursor-pointer hover:text-indigo-600 transition-colors"
+                  className="py-2 px-4 rounded-xl font-bold text-sm outline-none cursor-pointer transition-colors"
+                  style={{ backgroundColor: "transparent", color: "var(--text-secondary)" }}
                 >
                   <option value="newest">Newest First</option>
                   <option value="upvotes">High Impact</option>
@@ -668,33 +922,36 @@ export default function CompanyQuestions() {
                     transition={{ delay: idx * 0.05 }}
                     key={q._id}
                     onClick={() => navigate(`/question/${q._id}`)}
-                    className="group cursor-pointer p-8 rounded-[2rem] bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/30 transition-all flex items-start gap-8 relative overflow-hidden"
+                    className="group cursor-pointer p-8 rounded-[2rem] transition-all flex items-start gap-8 relative overflow-hidden border"
+                    style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
                   >
                     <div className="hidden sm:flex flex-col items-center pt-2">
-                      <div className="w-3 h-3 rounded-full bg-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.4)]" />
-                      <div className="w-px h-full bg-slate-100 mt-4" />
+                      <div className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(129,140,248,0.5)]" style={{ backgroundColor: "var(--accent)" }} />
+                      <div className="w-px h-full mt-4" style={{ backgroundColor: "var(--border-color)" }} />
                     </div>
 
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                         <div className="flex items-center gap-3">
-                          <span className="px-4 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 text-[11px] font-black uppercase tracking-widest border border-indigo-100">
+                          <span className="px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest border"
+                                style={{ backgroundColor: "rgba(129,140,248,0.1)", color: "var(--accent)", borderColor: "rgba(129,140,248,0.2)" }}>
                             {q.role}
                           </span>
                           <span className={`text-[11px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl border ${
-                            q.difficulty === 'Hard' ? 'text-rose-600 bg-rose-50 border-rose-100' : 
-                            q.difficulty === 'Medium' ? 'text-amber-600 bg-amber-50 border-amber-100' : 
-                            'text-emerald-600 bg-emerald-50 border-emerald-100'
+                            q.difficulty === 'Hard' ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' : 
+                            q.difficulty === 'Medium' ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' : 
+                            'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
                           }`}>
                             {q.difficulty}
                           </span>
                         </div>
-                        <div className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                            <ChevronRight size={20} />
+                        <div className="p-2 rounded-xl transition-all duration-300" 
+                             style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-secondary)" }}>
+                            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
 
-                      <p className="text-slate-800 text-xl font-bold leading-relaxed group-hover:text-indigo-600 transition-colors">
+                      <p className="text-xl font-bold leading-relaxed group-hover:text-indigo-400 transition-colors" style={{ color: "var(--text-primary)" }}>
                         {q.question}
                       </p>
                     </div>
@@ -705,8 +962,8 @@ export default function CompanyQuestions() {
               {/* Infinite Scroll Loader */}
               {hasNextPage && (
                 <div ref={loaderRef} className="flex justify-center py-16">
-                  <div className="flex items-center gap-3 text-slate-400 font-bold">
-                    <Loader2 className="animate-spin text-indigo-600" size={24} />
+                  <div className="flex items-center gap-3 font-bold" style={{ color: "var(--text-secondary)" }}>
+                    <Loader2 className="animate-spin" style={{ color: "var(--accent)" }} size={24} />
                     <span>Fetching more content...</span>
                   </div>
                 </div>
@@ -714,7 +971,8 @@ export default function CompanyQuestions() {
 
               {!hasNextPage && !isLoading && questions.length > 0 && (
                 <div className="text-center py-16">
-                   <div className="inline-flex items-center gap-3 px-8 py-3 rounded-full bg-slate-100 text-slate-500 text-sm font-bold border border-slate-200">
+                   <div className="inline-flex items-center gap-3 px-8 py-3 rounded-full border text-sm font-bold"
+                        style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
                      <CircleDot size={16} className="text-emerald-500" />
                      Repository Fully Synced
                    </div>

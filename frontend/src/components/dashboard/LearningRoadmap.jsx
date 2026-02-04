@@ -210,6 +210,156 @@
 
 
 //new final
+// import React from "react";
+// import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+// import API from "../../api/api";
+// import { FiCheckCircle, FiCircle, FiLoader } from "react-icons/fi";
+
+// export default function LearningRoadmap() {
+//   const qc = useQueryClient();
+
+//   const { data = [], isLoading } = useQuery({
+//     queryKey: ["learning-roadmap"],
+//     queryFn: async () => {
+//       const res = await API.get("/learning-roadmap");
+//       return res.data.roadmap || [];
+//     },
+//     staleTime: 60_000,
+//   });
+
+//   const completeMut = useMutation({
+//     mutationFn: async (milestoneId) => {
+//       const res = await API.post("/learning-roadmap/complete", { milestoneId });
+//       return res.data;
+//     },
+//     onSuccess: () => qc.invalidateQueries(["learning-roadmap"]),
+//   });
+
+//   if (isLoading) {
+//     return (
+//       <div className="bg-white border border-slate-200 rounded-3xl flex flex-col items-center justify-center h-[350px]">
+//         <FiLoader className="w-8 h-8 text-indigo-500 animate-spin mb-4" />
+//         <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Generating Path...</p>
+//       </div>
+//     );
+//   }
+
+//   const completionRate = data.length > 0 
+//     ? (data.filter(m => m.completed).length / data.length) * 100 
+//     : 0;
+
+//   return (
+//     <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm h-full">
+//       {/* Header Section */}
+//       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+//         <div>
+//           <h2 className="text-xl font-bold text-slate-900 tracking-tight">Learning Roadmap</h2>
+//           <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">AI-Curated Growth Path</p>
+//         </div>
+        
+//         {/* Progress Display */}
+//         <div className="flex items-center gap-3 bg-slate-50 px-3 py-2 rounded-2xl border border-slate-100">
+//           <div className="h-2 w-24 bg-slate-200 rounded-full overflow-hidden">
+//             <div 
+//               className="h-full bg-emerald-500 transition-all duration-1000 ease-out" 
+//               style={{ width: `${completionRate}%` }}
+//             />
+//           </div>
+//           <span className="text-xs font-black text-slate-600">{Math.round(completionRate)}%</span>
+//         </div>
+//       </div>
+
+//       {data.length === 0 ? (
+//         <div className="text-center py-16 border-2 border-dashed border-slate-100 rounded-3xl">
+//           <p className="text-sm text-slate-400 max-w-[200px] mx-auto font-medium">
+//             Complete a mock interview to generate your personalized learning path.
+//           </p>
+//         </div>
+//       ) : (
+//         <div className="relative space-y-8">
+//           {/* Vertical Timeline Line */}
+//           <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-slate-100" />
+
+//           {data.map((m) => (
+//             <div
+//               key={m.id}
+//               className={`relative flex items-start gap-6 transition-all duration-300 ${
+//                 m.completed ? "opacity-60" : "opacity-100"
+//               }`}
+//             >
+//               {/* Timeline Indicator */}
+//               <div className="relative z-10 mt-1">
+//                 {m.completed ? (
+//                   <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
+//                     <FiCheckCircle size={20} />
+//                   </div>
+//                 ) : (
+//                   <div className="w-10 h-10 rounded-full bg-white border-2 border-indigo-500 flex items-center justify-center text-indigo-600 shadow-md shadow-indigo-50">
+//                     <FiCircle size={20} />
+//                   </div>
+//                 )}
+//               </div>
+
+//               {/* Milestone Content */}
+//               <div className={`flex-1 p-5 rounded-2xl transition-all duration-200 group border ${
+//                 m.completed 
+//                 ? "bg-slate-50 border-slate-100" 
+//                 : "bg-white border-slate-200 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-50/50"
+//               }`}>
+//                 <div className="flex items-start justify-between gap-4 mb-2">
+//                   <div className="space-y-1">
+//                     <div className="flex items-center gap-3">
+//                       <h3 className={`font-bold transition-colors ${m.completed ? "text-slate-500 line-through" : "text-slate-800"}`}>
+//                         {m.title}
+//                       </h3>
+//                       <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter border ${
+//                         m.priority === "High" 
+//                         ? "bg-rose-50 text-rose-600 border-rose-100" 
+//                         : "bg-sky-50 text-sky-600 border-sky-100"
+//                       }`}>
+//                         {m.priority}
+//                       </span>
+//                     </div>
+//                   </div>
+                  
+//                   {/* Mark as Complete Action */}
+//                   {!m.completed && (
+//                     <button
+//                       onClick={() => completeMut.mutate(m.id)}
+//                       disabled={completeMut.isLoading}
+//                       className="shrink-0 p-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all duration-200 disabled:opacity-50 shadow-sm"
+//                       title="Mark as complete"
+//                     >
+//                       {completeMut.isLoading && completeMut.variables === m.id ? (
+//                         <FiLoader className="animate-spin" />
+//                       ) : (
+//                         <FiCheckCircle size={18} />
+//                       )}
+//                     </button>
+//                   )}
+//                 </div>
+
+//                 <p className={`text-sm leading-relaxed mb-4 ${m.completed ? "text-slate-400" : "text-slate-500"}`}>
+//                   {m.description}
+//                 </p>
+
+//                 <div className="flex items-center gap-3">
+//                   <div className="px-3 py-1 bg-slate-100 rounded-lg">
+//                     <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+//                       <span className="text-indigo-500">#</span> {m.recommended}
+//                     </span>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+//dark mode
 import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API from "../../api/api";
@@ -237,9 +387,9 @@ export default function LearningRoadmap() {
 
   if (isLoading) {
     return (
-      <div className="bg-white border border-slate-200 rounded-3xl flex flex-col items-center justify-center h-[350px]">
-        <FiLoader className="w-8 h-8 text-indigo-500 animate-spin mb-4" />
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Generating Path...</p>
+      <div className="card flex flex-col items-center justify-center h-[350px]">
+        <FiLoader className="w-8 h-8 text-[var(--accent)] animate-spin mb-4" />
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">Generating Path...</p>
       </div>
     );
   }
@@ -249,52 +399,52 @@ export default function LearningRoadmap() {
     : 0;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm h-full">
+    <div className="card p-8 shadow-xl h-full border-[var(--border-color)]">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Learning Roadmap</h2>
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">AI-Curated Growth Path</p>
+          <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Learning Roadmap</h2>
+          <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">AI-Curated Growth Path</p>
         </div>
         
         {/* Progress Display */}
-        <div className="flex items-center gap-3 bg-slate-50 px-3 py-2 rounded-2xl border border-slate-100">
-          <div className="h-2 w-24 bg-slate-200 rounded-full overflow-hidden">
+        <div className="flex items-center gap-3 bg-[var(--bg-primary)] px-3 py-2 rounded-2xl border border-[var(--border-color)]">
+          <div className="h-2 w-24 bg-[var(--border-color)] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-emerald-500 transition-all duration-1000 ease-out" 
+              className="h-full bg-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(16,185,129,0.4)]" 
               style={{ width: `${completionRate}%` }}
             />
           </div>
-          <span className="text-xs font-black text-slate-600">{Math.round(completionRate)}%</span>
+          <span className="text-xs font-black text-[var(--text-primary)]">{Math.round(completionRate)}%</span>
         </div>
       </div>
 
       {data.length === 0 ? (
-        <div className="text-center py-16 border-2 border-dashed border-slate-100 rounded-3xl">
-          <p className="text-sm text-slate-400 max-w-[200px] mx-auto font-medium">
+        <div className="text-center py-16 border-2 border-dashed border-[var(--border-color)] rounded-3xl">
+          <p className="text-sm text-[var(--text-secondary)] max-w-[200px] mx-auto font-medium">
             Complete a mock interview to generate your personalized learning path.
           </p>
         </div>
       ) : (
         <div className="relative space-y-8">
           {/* Vertical Timeline Line */}
-          <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-slate-100" />
+          <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-[var(--border-color)]" />
 
           {data.map((m) => (
             <div
               key={m.id}
               className={`relative flex items-start gap-6 transition-all duration-300 ${
-                m.completed ? "opacity-60" : "opacity-100"
+                m.completed ? "opacity-50" : "opacity-100"
               }`}
             >
               {/* Timeline Indicator */}
               <div className="relative z-10 mt-1">
                 {m.completed ? (
-                  <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-sm">
                     <FiCheckCircle size={20} />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-white border-2 border-indigo-500 flex items-center justify-center text-indigo-600 shadow-md shadow-indigo-50">
+                  <div className="w-10 h-10 rounded-full bg-[var(--bg-card)] border-2 border-[var(--accent)] flex items-center justify-center text-[var(--accent)] shadow-lg shadow-indigo-500/10">
                     <FiCircle size={20} />
                   </div>
                 )}
@@ -303,19 +453,19 @@ export default function LearningRoadmap() {
               {/* Milestone Content */}
               <div className={`flex-1 p-5 rounded-2xl transition-all duration-200 group border ${
                 m.completed 
-                ? "bg-slate-50 border-slate-100" 
-                : "bg-white border-slate-200 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-50/50"
+                ? "bg-[var(--bg-primary)]/40 border-[var(--border-color)]" 
+                : "bg-[var(--bg-primary)] border-[var(--border-color)] hover:border-[var(--accent)] hover:shadow-lg hover:shadow-indigo-500/5"
               }`}>
                 <div className="flex items-start justify-between gap-4 mb-2">
                   <div className="space-y-1">
                     <div className="flex items-center gap-3">
-                      <h3 className={`font-bold transition-colors ${m.completed ? "text-slate-500 line-through" : "text-slate-800"}`}>
+                      <h3 className={`font-bold transition-colors ${m.completed ? "text-[var(--text-secondary)] line-through" : "text-[var(--text-primary)]"}`}>
                         {m.title}
                       </h3>
                       <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter border ${
                         m.priority === "High" 
-                        ? "bg-rose-50 text-rose-600 border-rose-100" 
-                        : "bg-sky-50 text-sky-600 border-sky-100"
+                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20" 
+                        : "bg-sky-500/10 text-sky-400 border-sky-500/20"
                       }`}>
                         {m.priority}
                       </span>
@@ -327,7 +477,7 @@ export default function LearningRoadmap() {
                     <button
                       onClick={() => completeMut.mutate(m.id)}
                       disabled={completeMut.isLoading}
-                      className="shrink-0 p-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all duration-200 disabled:opacity-50 shadow-sm"
+                      className="shrink-0 p-2 rounded-xl bg-indigo-500/10 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-all duration-200 disabled:opacity-50 shadow-sm border border-indigo-500/20"
                       title="Mark as complete"
                     >
                       {completeMut.isLoading && completeMut.variables === m.id ? (
@@ -339,14 +489,14 @@ export default function LearningRoadmap() {
                   )}
                 </div>
 
-                <p className={`text-sm leading-relaxed mb-4 ${m.completed ? "text-slate-400" : "text-slate-500"}`}>
+                <p className={`text-sm leading-relaxed mb-4 ${m.completed ? "text-[var(--text-secondary)]/70" : "text-[var(--text-secondary)]"}`}>
                   {m.description}
                 </p>
 
                 <div className="flex items-center gap-3">
-                  <div className="px-3 py-1 bg-slate-100 rounded-lg">
-                    <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
-                      <span className="text-indigo-500">#</span> {m.recommended}
+                  <div className="px-3 py-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg">
+                    <span className="text-[11px] font-bold text-[var(--text-secondary)] flex items-center gap-1">
+                      <span className="text-[var(--accent)]">#</span> {m.recommended}
                     </span>
                   </div>
                 </div>

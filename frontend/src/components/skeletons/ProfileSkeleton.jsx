@@ -58,37 +58,131 @@
 //   );
 // }
 
+// import Skeleton from "../ui/Skeleton";
+// import Navbar from "../Navbar";
+// import React from "react";
+
+// export default function ProfileSkeleton() {
+//   return (
+//     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100">
+//       <Navbar />
+
+//       <div className="max-w-4xl mx-auto p-6 md:p-10 pt-32 animate-fadeIn">
+        
+//         {/* HEADER SKELETON */}
+//         <div className="flex items-center gap-4 mb-12">
+//            <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-sm">
+//               <div className="w-8 h-8 bg-slate-100 rounded-lg animate-pulse" />
+//            </div>
+//            {/* Floating title placeholder */}
+//            <Skeleton className="h-10 w-48 rounded-2xl" floating={true} />
+//         </div>
+
+//         {/* PROFILE CARD SKELETON */}
+//         <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 md:p-10 shadow-xl shadow-slate-200/50">
+//           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+//             {/* Floating Squircle Avatar */}
+//             <Skeleton className="w-24 h-24 rounded-[2rem] shrink-0" floating={true} />
+            
+//             <div className="flex-1 space-y-4 w-full text-center md:text-left">
+//               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+//                 <div className="space-y-3">
+//                   <Skeleton className="h-8 w-56 mx-auto md:mx-0" />
+//                   <Skeleton className="h-4 w-72 mx-auto md:mx-0" />
+//                 </div>
+//                 <Skeleton className="h-10 w-32 rounded-xl mx-auto md:mx-0" />
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* STATS SKELETON */}
+//           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+//             <div className="rounded-[2rem] p-8 bg-slate-50 border border-slate-100">
+//               <Skeleton className="h-4 w-32 mb-4" />
+//               <div className="flex items-baseline gap-2">
+//                 <Skeleton className="h-12 w-20 rounded-xl" floating={true} />
+//                 <Skeleton className="h-4 w-16" />
+//               </div>
+//             </div>
+
+//             <div className="flex flex-wrap gap-4 items-end justify-center md:justify-end">
+//               <Skeleton className="h-14 w-28 rounded-2xl" />
+//               <Skeleton className="h-14 w-36 rounded-2xl" />
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* RECENT ACTIVITY SKELETON */}
+//         <div className="mt-16">
+//           <div className="flex items-center gap-3 mb-8">
+//              <div className="w-8 h-1 bg-indigo-600 rounded-full" />
+//              <Skeleton className="h-7 w-64" />
+//           </div>
+          
+//           <div className="space-y-3">
+//             {[1, 2, 3, 4].map((i) => (
+//               <div
+//                 key={i}
+//                 className="bg-white border border-slate-100 p-6 rounded-[2rem] shadow-sm flex flex-col md:flex-row justify-between items-center gap-4"
+//               >
+//                 <div className="flex items-center gap-5 w-full md:w-auto">
+//                   {/* Floating Activity Icon */}
+//                   <Skeleton className="w-12 h-12 rounded-xl shrink-0" floating={true} />
+//                   <div className="space-y-2 flex-1">
+//                     <Skeleton className="h-5 w-48 md:w-64" />
+//                     <Skeleton className="h-3 w-32" />
+//                   </div>
+//                 </div>
+//                 <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+//                     <Skeleton className="h-8 w-24 rounded-lg" />
+//                     <Skeleton className="h-10 w-10 rounded-xl" />
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+//dark mode
 import Skeleton from "../ui/Skeleton";
 import Navbar from "../Navbar";
 import React from "react";
 
 export default function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100">
+    <div className="min-h-screen transition-colors duration-500 font-sans" 
+         style={{ backgroundColor: "var(--bg-primary)" }}>
       <Navbar />
 
       <div className="max-w-4xl mx-auto p-6 md:p-10 pt-32 animate-fadeIn">
         
         {/* HEADER SKELETON */}
         <div className="flex items-center gap-4 mb-12">
-           <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-sm">
-              <div className="w-8 h-8 bg-slate-100 rounded-lg animate-pulse" />
+           <div className="p-3 rounded-2xl border" 
+                style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+              <div className="w-8 h-8 rounded-lg animate-pulse" 
+                   style={{ backgroundColor: "var(--bg-primary)" }} />
            </div>
            {/* Floating title placeholder */}
            <Skeleton className="h-10 w-48 rounded-2xl" floating={true} />
         </div>
 
         {/* PROFILE CARD SKELETON */}
-        <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 md:p-10 shadow-xl shadow-slate-200/50">
+        <div className="rounded-[2.5rem] p-8 md:p-10 border shadow-2xl"
+             style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+          
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             {/* Floating Squircle Avatar */}
-            <Skeleton className="w-24 h-24 rounded-[2rem] shrink-0" floating={true} />
+            <Skeleton className="w-24 h-24 rounded-[2rem] shrink-0 opacity-40" floating={true} />
             
             <div className="flex-1 space-y-4 w-full text-center md:text-left">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-3">
                   <Skeleton className="h-8 w-56 mx-auto md:mx-0" />
-                  <Skeleton className="h-4 w-72 mx-auto md:mx-0" />
+                  <Skeleton className="h-4 w-72 mx-auto md:mx-0 opacity-40" />
                 </div>
                 <Skeleton className="h-10 w-32 rounded-xl mx-auto md:mx-0" />
               </div>
@@ -97,16 +191,17 @@ export default function ProfileSkeleton() {
 
           {/* STATS SKELETON */}
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-[2rem] p-8 bg-slate-50 border border-slate-100">
-              <Skeleton className="h-4 w-32 mb-4" />
+            <div className="rounded-[2rem] p-8 border" 
+                 style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}>
+              <Skeleton className="h-4 w-32 mb-4 opacity-40" />
               <div className="flex items-baseline gap-2">
                 <Skeleton className="h-12 w-20 rounded-xl" floating={true} />
-                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-16 opacity-30" />
               </div>
             </div>
 
             <div className="flex flex-wrap gap-4 items-end justify-center md:justify-end">
-              <Skeleton className="h-14 w-28 rounded-2xl" />
+              <Skeleton className="h-14 w-28 rounded-2xl opacity-50" />
               <Skeleton className="h-14 w-36 rounded-2xl" />
             </div>
           </div>
@@ -115,7 +210,7 @@ export default function ProfileSkeleton() {
         {/* RECENT ACTIVITY SKELETON */}
         <div className="mt-16">
           <div className="flex items-center gap-3 mb-8">
-             <div className="w-8 h-1 bg-indigo-600 rounded-full" />
+             <div className="w-8 h-1 rounded-full" style={{ backgroundColor: "var(--accent)" }} />
              <Skeleton className="h-7 w-64" />
           </div>
           
@@ -123,19 +218,20 @@ export default function ProfileSkeleton() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="bg-white border border-slate-100 p-6 rounded-[2rem] shadow-sm flex flex-col md:flex-row justify-between items-center gap-4"
+                className="p-6 rounded-[2rem] border shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 transition-all"
+                style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
               >
                 <div className="flex items-center gap-5 w-full md:w-auto">
                   {/* Floating Activity Icon */}
-                  <Skeleton className="w-12 h-12 rounded-xl shrink-0" floating={true} />
+                  <Skeleton className="w-12 h-12 rounded-xl shrink-0 opacity-40" floating={true} />
                   <div className="space-y-2 flex-1">
                     <Skeleton className="h-5 w-48 md:w-64" />
-                    <Skeleton className="h-3 w-32" />
+                    <Skeleton className="h-3 w-32 opacity-30" />
                   </div>
                 </div>
                 <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                    <Skeleton className="h-8 w-24 rounded-lg" />
-                    <Skeleton className="h-10 w-10 rounded-xl" />
+                    <Skeleton className="h-8 w-24 rounded-lg opacity-40" />
+                    <Skeleton className="h-10 w-10 rounded-xl opacity-20" />
                 </div>
               </div>
             ))}

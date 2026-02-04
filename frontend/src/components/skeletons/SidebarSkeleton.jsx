@@ -43,43 +43,107 @@
 //   );
 // }
 
+
+
+// import React from "react";
+// import Skeleton from "../ui/Skeleton";
+
+// export default function SidebarSkeleton({ collapsed }) {
+//   return (
+//     <aside
+//       className={`fixed top-16 left-0 h-[calc(100vh-4rem)] transition-all duration-300
+//       ${collapsed ? "w-20" : "w-64"}
+//       bg-white border-r border-slate-200 z-40 shadow-sm`}
+//     >
+//       <div className="mt-8 px-4 space-y-10">
+//         {/* Repeat fake sections to mirror the "CORE", "PRACTICE", and "LEARNING" blocks */}
+//         {[1, 2, 3].map((section) => (
+//           <div key={section} className="space-y-4">
+//             {/* Section title placeholder */}
+//             {!collapsed && (
+//               <div className="px-2">
+//                 <Skeleton className="h-3 w-16 rounded-md opacity-50" />
+//               </div>
+//             )}
+
+//             {/* Menu items list */}
+//             <div className="flex flex-col gap-3">
+//               {[1, 2, 3].map((item) => (
+//                 <div
+//                   key={item}
+//                   className="flex items-center gap-4 px-3 py-3 rounded-2xl bg-transparent"
+//                 >
+//                   {/* Floating Icon Placeholder */}
+//                   <Skeleton 
+//                     className="w-6 h-6 rounded-xl shrink-0" 
+//                     floating={true} 
+//                   />
+
+//                   {/* Text Placeholder - Only visible when sidebar is expanded */}
+//                   {!collapsed && (
+//                     <Skeleton className="h-3 w-32 rounded-lg" />
+//                   )}
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+      
+//       {/* Footer / Bottom Item Placeholder */}
+//       <div className="absolute bottom-10 left-0 w-full px-4">
+//         <div className="flex items-center gap-4 px-3 py-3">
+//            <Skeleton className="w-6 h-6 rounded-xl shrink-0" floating={true} />
+//            {!collapsed && <Skeleton className="h-3 w-28 rounded-lg" />}
+//         </div>
+//       </div>
+//     </aside>
+//   );
+// }
+
+//dark mode
 import React from "react";
 import Skeleton from "../ui/Skeleton";
 
 export default function SidebarSkeleton({ collapsed }) {
   return (
     <aside
-      className={`fixed top-16 left-0 h-[calc(100vh-4rem)] transition-all duration-300
+      className={`fixed top-16 left-0 h-[calc(100vh-4rem)] transition-all duration-300 z-40
       ${collapsed ? "w-20" : "w-64"}
-      bg-white border-r border-slate-200 z-40 shadow-sm`}
+      border-r`}
+      style={{ 
+        backgroundColor: "var(--bg-card)", 
+        borderColor: "var(--border-color)" 
+      }}
     >
       <div className="mt-8 px-4 space-y-10">
-        {/* Repeat fake sections to mirror the "CORE", "PRACTICE", and "LEARNING" blocks */}
+        {/* Mirroring Sections: CORE, PRACTICE, LEARNING */}
         {[1, 2, 3].map((section) => (
           <div key={section} className="space-y-4">
-            {/* Section title placeholder */}
+            
+            {/* Section Header Placeholder */}
             {!collapsed && (
-              <div className="px-2">
-                <Skeleton className="h-3 w-16 rounded-md opacity-50" />
+              <div className="px-4">
+                <Skeleton className="h-2 w-16 rounded-full opacity-20" />
               </div>
             )}
 
             {/* Menu items list */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
               {[1, 2, 3].map((item) => (
                 <div
                   key={item}
-                  className="flex items-center gap-4 px-3 py-3 rounded-2xl bg-transparent"
+                  className={`flex items-center rounded-2xl ${collapsed ? "justify-center" : "gap-4 px-4"} py-3`}
                 >
-                  {/* Floating Icon Placeholder */}
+                  {/* Icon Placeholder - Subtle floating effect */}
                   <Skeleton 
-                    className="w-6 h-6 rounded-xl shrink-0" 
+                    className="w-5 h-5 rounded-lg shrink-0" 
                     floating={true} 
                   />
 
-                  {/* Text Placeholder - Only visible when sidebar is expanded */}
+                  {/* Text Placeholder */}
                   {!collapsed && (
-                    <Skeleton className="h-3 w-32 rounded-lg" />
+                    <Skeleton className="h-3 w-28 rounded-md opacity-40" />
                   )}
                 </div>
               ))}
@@ -88,11 +152,11 @@ export default function SidebarSkeleton({ collapsed }) {
         ))}
       </div>
       
-      {/* Footer / Bottom Item Placeholder */}
-      <div className="absolute bottom-10 left-0 w-full px-4">
-        <div className="flex items-center gap-4 px-3 py-3">
-           <Skeleton className="w-6 h-6 rounded-xl shrink-0" floating={true} />
-           {!collapsed && <Skeleton className="h-3 w-28 rounded-lg" />}
+      {/* Footer / Help & Support Placeholder */}
+      <div className="absolute bottom-8 left-0 w-full px-4 border-t pt-4" style={{ borderColor: "var(--border-color)" }}>
+        <div className={`flex items-center ${collapsed ? "justify-center" : "gap-4 px-4"} py-3`}>
+           <Skeleton className="w-5 h-5 rounded-lg shrink-0" floating={true} />
+           {!collapsed && <Skeleton className="h-3 w-24 rounded-md opacity-40" />}
         </div>
       </div>
     </aside>

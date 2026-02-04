@@ -17,6 +17,21 @@
 // module.exports = router;
 
 
+// const express = require("express");
+// const router = express.Router();
+// const auth = require("../middlewares/auth");
+// const authCtrl = require("../controllers/authController");
+
+// router.post("/register", authCtrl.register);
+// router.post("/login", authCtrl.login);
+
+// /* ✅ SAFE ME ROUTE */
+// router.get("/me", auth, (req, res) => {
+//   res.json({ user: req.user });
+// });
+
+// module.exports = router;
+
 const express = require("express");
 const router = express.Router();
 const auth = require("../middlewares/auth");
@@ -25,7 +40,6 @@ const authCtrl = require("../controllers/authController");
 router.post("/register", authCtrl.register);
 router.post("/login", authCtrl.login);
 
-/* ✅ SAFE ME ROUTE */
 router.get("/me", auth, (req, res) => {
   res.json({ user: req.user });
 });

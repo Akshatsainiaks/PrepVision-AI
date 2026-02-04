@@ -118,6 +118,98 @@
 
 
 //new final
+// import React from "react";
+// import { FiTrendingUp, FiCalendar } from "react-icons/fi";
+
+// export default function StreakCard({ streak = 0 }) {
+//   const days = ["S", "M", "T", "W", "T", "F", "S"];
+//   const currentDay = new Date().getDay();
+
+//   return (
+//     <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm relative overflow-hidden group h-full">
+//       {/* Background Decorative Element - Softened for light mode */}
+//       <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-50 blur-[50px] rounded-full group-hover:bg-orange-100 transition-colors duration-500" />
+
+//       <div className="flex items-start justify-between relative z-10">
+//         <div className="flex items-center gap-5">
+//           {/* THE FLAME ICON */}
+//           <div className="relative">
+//             {/* Soft Glow behind the icon */}
+//             <div className="absolute inset-0 bg-orange-200 blur-xl opacity-40 group-hover:opacity-60 transition-opacity animate-pulse"></div>
+//             <div className="
+//               relative w-14 h-14 rounded-2xl
+//               flex items-center justify-center
+//               bg-orange-50 border border-orange-100 
+//               text-2xl shadow-sm
+//             ">
+//               🔥
+//             </div>
+//           </div>
+
+//           {/* TEXT CONTENT */}
+//           <div>
+//             <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+//               Activity Streak
+//             </p>
+//             <div className="flex items-baseline gap-2">
+//               <p className="text-5xl font-black text-slate-900 tracking-tighter">
+//                 {streak}
+//               </p>
+//               <p className="text-sm font-black text-orange-600 uppercase">Days</p>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* STATUS BADGE */}
+//         <div className="hidden sm:block">
+//            <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+//               <FiTrendingUp className="text-sm" />
+//               ACTIVE
+//            </div>
+//         </div>
+//       </div>
+
+//       {/* WEEKLY VISUALIZER */}
+//       <div className="mt-10 relative z-10">
+//         <div className="flex justify-between items-center">
+//           {days.map((day, idx) => {
+//             const isToday = idx === currentDay;
+//             const isCompleted = idx < currentDay;
+
+//             return (
+//               <div key={idx} className="flex flex-col items-center gap-2">
+//                 <div className={`
+//                   w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-bold transition-all duration-300
+//                   ${isToday ? 
+//                     'bg-orange-600 text-white shadow-lg shadow-orange-200 scale-110 ring-4 ring-orange-50' : 
+//                     isCompleted ? 
+//                     'bg-orange-50 text-orange-600 border border-orange-100' : 
+//                     'bg-slate-50 text-slate-400 border border-slate-100'}
+//                 `}>
+//                   {day}
+//                 </div>
+//               </div>
+//             );
+//           })}
+//         </div>
+//       </div>
+
+//       {/* MOTIVATIONAL FOOTER */}
+//       <div className="mt-10 pt-5 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+//         <p className="text-[12px] text-slate-500 font-medium italic">
+//           “Consistency is the secret of masters.”
+//         </p>
+//         <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-tight bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+//           <FiCalendar className="text-orange-500" />
+//           <span>Next Goal: <span className="text-slate-700">{streak + (7 - (streak % 7))} Days</span></span>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+//dark mode
 import React from "react";
 import { FiTrendingUp, FiCalendar } from "react-icons/fi";
 
@@ -126,43 +218,44 @@ export default function StreakCard({ streak = 0 }) {
   const currentDay = new Date().getDay();
 
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm relative overflow-hidden group h-full">
-      {/* Background Decorative Element - Softened for light mode */}
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-50 blur-[50px] rounded-full group-hover:bg-orange-100 transition-colors duration-500" />
+    <div className="card p-8 relative overflow-hidden group h-full transition-all duration-300">
+      {/* Background Glow - Now an amber/orange nebula effect */}
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/10 blur-[60px] rounded-full group-hover:bg-orange-500/20 transition-colors duration-500" />
 
       <div className="flex items-start justify-between relative z-10">
         <div className="flex items-center gap-5">
           {/* THE FLAME ICON */}
           <div className="relative">
-            {/* Soft Glow behind the icon */}
-            <div className="absolute inset-0 bg-orange-200 blur-xl opacity-40 group-hover:opacity-60 transition-opacity animate-pulse"></div>
-            <div className="
-              relative w-14 h-14 rounded-2xl
-              flex items-center justify-center
-              bg-orange-50 border border-orange-100 
-              text-2xl shadow-sm
-            ">
+            {/* Glow behind the icon optimized for dark mode */}
+            <div className="absolute inset-0 bg-orange-600 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity animate-pulse"></div>
+            <div 
+              className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-lg border"
+              style={{ 
+                backgroundColor: "var(--bg-primary)", 
+                borderColor: "rgba(249, 115, 22, 0.2)" 
+              }}
+            >
               🔥
             </div>
           </div>
 
           {/* TEXT CONTENT */}
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
               Activity Streak
             </p>
             <div className="flex items-baseline gap-2">
-              <p className="text-5xl font-black text-slate-900 tracking-tighter">
+              <p className="text-5xl font-black tracking-tighter text-[var(--text-primary)]">
                 {streak}
               </p>
-              <p className="text-sm font-black text-orange-600 uppercase">Days</p>
+              <p className="text-sm font-black text-orange-500 uppercase">Days</p>
             </div>
           </div>
         </div>
 
         {/* STATUS BADGE */}
         <div className="hidden sm:block">
-           <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+           <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
               <FiTrendingUp className="text-sm" />
               ACTIVE
            </div>
@@ -181,10 +274,10 @@ export default function StreakCard({ streak = 0 }) {
                 <div className={`
                   w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-bold transition-all duration-300
                   ${isToday ? 
-                    'bg-orange-600 text-white shadow-lg shadow-orange-200 scale-110 ring-4 ring-orange-50' : 
+                    'bg-orange-600 text-white shadow-[0_0_20px_rgba(234,88,12,0.4)] scale-110 ring-4 ring-orange-500/10' : 
                     isCompleted ? 
-                    'bg-orange-50 text-orange-600 border border-orange-100' : 
-                    'bg-slate-50 text-slate-400 border border-slate-100'}
+                    'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 
+                    'bg-[var(--bg-primary)] text-[var(--text-secondary)] border border-[var(--border-color)]'}
                 `}>
                   {day}
                 </div>
@@ -195,13 +288,13 @@ export default function StreakCard({ streak = 0 }) {
       </div>
 
       {/* MOTIVATIONAL FOOTER */}
-      <div className="mt-10 pt-5 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
-        <p className="text-[12px] text-slate-500 font-medium italic">
+      <div className="mt-10 pt-5 border-t border-[var(--border-color)] flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+        <p className="text-[12px] text-[var(--text-secondary)] font-medium italic">
           “Consistency is the secret of masters.”
         </p>
-        <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-tight bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+        <div className="flex items-center gap-2 text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-tight bg-[var(--bg-primary)] px-3 py-1.5 rounded-lg border border-[var(--border-color)]">
           <FiCalendar className="text-orange-500" />
-          <span>Next Goal: <span className="text-slate-700">{streak + (7 - (streak % 7))} Days</span></span>
+          <span>Next Goal: <span className="text-[var(--text-primary)]">{streak + (7 - (streak % 7))} Days</span></span>
         </div>
       </div>
     </div>
