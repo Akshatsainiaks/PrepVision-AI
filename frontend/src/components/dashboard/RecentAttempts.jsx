@@ -303,10 +303,143 @@
 // }
 
 //dark mode
+// import React from "react";
+// import { useQuery } from "@tanstack/react-query";
+// import API from "../../api/api";
+// import { FiLoader, FiArrowRight, FiBriefcase, FiCalendar, FiActivity } from "react-icons/fi";
+// import { Link } from "react-router-dom";
+
+// export default function RecentAttempts() {
+//   const { data = [], isLoading } = useQuery({
+//     queryKey: ["recent-interviews"],
+//     queryFn: async () => {
+//       const res = await API.get("/interview-history");
+//       return res.data.sessions || [];
+//     },
+//   });
+
+//   if (isLoading) {
+//     return (
+//       <div className="flex flex-col items-center justify-center py-16 card shadow-sm">
+//         <div className="relative flex items-center justify-center">
+//           <div className="absolute w-12 h-12 border-2 border-indigo-500/20 rounded-full animate-ping"></div>
+//           <FiLoader className="animate-spin text-[var(--accent)] text-2xl relative z-10" />
+//         </div>
+//         <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--text-secondary)]">
+//           Syncing Records
+//         </p>
+//       </div>
+//     );
+//   }
+
+//   if (data.length === 0) {
+//     return (
+//       <div className="p-12 text-center border-2 border-dashed border-[var(--border-color)] rounded-[2rem] bg-[var(--bg-primary)]/30">
+//         <div className="w-14 h-14 bg-[var(--bg-card)] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[var(--border-color)] text-[var(--text-secondary)] shadow-sm">
+//           <FiActivity size={28} />
+//         </div>
+//         <p className="text-sm text-[var(--text-primary)] font-bold">No activity detected yet.</p>
+//         <p className="text-xs text-[var(--text-secondary)] mt-2">Complete a mock interview to see your history here.</p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-3">
+//       {data.map((session) => {
+//         const avgScore =
+//           session.questions?.length > 0
+//             ? session.questions.reduce((sum, q) => sum + (q.aiScore || 0), 0) /
+//               session.questions.length
+//             : 0;
+
+//         const getScoreTheme = (score) => {
+//           if (score >= 8) return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+//           if (score >= 5) return "text-amber-400 bg-amber-500/10 border-amber-500/20";
+//           return "text-rose-400 bg-rose-500/10 border-rose-500/20";
+//         };
+
+//         return (
+//           <div
+//             key={session._id}
+//             className="group relative flex items-center justify-between p-4 rounded-2xl transition-all duration-300 border"
+//             style={{ 
+//                 backgroundColor: "var(--bg-card)", 
+//                 borderColor: "var(--border-color)" 
+//             }}
+//           >
+//             {/* Hover Glow Background */}
+//             <div className="absolute inset-0 rounded-2xl bg-indigo-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+//             {/* LEFT: INFO */}
+//             <div className="flex items-center gap-4 relative z-10">
+//               <div className="hidden sm:flex w-12 h-12 rounded-xl border items-center justify-center transition-all duration-300"
+//                    style={{ 
+//                        backgroundColor: "var(--bg-primary)", 
+//                        borderColor: "var(--border-color)",
+//                        color: "var(--text-secondary)" 
+//                    }}>
+//                 <FiBriefcase size={20} className="group-hover:text-[var(--accent)]" />
+//               </div>
+//               <div>
+//                 <h3 className="text-base font-bold tracking-tight text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
+//                   {session.company}
+//                 </h3>
+//                 <div className="flex items-center gap-3 mt-1">
+//                   <span className="text-xs font-semibold text-[var(--text-secondary)]">{session.role}</span>
+//                   <div className="w-1 h-1 rounded-full bg-[var(--border-color)]"></div>
+//                   <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-secondary)]">
+//                     <FiCalendar size={12} className="text-indigo-400/80" />
+//                     {new Date(session.createdAt).toLocaleDateString(undefined, { 
+//                       month: 'short', 
+//                       day: 'numeric', 
+//                       year: 'numeric' 
+//                     })}
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* RIGHT: SCORE & ACTION */}
+//             <div className="flex items-center gap-6 relative z-10">
+//               <div className="text-right hidden xs:block">
+//                 <div className={`inline-flex items-center px-3 py-1 rounded-lg border text-sm font-black tracking-tight ${getScoreTheme(avgScore)}`}>
+//                   {avgScore.toFixed(1)} <span className="opacity-40 text-[10px] ml-1">/ 10</span>
+//                 </div>
+//                 <p className="text-[9px] uppercase tracking-widest font-black text-[var(--text-secondary)] mt-1.5 ml-1">AI Score</p>
+//               </div>
+
+//               <Link
+//                 to={`/mock?session=${session._id}`}
+//                 className="flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-300"
+//                 style={{ 
+//                     backgroundColor: "var(--bg-primary)", 
+//                     borderColor: "var(--border-color)",
+//                     color: "var(--text-secondary)" 
+//                 }}
+//               >
+//                 <FiArrowRight size={20} className="group-hover:text-[var(--text-primary)]" />
+//               </Link>
+//             </div>
+//           </div>
+//         );
+//       })}
+//     </div>
+//   );
+// }
+
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import API from "../../api/api";
-import { FiLoader, FiArrowRight, FiBriefcase, FiCalendar, FiActivity } from "react-icons/fi";
+import {
+  FiLoader,
+  FiArrowRight,
+  FiBriefcase,
+  FiCalendar,
+  FiEdit3,
+  FiActivity,
+} from "react-icons/fi";
 import { Link } from "react-router-dom";
 
 export default function RecentAttempts() {
@@ -320,105 +453,109 @@ export default function RecentAttempts() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 card shadow-sm">
-        <div className="relative flex items-center justify-center">
-          <div className="absolute w-12 h-12 border-2 border-indigo-500/20 rounded-full animate-ping"></div>
-          <FiLoader className="animate-spin text-[var(--accent)] text-2xl relative z-10" />
-        </div>
-        <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--text-secondary)]">
+      <div className="flex flex-col items-center justify-center py-16 card">
+        <FiLoader className="animate-spin text-[var(--accent)] text-2xl" />
+        <p className="mt-4 text-[11px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
           Syncing Records
         </p>
       </div>
     );
   }
 
-  if (data.length === 0) {
+  if (!data.length) {
     return (
-      <div className="p-12 text-center border-2 border-dashed border-[var(--border-color)] rounded-[2rem] bg-[var(--bg-primary)]/30">
-        <div className="w-14 h-14 bg-[var(--bg-card)] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[var(--border-color)] text-[var(--text-secondary)] shadow-sm">
-          <FiActivity size={28} />
-        </div>
-        <p className="text-sm text-[var(--text-primary)] font-bold">No activity detected yet.</p>
-        <p className="text-xs text-[var(--text-secondary)] mt-2">Complete a mock interview to see your history here.</p>
+      <div className="p-12 text-center border-2 border-dashed border-[var(--border-color)] rounded-2xl">
+        <FiActivity className="mx-auto text-3xl text-[var(--text-secondary)] mb-3" />
+        <p className="text-sm font-bold text-[var(--text-primary)]">
+          No activity yet
+        </p>
+        <p className="text-xs text-[var(--text-secondary)] mt-1">
+          Complete a written or live interview to see history.
+        </p>
       </div>
     );
   }
 
+  const scoreTheme = (score) => {
+    if (score >= 8) return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+    if (score >= 5) return "text-amber-400 bg-amber-500/10 border-amber-500/20";
+    return "text-rose-400 bg-rose-500/10 border-rose-500/20";
+  };
+
   return (
     <div className="space-y-3">
       {data.map((session) => {
-        const avgScore =
-          session.questions?.length > 0
-            ? session.questions.reduce((sum, q) => sum + (q.aiScore || 0), 0) /
-              session.questions.length
-            : 0;
+        const isWritten = session.type === "WRITTEN";
 
-        const getScoreTheme = (score) => {
-          if (score >= 8) return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
-          if (score >= 5) return "text-amber-400 bg-amber-500/10 border-amber-500/20";
-          return "text-rose-400 bg-rose-500/10 border-rose-500/20";
-        };
+        const score = isWritten
+          ? session.overallScore || 0
+          : session.questions?.length
+          ? session.questions.reduce((s, q) => s + (q.aiScore || 0), 0) /
+            session.questions.length
+          : 0;
 
         return (
           <div
             key={session._id}
-            className="group relative flex items-center justify-between p-4 rounded-2xl transition-all duration-300 border"
-            style={{ 
-                backgroundColor: "var(--bg-card)", 
-                borderColor: "var(--border-color)" 
+            className="group flex items-center justify-between p-4 rounded-2xl border"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              borderColor: "var(--border-color)",
             }}
           >
-            {/* Hover Glow Background */}
-            <div className="absolute inset-0 rounded-2xl bg-indigo-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-
-            {/* LEFT: INFO */}
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="hidden sm:flex w-12 h-12 rounded-xl border items-center justify-center transition-all duration-300"
-                   style={{ 
-                       backgroundColor: "var(--bg-primary)", 
-                       borderColor: "var(--border-color)",
-                       color: "var(--text-secondary)" 
-                   }}>
-                <FiBriefcase size={20} className="group-hover:text-[var(--accent)]" />
+            {/* LEFT */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl border flex items-center justify-center text-[var(--text-secondary)]">
+                {isWritten ? <FiEdit3 /> : <FiBriefcase />}
               </div>
+
               <div>
-                <h3 className="text-base font-bold tracking-tight text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
-                  {session.company}
+                <h3 className="font-bold text-[var(--text-primary)]">
+                  {isWritten ? session.topic : session.company}
                 </h3>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-xs font-semibold text-[var(--text-secondary)]">{session.role}</span>
-                  <div className="w-1 h-1 rounded-full bg-[var(--border-color)]"></div>
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-secondary)]">
-                    <FiCalendar size={12} className="text-indigo-400/80" />
-                    {new Date(session.createdAt).toLocaleDateString(undefined, { 
-                      month: 'short', 
-                      day: 'numeric', 
-                      year: 'numeric' 
-                    })}
-                  </div>
+                <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)] mt-1">
+                  <span>{isWritten ? session.level : session.role}</span>
+                  <span>•</span>
+                  <FiCalendar />
+                  <span>
+                    {new Date(session.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
+
+                {/* TYPE BADGE */}
+                <span
+                  className={`inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-full border ${
+                    isWritten
+                      ? "text-indigo-400 bg-indigo-500/10 border-indigo-500/20"
+                      : "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                  }`}
+                >
+                  {session.type}
+                </span>
               </div>
             </div>
 
-            {/* RIGHT: SCORE & ACTION */}
-            <div className="flex items-center gap-6 relative z-10">
-              <div className="text-right hidden xs:block">
-                <div className={`inline-flex items-center px-3 py-1 rounded-lg border text-sm font-black tracking-tight ${getScoreTheme(avgScore)}`}>
-                  {avgScore.toFixed(1)} <span className="opacity-40 text-[10px] ml-1">/ 10</span>
-                </div>
-                <p className="text-[9px] uppercase tracking-widest font-black text-[var(--text-secondary)] mt-1.5 ml-1">AI Score</p>
+            {/* RIGHT */}
+            <div className="flex items-center gap-4">
+              <div
+                className={`px-3 py-1 rounded-lg border text-sm font-black ${scoreTheme(
+                  score
+                )}`}
+              >
+                {score.toFixed(1)}
+                <span className="text-[10px] opacity-50 ml-1">/10</span>
               </div>
 
               <Link
-                to={`/mock?session=${session._id}`}
-                className="flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-300"
-                style={{ 
-                    backgroundColor: "var(--bg-primary)", 
-                    borderColor: "var(--border-color)",
-                    color: "var(--text-secondary)" 
-                }}
+                to={
+                  isWritten
+                    ? `/mock/written/session/${session._id}`
+                    : `/mock?session=${session._id}`
+                }
+                className="w-10 h-10 flex items-center justify-center rounded-xl border"
+                style={{ borderColor: "var(--border-color)" }}
               >
-                <FiArrowRight size={20} className="group-hover:text-[var(--text-primary)]" />
+                <FiArrowRight />
               </Link>
             </div>
           </div>

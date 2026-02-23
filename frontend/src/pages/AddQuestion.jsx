@@ -574,6 +574,220 @@
 // }
 
 
+// //dark mode
+// import { useState } from "react";
+// import { useMutation, useQueryClient } from "@tanstack/react-query";
+// import API from "../api/api";
+// import React from "react";
+// import { FiPlusCircle, FiCheck, FiAlertTriangle, FiLoader } from "react-icons/fi";
+
+// export default function AddQuestion() {
+//   const queryClient = useQueryClient();
+
+//   const [form, setForm] = useState({
+//     company: "",
+//     role: "",
+//     type: "",
+//     question: "",
+//     difficulty: "Medium",
+//     tags: "",
+//   });
+
+//   const [message, setMessage] = useState("");
+
+//   const addQuestionMutation = useMutation({
+//     mutationFn: async (payload) => {
+//       const res = await API.post("/questions", payload);
+//       return res.data;
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries(["questions"]);
+//       setMessage("🎉 Question added successfully!");
+//       setForm({
+//         company: "",
+//         role: "",
+//         type: "",
+//         question: "",
+//         difficulty: "Medium",
+//         tags: "",
+//       });
+//       setTimeout(() => setMessage(""), 3000);
+//     },
+//     onError: (err) => {
+//       setMessage(err.response?.data?.message || "❌ Error adding question");
+//     },
+//   });
+
+//   const handleSubmit = () => {
+//     if (!form.company || !form.role || !form.type || !form.question) {
+//       setMessage("⚠️ Required: Company, Role, Type, and Question.");
+//       return;
+//     }
+
+//     const payload = {
+//       ...form,
+//       type: form.type.trim(),
+//       tags: form.tags
+//         ? form.tags.split(",").map((t) => t.trim()).filter(Boolean)
+//         : [],
+//     };
+
+//     addQuestionMutation.mutate(payload);
+//   };
+
+//   const inputStyles = `
+//     w-full p-3.5 rounded-xl border outline-none transition-all
+//     bg-[var(--bg-primary)] border-[var(--border-color)] 
+//     text-[var(--text-primary)] placeholder-slate-500
+//     focus:ring-4 focus:ring-indigo-500/10 focus:border-[var(--accent)]
+//   `;
+
+//   return (
+//     <div className="max-w-2xl mx-auto pb-12 animate-fadeIn transition-colors duration-300">
+//       {/* PAGE TITLE */}
+//       <div className="flex items-center gap-3 mb-8">
+//         <div className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/20"
+//              style={{ backgroundColor: "var(--accent)" }}>
+//           <FiPlusCircle size={28} />
+//         </div>
+//         <div>
+//           <h2 className="text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
+//             Contribute <span style={{ color: "var(--accent)" }}>Question</span>
+//           </h2>
+//           <p className="font-medium" style={{ color: "var(--text-secondary)" }}>
+//             Help the community by sharing interview experiences.
+//           </p>
+//         </div>
+//       </div>
+
+//       {/* FORM CARD */}
+//       <div className="card rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
+        
+//         {/* Form Progress Bar */}
+//         <div className="absolute top-0 left-0 w-full h-1 bg-[var(--bg-primary)]">
+//             <div 
+//                 className="h-full transition-all duration-500" 
+//                 style={{ 
+//                     width: `${Object.values(form).filter(Boolean).length * 16.6}%`,
+//                     backgroundColor: "var(--accent)"
+//                 }} 
+//             />
+//         </div>
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+//           <div className="space-y-1.5">
+//             <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Company</label>
+//             <input
+//               type="text"
+//               placeholder="e.g. Google, Amazon"
+//               className={inputStyles}
+//               value={form.company}
+//               onChange={(e) => setForm({ ...form, company: e.target.value })}
+//             />
+//           </div>
+
+//           <div className="space-y-1.5">
+//             <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Role</label>
+//             <input
+//               type="text"
+//               placeholder="e.g. SDE, Frontend"
+//               className={inputStyles}
+//               value={form.role}
+//               onChange={(e) => setForm({ ...form, role: e.target.value })}
+//             />
+//           </div>
+//         </div>
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+//             <div className="space-y-1.5">
+//                 <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Question Type</label>
+//                 <input
+//                 list="question-type-options"
+//                 placeholder="Select or Type..."
+//                 className={inputStyles}
+//                 value={form.type}
+//                 onChange={(e) => setForm({ ...form, type: e.target.value })}
+//                 />
+//                 <datalist id="question-type-options">
+//                     <option value="DSA" />
+//                     <option value="DBMS" />
+//                     <option value="Coding" />
+//                     <option value="HR" />
+//                     <option value="System Design" />
+//                 </datalist>
+//             </div>
+
+//             <div className="space-y-1.5">
+//                 <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Difficulty</label>
+//                 <select
+//                 className={`${inputStyles} appearance-none`}
+//                 value={form.difficulty}
+//                 onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
+//                 >
+//                 <option>Easy</option>
+//                 <option>Medium</option>
+//                 <option>Hard</option>
+//                 </select>
+//             </div>
+//         </div>
+
+//         {/* Question Area */}
+//         <div className="space-y-1.5 mb-6">
+//             <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Interview Question</label>
+//             <textarea
+//             placeholder="Type the question details here..."
+//             className={`${inputStyles} h-40 resize-none`}
+//             value={form.question}
+//             onChange={(e) => setForm({ ...form, question: e.target.value })}
+//             />
+//         </div>
+
+//         {/* Tags */}
+//         <div className="space-y-1.5 mb-8">
+//             <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Tags (comma separated)</label>
+//             <input
+//             type="text"
+//             placeholder="arrays, recursion, dynamic programming..."
+//             className={inputStyles}
+//             value={form.tags}
+//             onChange={(e) => setForm({ ...form, tags: e.target.value })}
+//             />
+//         </div>
+
+//         {/* Submit */}
+//         <button
+//           onClick={handleSubmit}
+//           disabled={addQuestionMutation.isLoading}
+//           className="w-full py-4 rounded-2xl text-white font-black text-lg shadow-xl transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3"
+//           style={{ 
+//             backgroundColor: "var(--accent)",
+//             boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.2)"
+//           }}
+//         >
+//           {addQuestionMutation.isLoading ? (
+//             <><FiLoader className="animate-spin" /> Processing...</>
+//           ) : (
+//             <><FiPlusCircle /> Publish Question</>
+//           )}
+//         </button>
+
+//         {/* Status Message */}
+//         {message && (
+//           <div className={`mt-6 p-4 rounded-xl border flex items-center gap-3 animate-fadeIn ${
+//               message.includes("🎉") 
+//               ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+//               : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+//           }`}>
+//             {message.includes("🎉") ? <FiCheck /> : <FiAlertTriangle />}
+//             <span className="text-sm font-bold uppercase tracking-tight">{message}</span>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
+
 //dark mode
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -601,7 +815,12 @@ export default function AddQuestion() {
       return res.data;
     },
     onSuccess: () => {
+      // ✅ existing
       queryClient.invalidateQueries(["questions"]);
+
+      // 🔥 REQUIRED FIX: refresh credits on dashboard
+      queryClient.invalidateQueries(["my-credits"]);
+
       setMessage("🎉 Question added successfully!");
       setForm({
         company: "",
@@ -646,15 +865,23 @@ export default function AddQuestion() {
     <div className="max-w-2xl mx-auto pb-12 animate-fadeIn transition-colors duration-300">
       {/* PAGE TITLE */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/20"
-             style={{ backgroundColor: "var(--accent)" }}>
+        <div
+          className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/20"
+          style={{ backgroundColor: "var(--accent)" }}
+        >
           <FiPlusCircle size={28} />
         </div>
         <div>
-          <h2 className="text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h2
+            className="text-4xl font-black tracking-tight"
+            style={{ color: "var(--text-primary)" }}
+          >
             Contribute <span style={{ color: "var(--accent)" }}>Question</span>
           </h2>
-          <p className="font-medium" style={{ color: "var(--text-secondary)" }}>
+          <p
+            className="font-medium"
+            style={{ color: "var(--text-secondary)" }}
+          >
             Help the community by sharing interview experiences.
           </p>
         </div>
@@ -662,21 +889,22 @@ export default function AddQuestion() {
 
       {/* FORM CARD */}
       <div className="card rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
-        
         {/* Form Progress Bar */}
         <div className="absolute top-0 left-0 w-full h-1 bg-[var(--bg-primary)]">
-            <div 
-                className="h-full transition-all duration-500" 
-                style={{ 
-                    width: `${Object.values(form).filter(Boolean).length * 16.6}%`,
-                    backgroundColor: "var(--accent)"
-                }} 
-            />
+          <div
+            className="h-full transition-all duration-500"
+            style={{
+              width: `${Object.values(form).filter(Boolean).length * 16.6}%`,
+              backgroundColor: "var(--accent)",
+            }}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="space-y-1.5">
-            <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Company</label>
+            <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>
+              Company
+            </label>
             <input
               type="text"
               placeholder="e.g. Google, Amazon"
@@ -687,7 +915,9 @@ export default function AddQuestion() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Role</label>
+            <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>
+              Role
+            </label>
             <input
               type="text"
               placeholder="e.g. SDE, Frontend"
@@ -699,59 +929,67 @@ export default function AddQuestion() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="space-y-1.5">
-                <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Question Type</label>
-                <input
-                list="question-type-options"
-                placeholder="Select or Type..."
-                className={inputStyles}
-                value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value })}
-                />
-                <datalist id="question-type-options">
-                    <option value="DSA" />
-                    <option value="DBMS" />
-                    <option value="Coding" />
-                    <option value="HR" />
-                    <option value="System Design" />
-                </datalist>
-            </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>
+              Question Type
+            </label>
+            <input
+              list="question-type-options"
+              placeholder="Select or Type..."
+              className={inputStyles}
+              value={form.type}
+              onChange={(e) => setForm({ ...form, type: e.target.value })}
+            />
+            <datalist id="question-type-options">
+              <option value="DSA" />
+              <option value="DBMS" />
+              <option value="Coding" />
+              <option value="HR" />
+              <option value="System Design" />
+            </datalist>
+          </div>
 
-            <div className="space-y-1.5">
-                <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Difficulty</label>
-                <select
-                className={`${inputStyles} appearance-none`}
-                value={form.difficulty}
-                onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
-                >
-                <option>Easy</option>
-                <option>Medium</option>
-                <option>Hard</option>
-                </select>
-            </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>
+              Difficulty
+            </label>
+            <select
+              className={`${inputStyles} appearance-none`}
+              value={form.difficulty}
+              onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
+            >
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+            </select>
+          </div>
         </div>
 
         {/* Question Area */}
         <div className="space-y-1.5 mb-6">
-            <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Interview Question</label>
-            <textarea
+          <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>
+            Interview Question
+          </label>
+          <textarea
             placeholder="Type the question details here..."
             className={`${inputStyles} h-40 resize-none`}
             value={form.question}
             onChange={(e) => setForm({ ...form, question: e.target.value })}
-            />
+          />
         </div>
 
         {/* Tags */}
         <div className="space-y-1.5 mb-8">
-            <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>Tags (comma separated)</label>
-            <input
+          <label className="text-sm font-bold ml-1" style={{ color: "var(--text-secondary)" }}>
+            Tags (comma separated)
+          </label>
+          <input
             type="text"
             placeholder="arrays, recursion, dynamic programming..."
             className={inputStyles}
             value={form.tags}
             onChange={(e) => setForm({ ...form, tags: e.target.value })}
-            />
+          />
         </div>
 
         {/* Submit */}
@@ -759,27 +997,35 @@ export default function AddQuestion() {
           onClick={handleSubmit}
           disabled={addQuestionMutation.isLoading}
           className="w-full py-4 rounded-2xl text-white font-black text-lg shadow-xl transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3"
-          style={{ 
+          style={{
             backgroundColor: "var(--accent)",
-            boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.2)"
+            boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.2)",
           }}
         >
           {addQuestionMutation.isLoading ? (
-            <><FiLoader className="animate-spin" /> Processing...</>
+            <>
+              <FiLoader className="animate-spin" /> Processing...
+            </>
           ) : (
-            <><FiPlusCircle /> Publish Question</>
+            <>
+              <FiPlusCircle /> Publish Question
+            </>
           )}
         </button>
 
         {/* Status Message */}
         {message && (
-          <div className={`mt-6 p-4 rounded-xl border flex items-center gap-3 animate-fadeIn ${
-              message.includes("🎉") 
-              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
-              : "bg-rose-500/10 border-rose-500/20 text-rose-400"
-          }`}>
+          <div
+            className={`mt-6 p-4 rounded-xl border flex items-center gap-3 animate-fadeIn ${
+              message.includes("🎉")
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+            }`}
+          >
             {message.includes("🎉") ? <FiCheck /> : <FiAlertTriangle />}
-            <span className="text-sm font-bold uppercase tracking-tight">{message}</span>
+            <span className="text-sm font-bold uppercase tracking-tight">
+              {message}
+            </span>
           </div>
         )}
       </div>

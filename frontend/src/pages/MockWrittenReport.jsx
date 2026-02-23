@@ -112,19 +112,606 @@
 
 
 //dark mode
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
+// import { useParams, useNavigate } from "react-router-dom";
+// import Navbar from "../components/Navbar";
+// import { motion } from "framer-motion";
+// import { getWrittenInterviewSession } from "../api/writtenInterviewApi";
+// import { FiAward, FiBookOpen, FiCornerDownRight, FiLoader, FiRotateCcw } from "react-icons/fi";
+
+// export default function MockWrittenReport() {
+//   const { sessionId } = useParams();
+//   const navigate = useNavigate();
+
+//   const [session, setSession] = useState(null);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     if (!sessionId) {
+//       navigate("/mock");
+//       return;
+//     }
+
+//     getWrittenInterviewSession(sessionId)
+//       .then((data) => {
+//         setSession(data);
+//         setLoading(false);
+//       })
+//       .catch(() => {
+//         navigate("/mock");
+//       });
+//   }, [sessionId, navigate]);
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex flex-col items-center justify-center transition-colors duration-300"
+//            style={{ backgroundColor: "var(--bg-primary)" }}>
+//         <FiLoader className="w-10 h-10 animate-spin mb-4" style={{ color: "var(--accent)" }} />
+//         <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: "var(--text-secondary)" }}>
+//           Compiling AI Insights...
+//         </p>
+//       </div>
+//     );
+//   }
+
+//   if (!session) return null;
+
+//   // Calculate Average Score
+//   const avgScore = session.questions.reduce((acc, curr) => acc + (curr.aiScore || 0), 0) / session.questions.length;
+
+//   return (
+//     <div className="min-h-screen transition-colors duration-300 font-sans"
+//          style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
+//       <Navbar />
+
+//       <div className="max-w-4xl mx-auto pt-32 px-6 pb-20">
+        
+//         {/* HEADER & SUMMARY CARD */}
+//         <motion.div
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           className="card p-10 rounded-[2.5rem] relative overflow-hidden mb-12"
+//         >
+//           <div className="absolute top-0 right-0 p-10 opacity-5">
+//             <FiAward size={150} />
+//           </div>
+
+//           <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+//             <div>
+//               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border mb-4"
+//                    style={{ backgroundColor: "rgba(129, 140, 248, 0.1)", borderColor: "rgba(129, 140, 248, 0.2)", color: "var(--accent)" }}>
+//                 <span className="text-[10px] font-black uppercase tracking-widest">Written Assessment</span>
+//               </div>
+//               <h1 className="text-5xl font-black tracking-tighter leading-tight">
+//                 Interview <span style={{ color: "var(--accent)" }}>Report</span>
+//               </h1>
+//               <p className="mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>
+//                 {session.topic} • {session.level} Level
+//               </p>
+//             </div>
+
+//             <div className="text-right">
+//                 <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: "var(--text-secondary)" }}>Overall Performance</p>
+//                 <div className="text-6xl font-black tracking-tighter" style={{ color: "var(--accent)" }}>
+//                     {Math.round(avgScore)}%
+//                 </div>
+//             </div>
+//           </div>
+//         </motion.div>
+
+//         {/* QUESTIONS BREAKDOWN */}
+//         <div className="space-y-6">
+//           <h2 className="text-xs font-black uppercase tracking-[0.2em] ml-2 mb-4" style={{ color: "var(--text-secondary)" }}>
+//             Response Breakdown
+//           </h2>
+          
+//           {session.questions.map((q, idx) => (
+//             <div
+//               key={q._id}
+//               className="card p-8 rounded-[2rem] border transition-all hover:border-[var(--accent)]"
+//               style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+//             >
+//               <div className="flex justify-between items-start gap-4 mb-6">
+//                 <h3 className="text-xl font-bold tracking-tight max-w-2xl leading-snug">
+//                   <span className="opacity-30 mr-2">0{idx + 1}.</span> {q.question}
+//                 </h3>
+//                 <div className="px-4 py-1.5 rounded-xl border text-sm font-black tracking-tighter"
+//                      style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)", color: "var(--accent)" }}>
+//                   {q.aiScore ?? "—"}/10
+//                 </div>
+//               </div>
+
+//               {/* USER ANSWER */}
+//               <div className="mb-6 p-5 rounded-2xl border" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}>
+//                 <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest opacity-40">
+//                     <FiCornerDownRight /> Your Response
+//                 </div>
+//                 <p className="text-[var(--text-secondary)] text-sm leading-relaxed font-medium">
+//                   {q.userAnswer || "— Not Answered —"}
+//                 </p>
+//               </div>
+
+//               {/* AI FEEDBACK */}
+//               <div className="p-5 rounded-2xl border" 
+//                    style={{ backgroundColor: "rgba(129, 140, 248, 0.05)", borderColor: "rgba(129, 140, 248, 0.1)" }}>
+//                 <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+//                     <FiBookOpen /> AI Feedback
+//                 </div>
+//                 <p className="text-sm leading-relaxed font-semibold italic" style={{ color: "var(--text-primary)" }}>
+//                   "{q.aiFeedback || "Processing feedback..."}"
+//                 </p>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+
+//         {/* ACTIONS */}
+//         <div className="mt-12 flex justify-center">
+//           <button
+//             onClick={() => navigate("/mock")}
+//             className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:translate-y-[-2px] active:scale-95"
+//             style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+//           >
+//             <FiRotateCcw className="group-hover:rotate-[-45deg] transition-transform" />
+//             Take Another Interview
+//           </button>
+//         </div>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+// import React, { useEffect, useState } from "react";
+// import { useParams, useNavigate } from "react-router-dom";
+// import { motion } from "framer-motion";
+// import { getWrittenInterviewSession } from "../api/writtenInterviewApi";
+// import { FiAward, FiBookOpen, FiCornerDownRight, FiLoader, FiRotateCcw, FiArrowLeft } from "react-icons/fi";
+
+// export default function MockWrittenReport() {
+//   const { sessionId } = useParams();
+//   const navigate = useNavigate();
+
+//   const [session, setSession] = useState(null);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     if (!sessionId) {
+//       navigate("/mock");
+//       return;
+//     }
+
+//     getWrittenInterviewSession(sessionId)
+//       .then((data) => {
+//         setSession(data);
+//         setLoading(false);
+//       })
+//       .catch(() => {
+//         navigate("/mock");
+//       });
+//   }, [sessionId, navigate]);
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex flex-col items-center justify-center transition-colors duration-300"
+//            style={{ backgroundColor: "var(--bg-primary)" }}>
+//         <FiLoader className="w-10 h-10 animate-spin mb-4" style={{ color: "var(--accent)" }} />
+//         <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: "var(--text-secondary)" }}>
+//           Compiling AI Insights...
+//         </p>
+//       </div>
+//     );
+//   }
+
+//   if (!session) return null;
+
+//   // Calculate Average Score
+//   const avgScore = session.questions.reduce((acc, curr) => acc + (curr.aiScore || 0), 0) / session.questions.length;
+
+//   return (
+//     <div className="min-h-screen transition-colors duration-300 font-sans relative"
+//          style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
+      
+//       {/* Background Decor to match start page */}
+//       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none" />
+
+//       {/* Floating Back Button - Replaces Navbar functionality */}
+//       <button 
+//         onClick={() => navigate("/mock")}
+//         className="fixed top-8 left-8 z-50 p-3 rounded-full border transition-all hover:bg-white/5 active:scale-90"
+//         style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
+//       >
+//         <FiArrowLeft size={20} />
+//       </button>
+
+//       <div className="max-w-4xl mx-auto pt-20 px-6 pb-20 relative z-10">
+        
+//         {/* HEADER & SUMMARY CARD */}
+//         <motion.div
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           className="card p-10 rounded-[2.5rem] relative overflow-hidden mb-12 border shadow-2xl"
+//           style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+//         >
+//           <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+//             <FiAward size={150} />
+//           </div>
+
+//           <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+//             <div>
+//               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border mb-4"
+//                    style={{ backgroundColor: "rgba(129, 140, 248, 0.1)", borderColor: "rgba(129, 140, 248, 0.2)", color: "var(--accent)" }}>
+//                 <span className="text-[10px] font-black uppercase tracking-widest">Written Assessment</span>
+//               </div>
+//               <h1 className="text-5xl font-black tracking-tighter leading-tight">
+//                 Interview <span style={{ color: "var(--accent)" }}>Report</span>
+//               </h1>
+//               <p className="mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>
+//                 {session.topic} • {session.level} Level
+//               </p>
+//             </div>
+
+//             <div className="text-right">
+//                 <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: "var(--text-secondary)" }}>Overall Performance</p>
+//                 <div className="text-6xl font-black tracking-tighter" style={{ color: "var(--accent)" }}>
+//                     {Math.round(avgScore)}%
+//                 </div>
+//             </div>
+//           </div>
+//         </motion.div>
+
+//         {/* QUESTIONS BREAKDOWN */}
+//         <div className="space-y-6">
+//           <h2 className="text-xs font-black uppercase tracking-[0.2em] ml-2 mb-4" style={{ color: "var(--text-secondary)" }}>
+//             Response Breakdown
+//           </h2>
+          
+//           {session.questions.map((q, idx) => (
+//             <div
+//               key={q._id}
+//               className="card p-8 rounded-[2rem] border transition-all hover:border-[var(--accent)]"
+//               style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+//             >
+//               <div className="flex justify-between items-start gap-4 mb-6">
+//                 <h3 className="text-xl font-bold tracking-tight max-w-2xl leading-snug">
+//                   <span className="opacity-30 mr-2">0{idx + 1}.</span> {q.question}
+//                 </h3>
+//                 <div className="px-4 py-1.5 rounded-xl border text-sm font-black tracking-tighter"
+//                      style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)", color: "var(--accent)" }}>
+//                   {q.aiScore ?? "—"}/10
+//                 </div>
+//               </div>
+
+//               {/* USER ANSWER */}
+//               <div className="mb-6 p-5 rounded-2xl border" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}>
+//                 <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest opacity-40">
+//                     <FiCornerDownRight /> Your Response
+//                 </div>
+//                 <p className="text-[var(--text-secondary)] text-sm leading-relaxed font-medium">
+//                   {q.userAnswer || "— Not Answered —"}
+//                 </p>
+//               </div>
+
+//               {/* AI FEEDBACK */}
+//               <div className="p-5 rounded-2xl border" 
+//                    style={{ backgroundColor: "rgba(129, 140, 248, 0.05)", borderColor: "rgba(129, 140, 248, 0.1)" }}>
+//                 <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+//                     <FiBookOpen /> AI Feedback
+//                 </div>
+//                 <p className="text-sm leading-relaxed font-semibold italic" style={{ color: "var(--text-primary)" }}>
+//                   "{q.aiFeedback || "Processing feedback..."}"
+//                 </p>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+
+//         {/* ACTIONS */}
+//         <div className="mt-12 flex justify-center">
+//           <button
+//             onClick={() => navigate("/mock")}
+//             className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:translate-y-[-2px] active:scale-95 shadow-lg"
+//             style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+//           >
+//             <FiRotateCcw className="group-hover:rotate-[-45deg] transition-transform" />
+//             Take Another Interview
+//           </button>
+//         </div>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+// import React, { useEffect, useState, useRef } from "react";
+// import { useParams, useNavigate } from "react-router-dom";
+// import { motion } from "framer-motion";
+// import { getWrittenInterviewSession } from "../api/writtenInterviewApi";
+// import { FiAward, FiBookOpen, FiCornerDownRight, FiLoader, FiRotateCcw, FiArrowLeft, FiDownload, FiCheckCircle } from "react-icons/fi";
+// import html2canvas from "html2canvas";
+// import jsPDF from "jspdf";
+
+// export default function MockWrittenReport() {
+//   const { sessionId } = useParams();
+//   const navigate = useNavigate();
+//   const reportRef = useRef(null);
+
+//   const [session, setSession] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [downloading, setDownloading] = useState(false);
+
+//   useEffect(() => {
+//     if (!sessionId) {
+//       navigate("/mock");
+//       return;
+//     }
+
+//     getWrittenInterviewSession(sessionId)
+//       .then((data) => {
+//         setSession(data);
+//         setLoading(false);
+//       })
+//       .catch(() => {
+//         navigate("/mock");
+//       });
+//   }, [sessionId, navigate]);
+
+//   // Download Report as PDF
+//   const downloadReport = async () => {
+//     setDownloading(true);
+//     try {
+//       const element = reportRef.current;
+//       const canvas = await html2canvas(element, {
+//         scale: 2,
+//         useCORS: true,
+//         logging: false,
+//         backgroundColor: getComputedStyle(document.documentElement)
+//           .getPropertyValue('--bg-primary') || '#0a0e1a'
+//       });
+
+//       const imgData = canvas.toDataURL('image/png');
+//       const pdf = new jsPDF({
+//         orientation: 'portrait',
+//         unit: 'mm',
+//         format: 'a4'
+//       });
+
+//       const imgWidth = 210; // A4 width in mm
+//       const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+//       let heightLeft = imgHeight;
+//       let position = 0;
+
+//       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+//       heightLeft -= 297; // A4 height
+
+//       while (heightLeft > 0) {
+//         position = heightLeft - imgHeight;
+//         pdf.addPage();
+//         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+//         heightLeft -= 297;
+//       }
+
+//       pdf.save(`Interview_Report_${session.topic}_${new Date().toLocaleDateString()}.pdf`);
+//     } catch (error) {
+//       console.error("Failed to download report:", error);
+//       alert("Failed to download report. Please try again.");
+//     } finally {
+//       setDownloading(false);
+//     }
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex flex-col items-center justify-center transition-colors duration-300"
+//            style={{ backgroundColor: "var(--bg-primary)" }}>
+//         <FiLoader className="w-10 h-10 animate-spin mb-4" style={{ color: "var(--accent)" }} />
+//         <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: "var(--text-secondary)" }}>
+//           Compiling AI Insights...
+//         </p>
+//       </div>
+//     );
+//   }
+
+//   if (!session) return null;
+
+//   // Calculate Average Score
+//   const avgScore = session.questions.reduce((acc, curr) => acc + (curr.aiScore || 0), 0) / session.questions.length;
+
+//   return (
+//     <div className="min-h-screen transition-colors duration-300 font-sans relative"
+//          style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
+      
+//       {/* Background Decor to match start page */}
+//       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none" />
+
+//       {/* Floating Back Button */}
+//       <button 
+//         onClick={() => navigate("/mock")}
+//         className="fixed top-8 left-8 z-50 p-3 rounded-full border transition-all hover:bg-white/5 active:scale-90"
+//         style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
+//       >
+//         <FiArrowLeft size={20} />
+//       </button>
+
+//       {/* Download Button */}
+//       <button 
+//         onClick={downloadReport}
+//         disabled={downloading}
+//         className="fixed top-8 right-8 z-50 flex items-center gap-2 px-4 py-3 rounded-full border transition-all hover:bg-white/5 active:scale-90 font-bold text-sm"
+//         style={{ 
+//           backgroundColor: downloading ? "var(--border-color)" : "var(--bg-card)", 
+//           borderColor: "var(--accent)", 
+//           color: "var(--accent)",
+//           cursor: downloading ? "not-allowed" : "pointer"
+//         }}
+//       >
+//         {downloading ? (
+//           <>
+//             <FiLoader className="animate-spin" size={18} />
+//             Generating...
+//           </>
+//         ) : (
+//           <>
+//             <FiDownload size={18} />
+//             Download Report
+//           </>
+//         )}
+//       </button>
+
+//       <div ref={reportRef} className="max-w-4xl mx-auto pt-20 px-6 pb-20 relative z-10">
+        
+//         {/* HEADER & SUMMARY CARD */}
+//         <motion.div
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           className="card p-10 rounded-[2.5rem] relative overflow-hidden mb-12 border shadow-2xl"
+//           style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+//         >
+//           <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+//             <FiAward size={150} />
+//           </div>
+
+//           <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+//             <div>
+//               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border mb-4"
+//                    style={{ backgroundColor: "rgba(129, 140, 248, 0.1)", borderColor: "rgba(129, 140, 248, 0.2)", color: "var(--accent)" }}>
+//                 <span className="text-[10px] font-black uppercase tracking-widest">Written Assessment</span>
+//               </div>
+//               <h1 className="text-5xl font-black tracking-tighter leading-tight">
+//                 Interview <span style={{ color: "var(--accent)" }}>Report</span>
+//               </h1>
+//               <p className="mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>
+//                 {session.topic} • {session.level} Level
+//               </p>
+//             </div>
+
+//             <div className="text-right">
+//                 <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: "var(--text-secondary)" }}>Overall Performance</p>
+//                 <div className="text-6xl font-black tracking-tighter" style={{ color: "var(--accent)" }}>
+//                     {Math.round(avgScore)}%
+//                 </div>
+//             </div>
+//           </div>
+//         </motion.div>
+
+//         {/* QUESTIONS BREAKDOWN */}
+//         <div className="space-y-6">
+//           <h2 className="text-xs font-black uppercase tracking-[0.2em] ml-2 mb-4" style={{ color: "var(--text-secondary)" }}>
+//             Response Breakdown
+//           </h2>
+          
+//           {session.questions.map((q, idx) => (
+//             <div
+//               key={q._id}
+//               className="card p-8 rounded-[2rem] border transition-all hover:border-[var(--accent)]"
+//               style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+//             >
+//               <div className="flex justify-between items-start gap-4 mb-6">
+//                 <h3 className="text-xl font-bold tracking-tight max-w-2xl leading-snug">
+//                   <span className="opacity-30 mr-2">0{idx + 1}.</span> {q.question}
+//                 </h3>
+//                 <div className="px-4 py-1.5 rounded-xl border text-sm font-black tracking-tighter"
+//                      style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)", color: "var(--accent)" }}>
+//                   {q.aiScore ?? "—"}/10
+//                 </div>
+//               </div>
+
+//               {/* USER ANSWER */}
+//               <div className="mb-6 p-5 rounded-2xl border" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}>
+//                 <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest opacity-40">
+//                     <FiCornerDownRight /> Your Response
+//                 </div>
+//                 <p className="text-[var(--text-secondary)] text-sm leading-relaxed font-medium">
+//                   {q.userAnswer || "— Not Answered —"}
+//                 </p>
+//               </div>
+
+//               {/* AI FEEDBACK */}
+//               <div className="mb-6 p-5 rounded-2xl border" 
+//                    style={{ backgroundColor: "rgba(129, 140, 248, 0.05)", borderColor: "rgba(129, 140, 248, 0.1)" }}>
+//                 <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+//                     <FiBookOpen /> AI Feedback
+//                 </div>
+//                 <p className="text-sm leading-relaxed font-semibold italic" style={{ color: "var(--text-primary)" }}>
+//                   "{q.aiFeedback || "Processing feedback..."}"
+//                 </p>
+//               </div>
+
+//               {/* CORRECT ANSWER - NEW SECTION */}
+//               {q.correctAnswer && (
+//                 <div className="p-5 rounded-2xl border" 
+//                      style={{ backgroundColor: "rgba(34, 197, 94, 0.05)", borderColor: "rgba(34, 197, 94, 0.2)" }}>
+//                   <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest" style={{ color: "#22c55e" }}>
+//                       <FiCheckCircle /> Model Answer
+//                   </div>
+//                   <p className="text-sm leading-relaxed font-medium" style={{ color: "var(--text-primary)" }}>
+//                     {q.correctAnswer}
+//                   </p>
+//                 </div>
+//               )}
+//             </div>
+//           ))}
+//         </div>
+
+//         {/* ACTIONS */}
+//         <div className="mt-12 flex justify-center gap-4">
+//           <button
+//             onClick={downloadReport}
+//             disabled={downloading}
+//             className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:translate-y-[-2px] active:scale-95 shadow-lg"
+//             style={{ 
+//               backgroundColor: downloading ? "var(--border-color)" : "var(--accent)", 
+//               color: "#fff",
+//               cursor: downloading ? "not-allowed" : "pointer",
+//               border: "none"
+//             }}
+//           >
+//             {downloading ? (
+//               <>
+//                 <FiLoader className="animate-spin" />
+//                 Generating PDF...
+//               </>
+//             ) : (
+//               <>
+//                 <FiDownload className="group-hover:translate-y-[-2px] transition-transform" />
+//                 Download Report
+//               </>
+//             )}
+//           </button>
+
+//           <button
+//             onClick={() => navigate("/mock")}
+//             className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:translate-y-[-2px] active:scale-95 shadow-lg"
+//             style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+//           >
+//             <FiRotateCcw className="group-hover:rotate-[-45deg] transition-transform" />
+//             Take Another Interview
+//           </button>
+//         </div>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import { motion } from "framer-motion";
 import { getWrittenInterviewSession } from "../api/writtenInterviewApi";
-import { FiAward, FiBookOpen, FiCornerDownRight, FiLoader, FiRotateCcw } from "react-icons/fi";
+import { FiAward, FiBookOpen, FiCornerDownRight, FiLoader, FiRotateCcw, FiArrowLeft, FiDownload, FiCheckCircle } from "react-icons/fi";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function MockWrittenReport() {
   const { sessionId } = useParams();
   const navigate = useNavigate();
+  const reportRef = useRef(null);
 
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!sessionId) {
@@ -142,6 +729,48 @@ export default function MockWrittenReport() {
       });
   }, [sessionId, navigate]);
 
+  const downloadReport = async () => {
+    setDownloading(true);
+    try {
+      const element = reportRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#0a0e1a" // Hardcoded for PDF consistency
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= 297;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= 297;
+      }
+
+      pdf.save(`Interview_Report_${session.topic}.pdf`);
+    } catch (error) {
+      console.error("Failed to download report:", error);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center transition-colors duration-300"
@@ -156,23 +785,34 @@ export default function MockWrittenReport() {
 
   if (!session) return null;
 
-  // Calculate Average Score
   const avgScore = session.questions.reduce((acc, curr) => acc + (curr.aiScore || 0), 0) / session.questions.length;
 
   return (
-    <div className="min-h-screen transition-colors duration-300 font-sans"
+    <div className="min-h-screen transition-colors duration-300 font-sans relative"
          style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
-      <Navbar />
+      
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none" />
 
-      <div className="max-w-4xl mx-auto pt-32 px-6 pb-20">
+      {/* Back Button Only */}
+      <button 
+        onClick={() => navigate("/mock")}
+        className="fixed top-8 left-8 z-50 p-3 rounded-full border transition-all hover:bg-white/5 active:scale-90"
+        style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
+      >
+        <FiArrowLeft size={20} />
+      </button>
+
+      <div ref={reportRef} className="max-w-4xl mx-auto pt-20 px-6 pb-20 relative z-10">
         
-        {/* HEADER & SUMMARY CARD */}
+        {/* SUMMARY CARD */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="card p-10 rounded-[2.5rem] relative overflow-hidden mb-12"
+          className="card p-10 rounded-[2.5rem] relative overflow-hidden mb-12 border shadow-2xl"
+          style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
         >
-          <div className="absolute top-0 right-0 p-10 opacity-5">
+          <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
             <FiAward size={150} />
           </div>
 
@@ -221,7 +861,6 @@ export default function MockWrittenReport() {
                 </div>
               </div>
 
-              {/* USER ANSWER */}
               <div className="mb-6 p-5 rounded-2xl border" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}>
                 <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest opacity-40">
                     <FiCornerDownRight /> Your Response
@@ -231,8 +870,7 @@ export default function MockWrittenReport() {
                 </p>
               </div>
 
-              {/* AI FEEDBACK */}
-              <div className="p-5 rounded-2xl border" 
+              <div className="mb-6 p-5 rounded-2xl border" 
                    style={{ backgroundColor: "rgba(129, 140, 248, 0.05)", borderColor: "rgba(129, 140, 248, 0.1)" }}>
                 <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--accent)" }}>
                     <FiBookOpen /> AI Feedback
@@ -241,22 +879,51 @@ export default function MockWrittenReport() {
                   "{q.aiFeedback || "Processing feedback..."}"
                 </p>
               </div>
+
+              {q.correctAnswer && (
+                <div className="p-5 rounded-2xl border" 
+                     style={{ backgroundColor: "rgba(34, 197, 94, 0.05)", borderColor: "rgba(34, 197, 94, 0.2)" }}>
+                  <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest" style={{ color: "#22c55e" }}>
+                      <FiCheckCircle /> Model Answer
+                  </div>
+                  <p className="text-sm leading-relaxed font-medium" style={{ color: "var(--text-primary)" }}>
+                    {q.correctAnswer}
+                  </p>
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        {/* ACTIONS */}
-        <div className="mt-12 flex justify-center">
+        {/* ACTIONS AT BOTTOM ONLY */}
+        <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
+          <button
+            onClick={downloadReport}
+            disabled={downloading}
+            className="group flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:translate-y-[-2px] active:scale-95 shadow-lg"
+            style={{ 
+              backgroundColor: downloading ? "var(--border-color)" : "var(--accent)", 
+              color: "#fff",
+              cursor: downloading ? "not-allowed" : "pointer",
+              border: "none"
+            }}
+          >
+            {downloading ? (
+              <><FiLoader className="animate-spin" /> Generating PDF...</>
+            ) : (
+              <><FiDownload className="group-hover:translate-y-[-2px] transition-transform" /> Download Report</>
+            )}
+          </button>
+
           <button
             onClick={() => navigate("/mock")}
-            className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:translate-y-[-2px] active:scale-95"
+            className="group flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:translate-y-[-2px] active:scale-95 shadow-lg"
             style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
           >
             <FiRotateCcw className="group-hover:rotate-[-45deg] transition-transform" />
-            Take Another Interview
+            Take Another
           </button>
         </div>
-
       </div>
     </div>
   );

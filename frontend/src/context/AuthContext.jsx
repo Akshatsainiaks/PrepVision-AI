@@ -96,8 +96,67 @@
 //   );
 // }
 
-//new before
-import React, { createContext, useState, useEffect } from "react";
+// //new before
+// import React, { createContext, useState, useEffect } from "react";
+// import API from "../api/api";
+// import { useNavigate } from "react-router-dom";
+
+// export const AuthContext = createContext();
+
+// export function AuthProvider({ children }) {
+//   const [user, setUser] = useState(null);
+//   const [loading, setLoading] = useState(true); // Track initial boot
+//   const [isServerOff, setIsServerOff] = useState(false); // Track server status
+//   const navigate = useNavigate();
+
+//   const loadUser = async () => {
+//     try {
+//       setLoading(true);
+//       const token = localStorage.getItem("token");
+//       if (!token) {
+//         setLoading(false);
+//         return;
+//       }
+
+//       const res = await API.get("/auth/me");
+//       if (res?.data?.user) {
+//         setUser(res.data.user);
+//         setIsServerOff(false); // Reset status if successful
+//       }
+//     } catch (err) {
+//       console.error("loadUser error:", err);
+      
+//       // If there is no response object, the server is unreachable
+//       if (!err.response) {
+//         setIsServerOff(true);
+//       } else {
+//         localStorage.removeItem("token");
+//         setUser(null);
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     loadUser();
+//   }, []);
+
+//   const logout = () => {
+//     localStorage.removeItem("token");
+//     sessionStorage.removeItem("announcement_closed");
+//     setUser(null);
+//     navigate("/");
+//   };
+
+//   return (
+//     <AuthContext.Provider value={{ user, setUser, logout, loadUser, loading, isServerOff }}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// }
+
+import React, { createContext, useState, useEffect, useRef } from "react";
 import API from "../api/api";
 import { useNavigate } from "react-router-dom";
 
@@ -105,28 +164,31 @@ export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Track initial boot
-  const [isServerOff, setIsServerOff] = useState(false); // Track server status
+  const [loading, setLoading] = useState(true);
+  const [isServerOff, setIsServerOff] = useState(false);
   const navigate = useNavigate();
+
+  const hasLoaded = useRef(false); // ✅ prevent double call
 
   const loadUser = async () => {
     try {
       setLoading(true);
+
       const token = localStorage.getItem("token");
       if (!token) {
         setLoading(false);
         return;
       }
 
-      const res = await API.get("/auth/me");
+      const res = await API.get("/auth/myprofile"); // ✅ UPDATED
+
       if (res?.data?.user) {
         setUser(res.data.user);
-        setIsServerOff(false); // Reset status if successful
+        setIsServerOff(false);
       }
     } catch (err) {
       console.error("loadUser error:", err);
-      
-      // If there is no response object, the server is unreachable
+
       if (!err.response) {
         setIsServerOff(true);
       } else {
@@ -139,6 +201,9 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
     loadUser();
   }, []);
 
@@ -150,7 +215,9 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, loadUser, loading, isServerOff }}>
+    <AuthContext.Provider
+      value={{ user, setUser, logout, loadUser, loading, isServerOff }}
+    >
       {children}
     </AuthContext.Provider>
   );

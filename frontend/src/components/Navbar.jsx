@@ -474,10 +474,147 @@
 //   );
 // }
 
+
+
+// import React, { useState, useContext } from "react";
+// import { Link, useLocation, useNavigate } from "react-router-dom";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { IoNotificationsOutline, IoMenuOutline, IoCloseOutline } from "react-icons/io5";
+// import { AuthContext } from "../context/AuthContext";
+// import logo from "../assets/new.png";
+
+// export default function Navbar() {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const location = useLocation();
+//   const navigate = useNavigate();
+//   const { user } = useContext(AuthContext);
+
+//   const navItems = [
+//     { label: "Dashboard", path: "/dashboard" },
+//     { label: "Questions", path: "/questions" },
+//     { label: "Add Question", path: "/add-question" },
+//     { label: "Mock", path: "/mock" },
+//     { label: "Chat", path: "/chat" },
+//     { label: "Leaderboard", path: "/leaderboard" },
+//   ];
+
+//   return (
+//     <nav className="fixed top-0 left-0 w-full h-16 z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10 px-4 md:px-8">
+//       <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4">
+        
+//         {/* LOGO */}
+//         <div
+//           onClick={() => navigate("/dashboard")}
+//           className="flex items-center gap-2.5 cursor-pointer shrink-0 group"
+//         >
+//           <div className="p-1.5 rounded-xl bg-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
+//             <img src={logo} alt="Logo" className="w-7 h-7 object-contain" />
+//           </div>
+//           <span className="text-xl font-bold tracking-tight text-white">
+//             PrepVision<span className="text-indigo-400">AI</span>
+//           </span>
+//         </div>
+
+//         {/* DESKTOP NAV LINKS */}
+//         <div className="hidden lg:flex items-center bg-slate-800/50 p-1 rounded-full border border-white/5 relative">
+//           {navItems.map((item) => {
+//             const isActive = location.pathname === item.path;
+//             return (
+//               <Link
+//                 key={item.path}
+//                 to={item.path}
+//                 className={`relative px-4 py-1.5 text-sm font-medium transition-colors duration-300 z-10 ${
+//                   isActive ? "text-white" : "text-slate-400 hover:text-white"
+//                 }`}
+//               >
+//                 {item.label}
+//                 {isActive && (
+//                   <motion.div
+//                     layoutId="nav-pill"
+//                     className="absolute inset-0 bg-indigo-600 rounded-full -z-10 shadow-[0_0_15px_rgba(79,70,229,0.4)]"
+//                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+//                   />
+//                 )}
+//               </Link>
+//             );
+//           })}
+//         </div>
+
+//         {/* RIGHT SECTION */}
+//         <div className="flex items-center gap-2 md:gap-4 shrink-0">
+//           <Link 
+//             to="/notifications" 
+//             className="p-2 rounded-full text-slate-400 hover:bg-white/5 hover:text-indigo-400 transition-all relative"
+//           >
+//             <IoNotificationsOutline size={22} />
+//             <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-slate-900" />
+//           </Link>
+
+//           <div className="hidden md:block h-6 w-[1px] bg-white/10 mx-1"></div>
+
+//           <Link
+//             to="/profile"
+//             className="flex items-center gap-2 p-1 pr-3 rounded-full bg-white/5 hover:bg-white/10 transition-all border border-white/5"
+//           >
+//             <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-500 flex items-center justify-center text-white ring-2 ring-indigo-500/20">
+//               {user?.avatar ? (
+//                 <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+//               ) : (
+//                 <span className="text-xs font-bold">{user?.name?.charAt(0) || "U"}</span>
+//               )}
+//             </div>
+//             <span className="hidden xl:block text-xs font-semibold text-white">
+//               {user?.name?.split(' ')[0] || "Profile"}
+//             </span>
+//           </Link>
+
+//           {/* MOBILE MENU BUTTON */}
+//           <button 
+//             onClick={() => setIsOpen(!isOpen)}
+//             className="lg:hidden p-2 text-slate-300 hover:bg-white/5 rounded-lg"
+//           >
+//             {isOpen ? <IoCloseOutline size={26} /> : <IoMenuOutline size={26} />}
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* MOBILE DROPDOWN */}
+//       <AnimatePresence>
+//         {isOpen && (
+//           <motion.div 
+//             initial={{ opacity: 0, y: -20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             exit={{ opacity: 0, y: -20 }}
+//             className="absolute top-16 left-0 w-full bg-slate-900 border-b border-white/10 lg:hidden flex flex-col p-4 gap-2"
+//           >
+//             {navItems.map((item) => (
+//               <Link
+//                 key={item.path}
+//                 to={item.path}
+//                 onClick={() => setIsOpen(false)}
+//                 className={`p-3 rounded-xl transition-colors ${
+//                   location.pathname === item.path ? "bg-indigo-600 text-white" : "text-slate-400 hover:bg-white/5"
+//                 }`}
+//               >
+//                 {item.label}
+//               </Link>
+//             ))}
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+//     </nav>
+//   );
+// }
+
 import React, { useState, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { IoNotificationsOutline, IoMenuOutline, IoCloseOutline } from "react-icons/io5";
+import {
+  IoNotificationsOutline,
+  IoMenuOutline,
+  IoCloseOutline,
+  IoChatbubbleEllipsesOutline,
+} from "react-icons/io5";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/new.png";
 
@@ -487,12 +624,12 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
+  // ❌ Removed Chat from center nav
   const navItems = [
     { label: "Dashboard", path: "/dashboard" },
     { label: "Questions", path: "/questions" },
     { label: "Add Question", path: "/add-question" },
     { label: "Mock", path: "/mock" },
-    { label: "Chat", path: "/chat" },
     { label: "Leaderboard", path: "/leaderboard" },
   ];
 
@@ -540,8 +677,22 @@ export default function Navbar() {
 
         {/* RIGHT SECTION */}
         <div className="flex items-center gap-2 md:gap-4 shrink-0">
-          <Link 
-            to="/notifications" 
+
+          {/* 💬 CHAT ICON */}
+          <Link
+            to="/chat"
+            className={`p-2 rounded-full transition-all relative ${
+              location.pathname === "/chat"
+                ? "text-indigo-400 bg-white/5"
+                : "text-slate-400 hover:bg-white/5 hover:text-indigo-400"
+            }`}
+          >
+            <IoChatbubbleEllipsesOutline size={22} />
+          </Link>
+
+          {/* 🔔 NOTIFICATIONS */}
+          <Link
+            to="/notifications"
             className="p-2 rounded-full text-slate-400 hover:bg-white/5 hover:text-indigo-400 transition-all relative"
           >
             <IoNotificationsOutline size={22} />
@@ -550,28 +701,39 @@ export default function Navbar() {
 
           <div className="hidden md:block h-6 w-[1px] bg-white/10 mx-1"></div>
 
+          {/* 👤 PROFILE */}
           <Link
             to="/profile"
             className="flex items-center gap-2 p-1 pr-3 rounded-full bg-white/5 hover:bg-white/10 transition-all border border-white/5"
           >
             <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-500 flex items-center justify-center text-white ring-2 ring-indigo-500/20">
               {user?.avatar ? (
-                <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+                <img
+                  src={user.avatar}
+                  alt="avatar"
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <span className="text-xs font-bold">{user?.name?.charAt(0) || "U"}</span>
+                <span className="text-xs font-bold">
+                  {user?.name?.charAt(0) || "U"}
+                </span>
               )}
             </div>
             <span className="hidden xl:block text-xs font-semibold text-white">
-              {user?.name?.split(' ')[0] || "Profile"}
+              {user?.name?.split(" ")[0] || "Profile"}
             </span>
           </Link>
 
-          {/* MOBILE MENU BUTTON */}
-          <button 
+          {/* 📱 MOBILE MENU BUTTON */}
+          <button
             onClick={() => setIsOpen(!isOpen)}
             className="lg:hidden p-2 text-slate-300 hover:bg-white/5 rounded-lg"
           >
-            {isOpen ? <IoCloseOutline size={26} /> : <IoMenuOutline size={26} />}
+            {isOpen ? (
+              <IoCloseOutline size={26} />
+            ) : (
+              <IoMenuOutline size={26} />
+            )}
           </button>
         </div>
       </div>
@@ -579,7 +741,7 @@ export default function Navbar() {
       {/* MOBILE DROPDOWN */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -591,7 +753,9 @@ export default function Navbar() {
                 to={item.path}
                 onClick={() => setIsOpen(false)}
                 className={`p-3 rounded-xl transition-colors ${
-                  location.pathname === item.path ? "bg-indigo-600 text-white" : "text-slate-400 hover:bg-white/5"
+                  location.pathname === item.path
+                    ? "bg-indigo-600 text-white"
+                    : "text-slate-400 hover:bg-white/5"
                 }`}
               >
                 {item.label}

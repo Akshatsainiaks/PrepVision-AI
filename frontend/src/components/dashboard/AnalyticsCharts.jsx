@@ -389,7 +389,170 @@
 //   );
 // }
 
-//dark mode
+// //dark mode
+// import React from "react";
+// import { useQuery } from "@tanstack/react-query";
+// import API from "../../api/api";
+// import {
+//   AreaChart,
+//   Area,
+//   XAxis,
+//   YAxis,
+//   Tooltip,
+//   BarChart,
+//   Bar,
+//   ResponsiveContainer,
+//   CartesianGrid,
+// } from "recharts";
+
+// export default function AnalyticsCharts() {
+//   const { data, isLoading } = useQuery({
+//     queryKey: ["analytics"],
+//     queryFn: async () => {
+//       const res = await API.get("/analytics");
+//       return res.data;
+//     },
+//   });
+
+//   // Dark Theme Chart Constants
+//   const colors = {
+//     accent: "#818cf8",      /* var(--accent) */
+//     grid: "#1e293b",        /* var(--border-color) */
+//     text: "#94a3b8",        /* var(--text-secondary) */
+//     card: "#0f172a",        /* var(--bg-card) */
+//     tooltipBg: "#1e293b"
+//   };
+
+//   if (isLoading) {
+//     return (
+//       <div className="card flex flex-col items-center justify-center h-[450px] animate-pulse">
+//         <div className="w-10 h-10 border-4 border-slate-800 border-t-[var(--accent)] rounded-full animate-spin"></div>
+//         <p className="mt-4 text-xs text-[var(--text-secondary)] font-bold tracking-widest uppercase">
+//           Synthesizing Data...
+//         </p>
+//       </div>
+//     );
+//   }
+
+//   if (!data || !data.trend?.length) {
+//     return (
+//       <div className="card border-2 border-dashed border-[var(--border-color)] flex items-center justify-center h-[450px]">
+//         <div className="text-center">
+//           <div className="text-4xl mb-3 opacity-30">📊</div>
+//           <p className="text-sm text-[var(--text-secondary)] max-w-xs mx-auto leading-relaxed font-medium">
+//             No analytics data yet. Complete mock interviews to see your performance trends.
+//           </p>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-8">
+//       {/* SCORE TREND CHART */}
+//       <div className="card p-8 shadow-xl shadow-black/20">
+//         <div className="flex items-center justify-between mb-8">
+//           <div>
+//             <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Performance Trend</h2>
+//             <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">Consistency Analysis</p>
+//           </div>
+//           <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-bold text-[var(--accent)] uppercase">
+//             Live Updates
+//           </div>
+//         </div>
+
+//         <div className="h-64 w-full">
+//           <ResponsiveContainer width="100%" height="100%">
+//             <AreaChart data={data.trend} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+//               <defs>
+//                 <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
+//                   <stop offset="5%" stopColor={colors.accent} stopOpacity={0.3} />
+//                   <stop offset="95%" stopColor={colors.accent} stopOpacity={0} />
+//                 </linearGradient>
+//               </defs>
+//               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={colors.grid} />
+//               <XAxis 
+//                 dataKey="date" 
+//                 axisLine={false} 
+//                 tickLine={false} 
+//                 tick={{ fill: colors.text, fontSize: 11, fontWeight: 600 }}
+//                 dy={10}
+//               />
+//               <YAxis 
+//                 axisLine={false} 
+//                 tickLine={false} 
+//                 tick={{ fill: colors.text, fontSize: 11 }} 
+//                 domain={[0, 10]} 
+//               />
+//               <Tooltip
+//                 cursor={{ stroke: colors.accent, strokeWidth: 1.5 }}
+//                 contentStyle={{
+//                   backgroundColor: colors.tooltipBg,
+//                   border: `1px solid ${colors.grid}`,
+//                   borderRadius: "12px",
+//                   boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.3)",
+//                   padding: "10px"
+//                 }}
+//                 itemStyle={{ color: colors.accent, fontWeight: "700", fontSize: "14px" }}
+//               />
+//               <Area
+//                 type="monotone"
+//                 dataKey="score"
+//                 stroke={colors.accent}
+//                 strokeWidth={3}
+//                 fillOpacity={1}
+//                 fill="url(#scoreGradient)"
+//                 animationDuration={2000}
+//               />
+//             </AreaChart>
+//           </ResponsiveContainer>
+//         </div>
+//       </div>
+
+//       {/* WEAK TOPICS CHART */}
+//       <div className="card p-8 shadow-xl shadow-black/20">
+//         <div className="mb-8">
+//           <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Weakest Topics</h2>
+//           <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">Focus Areas for Improvement</p>
+//         </div>
+
+//         <div className="h-64 w-full">
+//           <ResponsiveContainer width="100%" height="100%">
+//             <BarChart data={data.topicStats} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+//               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={colors.grid} />
+//               <XAxis 
+//                 dataKey="topic" 
+//                 axisLine={false} 
+//                 tickLine={false} 
+//                 tick={{ fill: colors.text, fontSize: 11, fontWeight: 600 }}
+//                 dy={10}
+//               />
+//               <YAxis axisLine={false} tickLine={false} tick={{ fill: colors.text, fontSize: 11 }} />
+//               <Tooltip
+//                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+//                 contentStyle={{
+//                   backgroundColor: colors.tooltipBg,
+//                   border: `1px solid ${colors.grid}`,
+//                   borderRadius: "12px",
+//                   boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.3)",
+//                 }}
+//                 itemStyle={{ color: colors.accent }}
+//               />
+//               <Bar
+//                 dataKey="mistakes"
+//                 fill={colors.accent}
+//                 radius={[6, 6, 0, 0]}
+//                 barSize={32}
+//                 animationDuration={1500}
+//               />
+//             </BarChart>
+//           </ResponsiveContainer>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import API from "../../api/api";
@@ -406,12 +569,13 @@ import {
 } from "recharts";
 
 export default function AnalyticsCharts() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["analytics"],
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["dashboard-analytics"],
     queryFn: async () => {
-      const res = await API.get("/analytics");
+      const res = await API.get("/dashboard/analytics");
       return res.data;
     },
+    staleTime: 1000 * 60 * 5, // cache for 5 min
   });
 
   // Dark Theme Chart Constants
@@ -429,6 +593,16 @@ export default function AnalyticsCharts() {
         <div className="w-10 h-10 border-4 border-slate-800 border-t-[var(--accent)] rounded-full animate-spin"></div>
         <p className="mt-4 text-xs text-[var(--text-secondary)] font-bold tracking-widest uppercase">
           Synthesizing Data...
+        </p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="card flex items-center justify-center h-[450px]">
+        <p className="text-sm text-red-400 font-semibold">
+          Failed to load analytics
         </p>
       </div>
     );
@@ -453,8 +627,12 @@ export default function AnalyticsCharts() {
       <div className="card p-8 shadow-xl shadow-black/20">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Performance Trend</h2>
-            <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">Consistency Analysis</p>
+            <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
+              Performance Trend
+            </h2>
+            <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">
+              Consistency Analysis
+            </p>
           </div>
           <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-bold text-[var(--accent)] uppercase">
             Live Updates
@@ -471,18 +649,18 @@ export default function AnalyticsCharts() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={colors.grid} />
-              <XAxis 
-                dataKey="date" 
-                axisLine={false} 
-                tickLine={false} 
+              <XAxis
+                dataKey="date"
+                axisLine={false}
+                tickLine={false}
                 tick={{ fill: colors.text, fontSize: 11, fontWeight: 600 }}
                 dy={10}
               />
-              <YAxis 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fill: colors.text, fontSize: 11 }} 
-                domain={[0, 10]} 
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                domain={[0, "dataMax + 1"]}
+                tick={{ fill: colors.text, fontSize: 11 }}
               />
               <Tooltip
                 cursor={{ stroke: colors.accent, strokeWidth: 1.5 }}
@@ -491,7 +669,7 @@ export default function AnalyticsCharts() {
                   border: `1px solid ${colors.grid}`,
                   borderRadius: "12px",
                   boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.3)",
-                  padding: "10px"
+                  padding: "10px",
                 }}
                 itemStyle={{ color: colors.accent, fontWeight: "700", fontSize: "14px" }}
               />
@@ -512,24 +690,32 @@ export default function AnalyticsCharts() {
       {/* WEAK TOPICS CHART */}
       <div className="card p-8 shadow-xl shadow-black/20">
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Weakest Topics</h2>
-          <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">Focus Areas for Improvement</p>
+          <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
+            Weakest Topics
+          </h2>
+          <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">
+            Focus Areas for Improvement
+          </p>
         </div>
 
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.topicStats} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={colors.grid} />
-              <XAxis 
-                dataKey="topic" 
-                axisLine={false} 
-                tickLine={false} 
+              <XAxis
+                dataKey="topic"
+                axisLine={false}
+                tickLine={false}
                 tick={{ fill: colors.text, fontSize: 11, fontWeight: 600 }}
                 dy={10}
               />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: colors.text, fontSize: 11 }} />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: colors.text, fontSize: 11 }}
+              />
               <Tooltip
-                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                cursor={{ fill: "rgba(255,255,255,0.05)" }}
                 contentStyle={{
                   backgroundColor: colors.tooltipBg,
                   border: `1px solid ${colors.grid}`,

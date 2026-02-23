@@ -722,6 +722,252 @@
 // }
 
 //dark mode
+// import { useEffect, useState, useContext, useRef } from "react";
+// import API from "../api/api";
+// import { AuthContext } from "../context/AuthContext";
+// import { Link } from "react-router-dom";
+// import ProfileSkeleton from "../components/skeletons/ProfileSkeleton";
+// import React from "react";
+// import { FiUser, FiSettings, FiCreditCard, FiEdit3, FiLogOut, FiCamera, FiEye } from "react-icons/fi";
+
+// export default function Profile() {
+//   const [data, setData] = useState(null);
+//   const [uploading, setUploading] = useState(false);
+//   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+//   const [showAvatarPreview, setShowAvatarPreview] = useState(false);
+
+//   const fileInputRef = useRef(null);
+//   const avatarMenuRef = useRef(null);
+
+//   const { logout } = useContext(AuthContext);
+
+//   useEffect(() => {
+//     let mounted = true;
+//     (async () => {
+//       try {
+//         const res = await API.get("/credits/me");
+//         if (mounted) setData(res.data);
+//       } catch (err) {
+//         console.error("Profile fetch error:", err);
+//       }
+//     })();
+//     return () => (mounted = false);
+//   }, []);
+
+//   useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target)) {
+//         setShowAvatarMenu(false);
+//       }
+//     };
+//     if (showAvatarMenu) {
+//       document.addEventListener("mousedown", handleClickOutside);
+//     }
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, [showAvatarMenu]);
+
+//   if (!data || !data.user) return <ProfileSkeleton />;
+
+//   const handleAvatarUpload = async (e) => {
+//     const file = e.target.files?.[0];
+//     if (!file || !file.type.startsWith("image/")) return;
+//     const formData = new FormData();
+//     formData.append("avatar", file);
+//     try {
+//       setUploading(true);
+//       const res = await API.post("/users/avatar", formData);
+//       localStorage.setItem("avatar", res.data.avatar);
+//       setData((prev) => ({
+//         ...prev,
+//         user: { ...prev.user, avatar: res.data.avatar },
+//       }));
+//     } catch {
+//       alert("Avatar upload failed");
+//     } finally {
+//       setUploading(false);
+//       e.target.value = "";
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen font-sans animate-fadeIn transition-colors duration-300"
+//          style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
+//       <div className="max-w-5xl mx-auto p-8 space-y-10">
+        
+//         {/* HEADER */}
+//         <header className="flex items-center gap-4">
+//           <div className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/10" 
+//                style={{ backgroundColor: "var(--accent)" }}>
+//             <FiUser size={28} />
+//           </div>
+//           <div>
+//             <h2 className="text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
+//               Profile <span style={{ color: "var(--accent)" }}>Settings</span>
+//             </h2>
+//             <p style={{ color: "var(--text-secondary)" }} className="font-medium">Manage your identity and account preferences</p>
+//           </div>
+//         </header>
+
+//         {/* PROFILE CARD */}
+//         <div className="card rounded-[2.5rem] p-10 border border-[var(--border-color)]" 
+//              style={{ backgroundColor: "var(--bg-card)" }}>
+//           <div className="flex flex-col md:flex-row items-center gap-8">
+//             <div className="relative" ref={avatarMenuRef}>
+//               <div
+//                 onClick={() => setShowAvatarMenu((p) => !p)}
+//                 className="group relative w-32 h-32 rounded-full overflow-hidden
+//                 border-4 shadow-lg flex items-center justify-center
+//                 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+//                 style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}
+//               >
+//                 {data.user.avatar ? (
+//                   <img src={data.user.avatar} alt="avatar" className="w-full h-full object-cover" />
+//                 ) : (
+//                   <span className="text-4xl font-black" style={{ color: "var(--text-secondary)" }}>
+//                     {data.user.name?.charAt(0)}
+//                   </span>
+//                 )}
+                
+//                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+//                     <FiCamera className="text-white text-2xl" />
+//                 </div>
+//               </div>
+
+//               {/* FLOATING ACTION MENU */}
+//               {showAvatarMenu && (
+//                 <div
+//                   className="absolute left-1/2 -translate-x-1/2 mt-4 w-52
+//                   rounded-2xl shadow-2xl z-50 p-2 animate-fadeIn border border-[var(--border-color)]"
+//                   style={{ backgroundColor: "var(--bg-card)", backdropBlur: "10px" }}
+//                 >
+//                   <button
+//                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-colors hover:bg-white/5"
+//                     style={{ color: "var(--text-primary)" }}
+//                     onClick={() => {
+//                       setShowAvatarPreview(true);
+//                       setShowAvatarMenu(false);
+//                     }}
+//                   >
+//                     <FiEye className="text-indigo-400" /> View Avatar
+//                   </button>
+//                   <button
+//                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-colors hover:bg-white/5"
+//                     style={{ color: "var(--text-primary)" }}
+//                     onClick={() => {
+//                       fileInputRef.current?.click();
+//                       setShowAvatarMenu(false);
+//                     }}
+//                   >
+//                     <FiCamera className="text-indigo-400" /> Change Avatar
+//                   </button>
+//                 </div>
+//               )}
+
+//               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+//             </div>
+
+//             <div className="text-center md:text-left">
+//               <h3 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>{data.user.name}</h3>
+//               <p className="font-medium text-lg" style={{ color: "var(--text-secondary)" }}>{data.user.email}</p>
+//               <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+//                   <span className="px-3 py-1 text-[10px] font-bold rounded-full border border-indigo-500/20 uppercase tracking-widest"
+//                         style={{ backgroundColor: "rgba(129, 140, 248, 0.1)", color: "var(--accent)" }}>
+//                     Candidate
+//                   </span>
+//                   <span className="px-3 py-1 text-[10px] font-bold rounded-full border border-emerald-500/20 uppercase tracking-widest"
+//                         style={{ backgroundColor: "rgba(16, 185, 129, 0.1)", color: "#10b981" }}>
+//                     Verified
+//                   </span>
+//               </div>
+//               {uploading && (
+//                 <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">
+//                   Updating cloud assets...
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* ACTIONS GRID */}
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//           <ActionCard 
+//             title="Account Security" 
+//             desc="Update your password and login methods" 
+//             link="/settings" 
+//             icon={<FiSettings className="text-blue-400" />} 
+//           />
+//           <ActionCard 
+//             title="Credit Wallet" 
+//             desc="View token history and balance" 
+//             link="/credit-history" 
+//             icon={<FiCreditCard className="text-indigo-400" />} 
+//           />
+//           <ActionCard 
+//             title="Edit Identity" 
+//             desc="Modify your public profile details" 
+//             link="/settings" 
+//             icon={<FiEdit3 className="text-emerald-400" />} 
+//           />
+//         </div>
+
+//         {/* DANGER ZONE - Refined for Dark Mode */}
+//         <div className="rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-rose-500/20"
+//              style={{ backgroundColor: "rgba(225, 29, 72, 0.03)" }}>
+//           <div>
+//             <h3 className="font-black text-xl text-rose-500">Sign Out</h3>
+//             <p className="text-sm font-medium mt-1 text-rose-400/70">Safely end your current session</p>
+//           </div>
+//           <button
+//             onClick={logout}
+//             className="flex items-center gap-3 px-10 py-4 rounded-2xl text-white font-bold shadow-lg shadow-rose-900/20 transition-all hover:bg-rose-700 active:scale-95"
+//             style={{ backgroundColor: "#e11d48" }}
+//           >
+//             <FiLogOut /> Logout
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* AVATAR PREVIEW MODAL */}
+//       {showAvatarPreview && (
+//         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[60] p-4">
+//           <div className="relative animate-fadeIn p-2 rounded-[2.5rem] shadow-2xl border border-[var(--border-color)]" 
+//                style={{ backgroundColor: "var(--bg-card)" }}>
+//             <img
+//               src={data.user.avatar}
+//               alt="avatar preview"
+//               className="max-w-full max-h-[75vh] rounded-[2rem] object-contain"
+//             />
+//             <button
+//               onClick={() => setShowAvatarPreview(false)}
+//               className="absolute -top-4 -right-4 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110"
+//               style={{ backgroundColor: "var(--accent)" }}
+//             >
+//               ✕
+//             </button>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// function ActionCard({ title, desc, link, icon }) {
+//   return (
+//     <Link
+//       to={link}
+//       className="group card rounded-[2rem] p-8 shadow-sm hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-300"
+//       style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-color)" }}
+//     >
+//       <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors group-hover:bg-white/5"
+//            style={{ backgroundColor: "var(--bg-primary)" }}>
+//         {React.cloneElement(icon, { size: 24 })}
+//       </div>
+//       <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">{title}</h4>
+//       <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">{desc}</p>
+//     </Link>
+//   );
+// }
+
 import { useEffect, useState, useContext, useRef } from "react";
 import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
@@ -741,18 +987,18 @@ export default function Profile() {
 
   const { logout } = useContext(AuthContext);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await API.get("/credits/me");
-        if (mounted) setData(res.data);
-      } catch (err) {
-        console.error("Profile fetch error:", err);
-      }
-    })();
-    return () => (mounted = false);
-  }, []);
+useEffect(() => {
+  let mounted = true;
+  (async () => {
+    try {
+      const res = await API.get("/auth/me"); // ✅ FIXED
+      if (mounted) setData(res.data);
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+    }
+  })();
+  return () => (mounted = false);
+}, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -790,27 +1036,35 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen font-sans animate-fadeIn transition-colors duration-300"
-         style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
+    <div
+      className="min-h-screen font-sans animate-fadeIn transition-colors duration-300"
+      style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}
+    >
       <div className="max-w-5xl mx-auto p-8 space-y-10">
         
         {/* HEADER */}
         <header className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/10" 
-               style={{ backgroundColor: "var(--accent)" }}>
+          <div
+            className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/10"
+            style={{ backgroundColor: "var(--accent)" }}
+          >
             <FiUser size={28} />
           </div>
           <div>
             <h2 className="text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
               Profile <span style={{ color: "var(--accent)" }}>Settings</span>
             </h2>
-            <p style={{ color: "var(--text-secondary)" }} className="font-medium">Manage your identity and account preferences</p>
+            <p style={{ color: "var(--text-secondary)" }} className="font-medium">
+              Manage your identity and account preferences
+            </p>
           </div>
         </header>
 
         {/* PROFILE CARD */}
-        <div className="card rounded-[2.5rem] p-10 border border-[var(--border-color)]" 
-             style={{ backgroundColor: "var(--bg-card)" }}>
+        <div
+          className="card rounded-[2.5rem] p-10 border border-[var(--border-color)]"
+          style={{ backgroundColor: "var(--bg-card)" }}
+        >
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative" ref={avatarMenuRef}>
               <div
@@ -827,13 +1081,12 @@ export default function Profile() {
                     {data.user.name?.charAt(0)}
                   </span>
                 )}
-                
+
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                    <FiCamera className="text-white text-2xl" />
+                  <FiCamera className="text-white text-2xl" />
                 </div>
               </div>
 
-              {/* FLOATING ACTION MENU */}
               {showAvatarMenu && (
                 <div
                   className="absolute left-1/2 -translate-x-1/2 mt-4 w-52
@@ -867,18 +1120,30 @@ export default function Profile() {
             </div>
 
             <div className="text-center md:text-left">
-              <h3 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>{data.user.name}</h3>
-              <p className="font-medium text-lg" style={{ color: "var(--text-secondary)" }}>{data.user.email}</p>
+              <h3 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
+                {data.user.name}
+              </h3>
+
+              {/* ✅ FIXED HERE */}
+              <p className="font-medium text-lg" style={{ color: "var(--text-secondary)" }}>
+                @{data.user.username}
+              </p>
+
               <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
-                  <span className="px-3 py-1 text-[10px] font-bold rounded-full border border-indigo-500/20 uppercase tracking-widest"
-                        style={{ backgroundColor: "rgba(129, 140, 248, 0.1)", color: "var(--accent)" }}>
-                    Candidate
-                  </span>
-                  <span className="px-3 py-1 text-[10px] font-bold rounded-full border border-emerald-500/20 uppercase tracking-widest"
-                        style={{ backgroundColor: "rgba(16, 185, 129, 0.1)", color: "#10b981" }}>
-                    Verified
-                  </span>
+                <span
+                  className="px-3 py-1 text-[10px] font-bold rounded-full border border-indigo-500/20 uppercase tracking-widest"
+                  style={{ backgroundColor: "rgba(129, 140, 248, 0.1)", color: "var(--accent)" }}
+                >
+                  Candidate
+                </span>
+                <span
+                  className="px-3 py-1 text-[10px] font-bold rounded-full border border-emerald-500/20 uppercase tracking-widest"
+                  style={{ backgroundColor: "rgba(16, 185, 129, 0.1)", color: "#10b981" }}
+                >
+                  Verified
+                </span>
               </div>
+
               {uploading && (
                 <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">
                   Updating cloud assets...
@@ -890,29 +1155,14 @@ export default function Profile() {
 
         {/* ACTIONS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ActionCard 
-            title="Account Security" 
-            desc="Update your password and login methods" 
-            link="/settings" 
-            icon={<FiSettings className="text-blue-400" />} 
-          />
-          <ActionCard 
-            title="Credit Wallet" 
-            desc="View token history and balance" 
-            link="/credit-history" 
-            icon={<FiCreditCard className="text-indigo-400" />} 
-          />
-          <ActionCard 
-            title="Edit Identity" 
-            desc="Modify your public profile details" 
-            link="/settings" 
-            icon={<FiEdit3 className="text-emerald-400" />} 
-          />
+          <ActionCard title="Account Security" desc="Update your password and login methods" link="/settings" icon={<FiSettings className="text-blue-400" />} />
+          <ActionCard title="Credit Wallet" desc="View token history and balance" link="/credit-history" icon={<FiCreditCard className="text-indigo-400" />} />
+          <ActionCard title="Edit Identity" desc="Modify your public profile details" link="/settings" icon={<FiEdit3 className="text-emerald-400" />} />
         </div>
 
-        {/* DANGER ZONE - Refined for Dark Mode */}
+        {/* LOGOUT */}
         <div className="rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-rose-500/20"
-             style={{ backgroundColor: "rgba(225, 29, 72, 0.03)" }}>
+          style={{ backgroundColor: "rgba(225, 29, 72, 0.03)" }}>
           <div>
             <h3 className="font-black text-xl text-rose-500">Sign Out</h3>
             <p className="text-sm font-medium mt-1 text-rose-400/70">Safely end your current session</p>
@@ -926,27 +1176,6 @@ export default function Profile() {
           </button>
         </div>
       </div>
-
-      {/* AVATAR PREVIEW MODAL */}
-      {showAvatarPreview && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[60] p-4">
-          <div className="relative animate-fadeIn p-2 rounded-[2.5rem] shadow-2xl border border-[var(--border-color)]" 
-               style={{ backgroundColor: "var(--bg-card)" }}>
-            <img
-              src={data.user.avatar}
-              alt="avatar preview"
-              className="max-w-full max-h-[75vh] rounded-[2rem] object-contain"
-            />
-            <button
-              onClick={() => setShowAvatarPreview(false)}
-              className="absolute -top-4 -right-4 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110"
-              style={{ backgroundColor: "var(--accent)" }}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -958,12 +1187,20 @@ function ActionCard({ title, desc, link, icon }) {
       className="group card rounded-[2rem] p-8 shadow-sm hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-300"
       style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-color)" }}
     >
-      <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors group-hover:bg-white/5"
-           style={{ backgroundColor: "var(--bg-primary)" }}>
+      <div
+        className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors group-hover:bg-white/5"
+        style={{ backgroundColor: "var(--bg-primary)" }}
+      >
         {React.cloneElement(icon, { size: 24 })}
       </div>
-      <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">{title}</h4>
-      <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">{desc}</p>
+
+      <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">
+        {title}
+      </h4>
+
+      <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">
+        {desc}
+      </p>
     </Link>
   );
 }
