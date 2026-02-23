@@ -1406,17 +1406,278 @@
 //   );
 // }
 
+// import React, { useEffect, useRef, useState } from "react";
+// import io from "socket.io-client";
+// import Navbar from "../components/Navbar";
+// import OnlineUsers from "../components/OnlineUsers";
+// import MessageBubble from "../components/MessageBubble";
+// import FileUploader from "../components/FileUploader";
+// import API from "../api/api";
+// import { FiSearch, FiSend, FiHash, FiUsers, FiInfo, FiPlus } from "react-icons/fi";
+// import { motion, AnimatePresence } from "framer-motion";
+
+// const SOCKET_URL = "http://localhost:4000";
+
+// export default function ChatPage() {
+
+//   /* ---------------- PREVENT BODY SCROLL ---------------- */
+//   useEffect(() => {
+//     document.body.style.overflow = "hidden";
+//     return () => {
+//       document.body.style.overflow = "auto";
+//     };
+//   }, []);
+
+//   const [activeRoom, setActiveRoom] = useState("global");
+//   const [rooms, setRooms] = useState([
+//     { id: "global", name: "Global", desc: "General chat", unread: 0 },
+//     { id: "dsa", name: "DSA", desc: "Algorithms discussion", unread: 0 },
+//     { id: "frontend", name: "Frontend", desc: "React / UI", unread: 0 }
+//   ]);
+
+//   const [messages, setMessages] = useState([]);
+//   const [onlineUsers, setOnlineUsers] = useState([]);
+//   const [text, setText] = useState("");
+//   const [typingUsers, setTypingUsers] = useState({});
+//   const [search, setSearch] = useState("");
+
+//   const socketRef = useRef(null);
+//   const messagesRef = useRef(null);
+
+//   const userId = localStorage.getItem("userId");
+//   const token = localStorage.getItem("token");
+//   const myName = localStorage.getItem("name") || "You";
+
+//   /* ---------------- SOCKET CONNECTION ---------------- */
+//   useEffect(() => {
+//     const s = io(SOCKET_URL, { auth: { token } });
+//     socketRef.current = s;
+
+//     s.on("connect", () => {
+//       s.emit("identify", { id: userId, name: myName });
+//       s.emit("joinGroup", activeRoom);
+//     });
+
+//     s.on("presence:update", (list) => setOnlineUsers(list));
+
+//     s.on("userTyping", ({ user, isTyping }) => {
+//       setTypingUsers((prev) => {
+//         const copy = { ...prev };
+//         if (isTyping) copy[user.id] = user;
+//         else delete copy[user.id];
+//         return copy;
+//       });
+//     });
+
+//     s.on("newMessage", (msg) => {
+//       if (messagesRef.current && document.getElementById(msg._id)) return;
+//       if (msg.user?._id === userId) return;
+//       setMessages((prev) => [...prev, msg]);
+//       scrollToBottom();
+//     });
+
+//     return () => s.disconnect();
+//   }, []);
+
+//   /* ---------------- LOAD ROOM ---------------- */
+//   useEffect(() => {
+//     if (!activeRoom) return;
+
+//     const load = async () => {
+//       try {
+//         const res = await API.get(`/chat/${activeRoom}`);
+//         const normalized = (res.data || []).map((m) => ({
+//           ...m,
+//           attachments: m.attachments || [],
+//           readBy: m.readBy || []
+//         }));
+//         setMessages(normalized);
+//       } catch (err) {
+//         console.error(err);
+//       } finally {
+//         scrollToBottom();
+//       }
+//     };
+
+//     load();
+//   }, [activeRoom]);
+
+//   const scrollToBottom = () => {
+//     setTimeout(() => {
+//       messagesRef.current?.scrollTo({
+//         top: messagesRef.current.scrollHeight,
+//         behavior: "smooth"
+//       });
+//     }, 50);
+//   };
+
+//   const onSend = async () => {
+//     if (!text.trim()) return;
+
+//     const payload = {
+//       groupId: activeRoom,
+//       message: text,
+//       userId,
+//       type: "text",
+//       attachments: []
+//     };
+
+//     const temp = {
+//       ...payload,
+//       _id: `tmp-${Date.now()}`,
+//       user: { _id: userId, name: myName },
+//       createdAt: new Date().toISOString()
+//     };
+
+//     setMessages((p) => [...p, temp]);
+//     scrollToBottom();
+
+//     socketRef.current.emit("groupMessage", payload);
+//     try { await API.post("/chat", payload); } catch (e) {}
+
+//     setText("");
+//   };
+
+//   const shown = messages.filter((m) =>
+//     search ? (m.message || "").toLowerCase().includes(search.toLowerCase()) : true
+//   );
+
+//   return (
+//     <div
+//       className="h-screen flex flex-col overflow-hidden font-sans"
+//       style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}
+//     >
+//       <Navbar />
+
+//       {/* MAIN WRAPPER */}
+//       <div className="flex-1 flex overflow-hidden gap-6 px-6 py-6 max-w-[1800px] mx-auto w-full">
+
+//         {/* ROOMS SIDEBAR */}
+//         <motion.aside
+//           initial={{ opacity: 0, x: -20 }}
+//           animate={{ opacity: 1, x: 0 }}
+//           className="w-80 rounded-[2.5rem] flex flex-col shadow-2xl overflow-hidden border"
+//           style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+//         >
+//           <div className="p-8 space-y-3">
+//             {rooms.map((room) => (
+//               <div
+//                 key={room.id}
+//                 onClick={() => setActiveRoom(room.id)}
+//                 className={`p-4 rounded-2xl cursor-pointer transition-all
+//                 ${activeRoom === room.id ? "bg-indigo-500/10 text-indigo-400" : "hover:bg-white/5 text-slate-400"}`}
+//               >
+//                 <div className="font-bold text-sm">{room.name}</div>
+//                 <div className="text-[10px] uppercase opacity-60">{room.desc}</div>
+//               </div>
+//             ))}
+//           </div>
+//         </motion.aside>
+
+//         {/* MAIN CHAT */}
+//         <motion.main
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           className="flex-1 rounded-[3rem] flex flex-col overflow-hidden shadow-2xl border"
+//           style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+//         >
+
+//           {/* HEADER */}
+//           <header className="px-10 py-6 border-b flex justify-between items-center"
+//             style={{ borderColor: "var(--border-color)" }}
+//           >
+//             <h2 className="text-2xl font-black">
+//               {rooms.find((r) => r.id === activeRoom)?.name}
+//             </h2>
+
+//             <div className="relative hidden lg:block">
+//               <FiSearch className="absolute left-5 top-1/2 -translate-y-1/2" />
+//               <input
+//                 value={search}
+//                 onChange={(e) => setSearch(e.target.value)}
+//                 placeholder="Search history..."
+//                 className="pl-14 pr-6 py-3 rounded-2xl border outline-none"
+//               />
+//             </div>
+//           </header>
+
+//           {/* MESSAGE AREA (ONLY SCROLLABLE PART) */}
+//           <div
+//             ref={messagesRef}
+//             className="flex-1 overflow-y-auto p-10 space-y-6"
+//           >
+//             <div className="max-w-5xl mx-auto">
+//               {shown.map((m) => (
+//                 <div key={m._id}>
+//                   <MessageBubble msg={m} currentUserId={userId} />
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+
+//           {/* INPUT */}
+//           <footer className="p-8 border-t"
+//             style={{ borderColor: "var(--border-color)" }}
+//           >
+//             <div className="max-w-5xl mx-auto flex items-end gap-5">
+//               <FileUploader />
+//               <div className="flex-1 relative">
+//                 <textarea
+//                   rows="1"
+//                   value={text}
+//                   onChange={(e) => setText(e.target.value)}
+//                   onKeyDown={(e) => {
+//                     if (e.key === "Enter" && !e.shiftKey) {
+//                       e.preventDefault();
+//                       onSend();
+//                     }
+//                   }}
+//                   className="w-full p-5 pr-16 rounded-2xl border resize-none"
+//                 />
+//                 <button
+//                   onClick={onSend}
+//                   className="absolute right-3 bottom-3 p-3 bg-indigo-500 text-white rounded-xl"
+//                 >
+//                   <FiSend />
+//                 </button>
+//               </div>
+//             </div>
+//           </footer>
+
+//         </motion.main>
+
+//         {/* ONLINE USERS */}
+//         <motion.aside
+//           initial={{ opacity: 0, x: 20 }}
+//           animate={{ opacity: 1, x: 0 }}
+//           className="w-80 rounded-[2.5rem] hidden xl:flex flex-col shadow-2xl overflow-hidden border"
+//           style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+//         >
+//           <div className="p-8">
+//             <OnlineUsers users={onlineUsers} />
+//           </div>
+//         </motion.aside>
+
+//       </div>
+//     </div>
+//   );
+// }
+
 import React, { useEffect, useRef, useState } from "react";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import Navbar from "../components/Navbar";
 import OnlineUsers from "../components/OnlineUsers";
 import MessageBubble from "../components/MessageBubble";
 import FileUploader from "../components/FileUploader";
 import API from "../api/api";
-import { FiSearch, FiSend, FiHash, FiUsers, FiInfo, FiPlus } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import { FiSearch, FiSend } from "react-icons/fi";
+import { motion } from "framer-motion";
 
-const SOCKET_URL = "http://localhost:4000";
+/* ✅ FIXED SOCKET URL */
+const SOCKET_URL =
+  import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace("/api", "")
+    : "http://localhost:4000";
 
 export default function ChatPage() {
 
@@ -1429,7 +1690,7 @@ export default function ChatPage() {
   }, []);
 
   const [activeRoom, setActiveRoom] = useState("global");
-  const [rooms, setRooms] = useState([
+  const [rooms] = useState([
     { id: "global", name: "Global", desc: "General chat", unread: 0 },
     { id: "dsa", name: "DSA", desc: "Algorithms discussion", unread: 0 },
     { id: "frontend", name: "Frontend", desc: "React / UI", unread: 0 }
@@ -1450,7 +1711,13 @@ export default function ChatPage() {
 
   /* ---------------- SOCKET CONNECTION ---------------- */
   useEffect(() => {
-    const s = io(SOCKET_URL, { auth: { token } });
+
+    const s = io(SOCKET_URL, {
+      transports: ["websocket"],
+      withCredentials: true,
+      auth: { token }
+    });
+
     socketRef.current = s;
 
     s.on("connect", () => {
@@ -1477,6 +1744,7 @@ export default function ChatPage() {
     });
 
     return () => s.disconnect();
+
   }, []);
 
   /* ---------------- LOAD ROOM ---------------- */
@@ -1549,10 +1817,8 @@ export default function ChatPage() {
     >
       <Navbar />
 
-      {/* MAIN WRAPPER */}
       <div className="flex-1 flex overflow-hidden gap-6 px-6 py-6 max-w-[1800px] mx-auto w-full">
 
-        {/* ROOMS SIDEBAR */}
         <motion.aside
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -1574,7 +1840,6 @@ export default function ChatPage() {
           </div>
         </motion.aside>
 
-        {/* MAIN CHAT */}
         <motion.main
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -1582,7 +1847,6 @@ export default function ChatPage() {
           style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
         >
 
-          {/* HEADER */}
           <header className="px-10 py-6 border-b flex justify-between items-center"
             style={{ borderColor: "var(--border-color)" }}
           >
@@ -1601,11 +1865,7 @@ export default function ChatPage() {
             </div>
           </header>
 
-          {/* MESSAGE AREA (ONLY SCROLLABLE PART) */}
-          <div
-            ref={messagesRef}
-            className="flex-1 overflow-y-auto p-10 space-y-6"
-          >
+          <div ref={messagesRef} className="flex-1 overflow-y-auto p-10 space-y-6">
             <div className="max-w-5xl mx-auto">
               {shown.map((m) => (
                 <div key={m._id}>
@@ -1615,7 +1875,6 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* INPUT */}
           <footer className="p-8 border-t"
             style={{ borderColor: "var(--border-color)" }}
           >
@@ -1646,7 +1905,6 @@ export default function ChatPage() {
 
         </motion.main>
 
-        {/* ONLINE USERS */}
         <motion.aside
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
