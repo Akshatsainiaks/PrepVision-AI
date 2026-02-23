@@ -357,6 +357,7 @@ import LiveInterview from "./pages/LiveInterview";
 /* 🔒 Layout & Auth */
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedLayout from "./components/layout/ProtectedLayout";
+import LearningRoadmap from "./components/dashboard/LearningRoadmap";
 
 export default function App() {
   const { loading, isServerOff, loadUser } = useContext(AuthContext);
@@ -422,6 +423,7 @@ export default function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/credits" element={<Credits />} />
+          <Route path="/roadmap" element={<LearningRoadmap />} />
         </Route>
       </Routes>
     </div>
