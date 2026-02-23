@@ -197,26 +197,27 @@ async function main() {
 
   const app = express();
 
-  /* ================= SAFE CORS CONFIG ================= */
+  /* ================= FINAL CORS CONFIG ================= */
+
   const allowedOrigins = [
     "http://localhost:5173",
-    "https://prep-vision-ai.vercel.app", // 🔥 Put your exact Vercel URL
+    "https://prep-vision-ai.vercel.app"
   ];
 
   app.use(
     cors({
-      origin: function (origin, callback) {
-        // allow requests with no origin (like mobile apps / postman)
-        if (!origin) return callback(null, true);
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true); // Postman / mobile apps
 
         if (allowedOrigins.includes(origin)) {
-          return callback(null, true);
+          callback(null, origin); // Return exact origin (NOT *)
         } else {
-          return callback(new Error("CORS not allowed for this origin"));
+          callback(new Error("Not allowed by CORS"));
         }
       },
       credentials: true,
-      methods: ["GET", "POST", "PUT", "DELETE"],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
     })
   );
 
@@ -224,9 +225,11 @@ async function main() {
   app.set("trust proxy", 1);
 
   /* ================= STATIC FILES ================= */
+
   app.use("/uploads", express.static(UPLOADS_PATH));
 
   /* ================= ROUTES ================= */
+
   app.use("/api/auth", authRoutes);
   app.use("/api/questions", questionRoutes);
   app.use("/api/interview", interviewRoutes);
@@ -245,14 +248,17 @@ async function main() {
   app.use("/api/users", userRoutes);
 
   /* ================= TEST AUTH ================= */
+
   app.get("/api/test-auth", auth, (req, res) => {
     res.json({ message: "Token working", user: req.user });
   });
 
   /* ================= ERROR HANDLER ================= */
+
   app.use(require("./middlewares/errorHandler"));
 
   /* ================= SOCKET.IO ================= */
+
   const server = http.createServer(app);
 
   const io = new Server(server, {
@@ -265,12 +271,12 @@ async function main() {
   socketHandler(io);
 
   /* ================= START SERVER ================= */
+
   server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
 }
 
-/* ================= STARTUP ERROR ================= */
 main().catch((err) => {
   console.error("Startup error:", err);
   process.exit(1);
