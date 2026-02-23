@@ -42,39 +42,30 @@
 
 import axios from "axios";
 
-/* ================= BASE URL ================= */
-
-// Make sure VITE_API_URL = https://prepvision-ai.onrender.com/api
-const BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000/api";
-
 const API = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: true, // Important for CORS compatibility
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000/api",
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-/* ================= REQUEST INTERCEPTOR ================= */
+/* ================= REQUEST ================= */
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-/* ================= RESPONSE INTERCEPTOR ================= */
+/* ================= RESPONSE ================= */
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Auto logout if token expired
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
 
