@@ -197,14 +197,26 @@ async function main() {
 
   const app = express();
 
-  /* ================= CORS FIX ================= */
+  /* ================= SAFE CORS CONFIG ================= */
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "https://prep-vision-ai.vercel.app", // 🔥 Put your exact Vercel URL
+  ];
+
   app.use(
     cors({
-      origin: [
-        "http://localhost:5173",
-        process.env.FRONTEND_URL, // set this in Render
-      ],
+      origin: function (origin, callback) {
+        // allow requests with no origin (like mobile apps / postman)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        } else {
+          return callback(new Error("CORS not allowed for this origin"));
+        }
+      },
       credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE"],
     })
   );
 
@@ -245,10 +257,7 @@ async function main() {
 
   const io = new Server(server, {
     cors: {
-      origin: [
-        "http://localhost:5173",
-        process.env.FRONTEND_URL,
-      ],
+      origin: allowedOrigins,
       credentials: true,
     },
   });
