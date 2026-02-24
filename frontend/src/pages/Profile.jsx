@@ -1205,6 +1205,907 @@
 //   );
 // }
 
+// import { useEffect, useState, useContext, useRef } from "react";
+// import API from "../api/api";
+// import { AuthContext } from "../context/AuthContext";
+// import { Link } from "react-router-dom";
+// import ProfileSkeleton from "../components/skeletons/ProfileSkeleton";
+// import React from "react";
+// import {
+//   FiUser,
+//   FiSettings,
+//   FiCreditCard,
+//   FiEdit3,
+//   FiLogOut,
+//   FiCamera,
+//   FiEye,
+// } from "react-icons/fi";
+
+// export default function Profile() {
+//   const [data, setData] = useState(null);
+//   const [uploading, setUploading] = useState(false);
+//   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+//   const [showAvatarPreview, setShowAvatarPreview] = useState(false);
+
+//   const fileInputRef = useRef(null);
+//   const avatarMenuRef = useRef(null);
+
+//   const { user, logout } = useContext(AuthContext);
+
+//   /* ✅ FIX: REMOVE EXTRA API CALL
+//      Now Profile reads from AuthContext only
+//   */
+//   useEffect(() => {
+//     if (user) {
+//       setData({ user });
+//     }
+//   }, [user]);
+
+//   useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (
+//         avatarMenuRef.current &&
+//         !avatarMenuRef.current.contains(e.target)
+//       ) {
+//         setShowAvatarMenu(false);
+//       }
+//     };
+
+//     if (showAvatarMenu) {
+//       document.addEventListener("mousedown", handleClickOutside);
+//     }
+
+//     return () =>
+//       document.removeEventListener("mousedown", handleClickOutside);
+//   }, [showAvatarMenu]);
+
+//   if (!data || !data.user) return <ProfileSkeleton />;
+
+//   const handleAvatarUpload = async (e) => {
+//     const file = e.target.files?.[0];
+//     if (!file || !file.type.startsWith("image/")) return;
+
+//     const formData = new FormData();
+//     formData.append("avatar", file);
+
+//     try {
+//       setUploading(true);
+//       const res = await API.post("/users/avatar", formData);
+
+//       localStorage.setItem("avatar", res.data.avatar);
+
+//       setData((prev) => ({
+//         ...prev,
+//         user: { ...prev.user, avatar: res.data.avatar },
+//       }));
+//     } catch {
+//       alert("Avatar upload failed");
+//     } finally {
+//       setUploading(false);
+//       e.target.value = "";
+//     }
+//   };
+
+//   return (
+//     <div
+//       className="min-h-screen font-sans animate-fadeIn transition-colors duration-300"
+//       style={{
+//         backgroundColor: "var(--bg-primary)",
+//         color: "var(--text-primary)",
+//       }}
+//     >
+//       <div className="max-w-5xl mx-auto p-8 space-y-10">
+//         {/* HEADER */}
+//         <header className="flex items-center gap-4">
+//           <div
+//             className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/10"
+//             style={{ backgroundColor: "var(--accent)" }}
+//           >
+//             <FiUser size={28} />
+//           </div>
+//           <div>
+//             <h2
+//               className="text-4xl font-black tracking-tight"
+//               style={{ color: "var(--text-primary)" }}
+//             >
+//               Profile <span style={{ color: "var(--accent)" }}>Settings</span>
+//             </h2>
+//             <p
+//               style={{ color: "var(--text-secondary)" }}
+//               className="font-medium"
+//             >
+//               Manage your identity and account preferences
+//             </p>
+//           </div>
+//         </header>
+
+//         {/* PROFILE CARD */}
+//         <div
+//           className="card rounded-[2.5rem] p-10 border border-[var(--border-color)]"
+//           style={{ backgroundColor: "var(--bg-card)" }}
+//         >
+//           <div className="flex flex-col md:flex-row items-center gap-8">
+//             <div className="relative" ref={avatarMenuRef}>
+//               <div
+//                 onClick={() => setShowAvatarMenu((p) => !p)}
+//                 className="group relative w-32 h-32 rounded-full overflow-hidden
+//                 border-4 shadow-lg flex items-center justify-center
+//                 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+//                 style={{
+//                   backgroundColor: "var(--bg-primary)",
+//                   borderColor: "var(--border-color)",
+//                 }}
+//               >
+//                 {data.user.avatar ? (
+//                   <img
+//                     src={data.user.avatar}
+//                     alt="avatar"
+//                     className="w-full h-full object-cover"
+//                   />
+//                 ) : (
+//                   <span
+//                     className="text-4xl font-black"
+//                     style={{ color: "var(--text-secondary)" }}
+//                   >
+//                     {data.user.name?.charAt(0)}
+//                   </span>
+//                 )}
+
+//                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+//                   <FiCamera className="text-white text-2xl" />
+//                 </div>
+//               </div>
+
+//               {showAvatarMenu && (
+//                 <div
+//                   className="absolute left-1/2 -translate-x-1/2 mt-4 w-52
+//                   rounded-2xl shadow-2xl z-50 p-2 animate-fadeIn border border-[var(--border-color)]"
+//                   style={{ backgroundColor: "var(--bg-card)" }}
+//                 >
+//                   <button
+//                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-colors hover:bg-white/5"
+//                     style={{ color: "var(--text-primary)" }}
+//                     onClick={() => {
+//                       setShowAvatarPreview(true);
+//                       setShowAvatarMenu(false);
+//                     }}
+//                   >
+//                     <FiEye className="text-indigo-400" /> View Avatar
+//                   </button>
+
+//                   <button
+//                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-colors hover:bg-white/5"
+//                     style={{ color: "var(--text-primary)" }}
+//                     onClick={() => {
+//                       fileInputRef.current?.click();
+//                       setShowAvatarMenu(false);
+//                     }}
+//                   >
+//                     <FiCamera className="text-indigo-400" /> Change Avatar
+//                   </button>
+//                 </div>
+//               )}
+
+//               <input
+//                 ref={fileInputRef}
+//                 type="file"
+//                 accept="image/*"
+//                 className="hidden"
+//                 onChange={handleAvatarUpload}
+//               />
+//             </div>
+
+//             <div className="text-center md:text-left">
+//               <h3
+//                 className="text-3xl font-black tracking-tight"
+//                 style={{ color: "var(--text-primary)" }}
+//               >
+//                 {data.user.name}
+//               </h3>
+
+//               <p
+//                 className="font-medium text-lg"
+//                 style={{ color: "var(--text-secondary)" }}
+//               >
+//                 @{data.user.username}
+//               </p>
+
+//               <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+//                 <span
+//                   className="px-3 py-1 text-[10px] font-bold rounded-full border border-indigo-500/20 uppercase tracking-widest"
+//                   style={{
+//                     backgroundColor: "rgba(129, 140, 248, 0.1)",
+//                     color: "var(--accent)",
+//                   }}
+//                 >
+//                   Candidate
+//                 </span>
+
+//                 <span
+//                   className="px-3 py-1 text-[10px] font-bold rounded-full border border-emerald-500/20 uppercase tracking-widest"
+//                   style={{
+//                     backgroundColor: "rgba(16, 185, 129, 0.1)",
+//                     color: "#10b981",
+//                   }}
+//                 >
+//                   Verified
+//                 </span>
+//               </div>
+
+//               {uploading && (
+//                 <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">
+//                   Updating cloud assets...
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* ACTIONS GRID */}
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//           <ActionCard
+//             title="Account Security"
+//             desc="Update your password and login methods"
+//             link="/settings"
+//             icon={<FiSettings className="text-blue-400" />}
+//           />
+//           <ActionCard
+//             title="Credit Wallet"
+//             desc="View token history and balance"
+//             link="/credit-history"
+//             icon={<FiCreditCard className="text-indigo-400" />}
+//           />
+//           <ActionCard
+//             title="Edit Identity"
+//             desc="Modify your public profile details"
+//             link="/settings"
+//             icon={<FiEdit3 className="text-emerald-400" />}
+//           />
+//         </div>
+
+//         {/* LOGOUT */}
+//         <div
+//           className="rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-rose-500/20"
+//           style={{ backgroundColor: "rgba(225, 29, 72, 0.03)" }}
+//         >
+//           <div>
+//             <h3 className="font-black text-xl text-rose-500">Sign Out</h3>
+//             <p className="text-sm font-medium mt-1 text-rose-400/70">
+//               Safely end your current session
+//             </p>
+//           </div>
+
+//           <button
+//             onClick={logout}
+//             className="flex items-center gap-3 px-10 py-4 rounded-2xl text-white font-bold shadow-lg shadow-rose-900/20 transition-all hover:bg-rose-700 active:scale-95"
+//             style={{ backgroundColor: "#e11d48" }}
+//           >
+//             <FiLogOut /> Logout
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// function ActionCard({ title, desc, link, icon }) {
+//   return (
+//     <Link
+//       to={link}
+//       className="group card rounded-[2rem] p-8 shadow-sm hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-300"
+//       style={{
+//         backgroundColor: "var(--bg-card)",
+//         border: "1px solid var(--border-color)",
+//       }}
+//     >
+//       <div
+//         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors group-hover:bg-white/5"
+//         style={{ backgroundColor: "var(--bg-primary)" }}
+//       >
+//         {React.cloneElement(icon, { size: 24 })}
+//       </div>
+
+//       <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">
+//         {title}
+//       </h4>
+
+//       <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">
+//         {desc}
+//       </p>
+//     </Link>
+//   );
+// }
+
+//before is final before live
+
+
+
+
+// import { useEffect, useState, useContext, useRef } from "react";
+// import API from "../api/api";
+// import { AuthContext } from "../context/AuthContext";
+// import { Link } from "react-router-dom";
+// import ProfileSkeleton from "../components/skeletons/ProfileSkeleton";
+// import React from "react";
+// import {
+//   FiUser,
+//   FiSettings,
+//   FiCreditCard,
+//   FiEdit3,
+//   FiLogOut,
+//   FiCamera,
+//   FiEye,
+// } from "react-icons/fi";
+
+// export default function Profile() {
+//   const [data, setData] = useState(null);
+//   const [uploading, setUploading] = useState(false);
+//   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+//   const [showAvatarPreview, setShowAvatarPreview] = useState(false);
+
+//   const fileInputRef = useRef(null);
+//   const avatarMenuRef = useRef(null);
+
+//   // ✅ FIX: Prevent double API call in React 18 StrictMode
+//   const hasFetched = useRef(false);
+
+//   const { setUser, logout } = useContext(AuthContext);
+
+//   useEffect(() => {
+//     if (hasFetched.current) return; // 🚀 block second call
+//     hasFetched.current = true;
+
+//     const loadProfile = async () => {
+//       try {
+//         const res = await API.get("/auth/myprofile");
+
+//         if (res?.data?.user) {
+//           setData({ user: res.data.user });
+//           setUser(res.data.user);
+//         }
+//       } catch (err) {
+//         console.error("Profile load error:", err);
+//       }
+//     };
+
+//     loadProfile();
+//   }, []);
+
+//   useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (
+//         avatarMenuRef.current &&
+//         !avatarMenuRef.current.contains(e.target)
+//       ) {
+//         setShowAvatarMenu(false);
+//       }
+//     };
+
+//     if (showAvatarMenu) {
+//       document.addEventListener("mousedown", handleClickOutside);
+//     }
+
+//     return () =>
+//       document.removeEventListener("mousedown", handleClickOutside);
+//   }, [showAvatarMenu]);
+
+//   if (!data || !data.user) return <ProfileSkeleton />;
+
+//   const handleAvatarUpload = async (e) => {
+//     const file = e.target.files?.[0];
+//     if (!file || !file.type.startsWith("image/")) return;
+
+//     const formData = new FormData();
+//     formData.append("avatar", file);
+
+//     try {
+//       setUploading(true);
+//       const res = await API.post("/users/avatar", formData);
+
+//       localStorage.setItem("avatar", res.data.avatar);
+
+//       setData((prev) => ({
+//         ...prev,
+//         user: { ...prev.user, avatar: res.data.avatar },
+//       }));
+//     } catch {
+//       alert("Avatar upload failed");
+//     } finally {
+//       setUploading(false);
+//       e.target.value = "";
+//     }
+//   };
+
+//   return (
+//     <div
+//       className="min-h-screen font-sans animate-fadeIn transition-colors duration-300"
+//       style={{
+//         backgroundColor: "var(--bg-primary)",
+//         color: "var(--text-primary)",
+//       }}
+//     >
+//       <div className="max-w-5xl mx-auto p-8 space-y-10">
+//         {/* HEADER */}
+//         <header className="flex items-center gap-4">
+//           <div
+//             className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/10"
+//             style={{ backgroundColor: "var(--accent)" }}
+//           >
+//             <FiUser size={28} />
+//           </div>
+//           <div>
+//             <h2
+//               className="text-4xl font-black tracking-tight"
+//               style={{ color: "var(--text-primary)" }}
+//             >
+//               Profile <span style={{ color: "var(--accent)" }}>Settings</span>
+//             </h2>
+//             <p
+//               style={{ color: "var(--text-secondary)" }}
+//               className="font-medium"
+//             >
+//               Manage your identity and account preferences
+//             </p>
+//           </div>
+//         </header>
+
+//         {/* PROFILE CARD */}
+//         <div
+//           className="card rounded-[2.5rem] p-10 border border-[var(--border-color)]"
+//           style={{ backgroundColor: "var(--bg-card)" }}
+//         >
+//           <div className="flex flex-col md:flex-row items-center gap-8">
+//             <div className="relative" ref={avatarMenuRef}>
+//               <div
+//                 onClick={() => setShowAvatarMenu((p) => !p)}
+//                 className="group relative w-32 h-32 rounded-full overflow-hidden
+//                 border-4 shadow-lg flex items-center justify-center
+//                 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+//                 style={{
+//                   backgroundColor: "var(--bg-primary)",
+//                   borderColor: "var(--border-color)",
+//                 }}
+//               >
+//                 {data.user.avatar ? (
+//                   <img
+//                     src={data.user.avatar}
+//                     alt="avatar"
+//                     className="w-full h-full object-cover"
+//                   />
+//                 ) : (
+//                   <span
+//                     className="text-4xl font-black"
+//                     style={{ color: "var(--text-secondary)" }}
+//                   >
+//                     {data.user.name?.charAt(0)}
+//                   </span>
+//                 )}
+
+//                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+//                   <FiCamera className="text-white text-2xl" />
+//                 </div>
+//               </div>
+
+//               <input
+//                 ref={fileInputRef}
+//                 type="file"
+//                 accept="image/*"
+//                 className="hidden"
+//                 onChange={handleAvatarUpload}
+//               />
+//             </div>
+
+//             <div className="text-center md:text-left">
+//               <h3 className="text-3xl font-black tracking-tight">
+//                 {data.user.name}
+//               </h3>
+
+//               <p className="font-medium text-lg text-[var(--text-secondary)]">
+//                 @{data.user.username}
+//               </p>
+
+//               {uploading && (
+//                 <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">
+//                   Updating cloud assets...
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* ACTIONS GRID */}
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//           <ActionCard
+//             title="Account Security"
+//             desc="Update your password and login methods"
+//             link="/settings"
+//             icon={<FiSettings className="text-blue-400" />}
+//           />
+//           <ActionCard
+//             title="Credit Wallet"
+//             desc="View token history and balance"
+//             link="/credit-history"
+//             icon={<FiCreditCard className="text-indigo-400" />}
+//           />
+//           <ActionCard
+//             title="Edit Identity"
+//             desc="Modify your public profile details"
+//             link="/settings"
+//             icon={<FiEdit3 className="text-emerald-400" />}
+//           />
+//         </div>
+
+//         {/* LOGOUT */}
+//         <div
+//           className="rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-rose-500/20"
+//           style={{ backgroundColor: "rgba(225, 29, 72, 0.03)" }}
+//         >
+//           <div>
+//             <h3 className="font-black text-xl text-rose-500">Sign Out</h3>
+//             <p className="text-sm font-medium mt-1 text-rose-400/70">
+//               Safely end your current session
+//             </p>
+//           </div>
+
+//           <button
+//             onClick={logout}
+//             className="flex items-center gap-3 px-10 py-4 rounded-2xl text-white font-bold shadow-lg shadow-rose-900/20 transition-all hover:bg-rose-700 active:scale-95"
+//             style={{ backgroundColor: "#e11d48" }}
+//           >
+//             <FiLogOut /> Logout
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// function ActionCard({ title, desc, link, icon }) {
+//   return (
+//     <Link
+//       to={link}
+//       className="group card rounded-[2rem] p-8 shadow-sm hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-300"
+//       style={{
+//         backgroundColor: "var(--bg-card)",
+//         border: "1px solid var(--border-color)",
+//       }}
+//     >
+//       <div
+//         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors group-hover:bg-white/5"
+//         style={{ backgroundColor: "var(--bg-primary)" }}
+//       >
+//         {React.cloneElement(icon, { size: 24 })}
+//       </div>
+
+//       <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">
+//         {title}
+//       </h4>
+
+//       <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">
+//         {desc}
+//       </p>
+//     </Link>
+//   );
+// }
+
+
+// import { useEffect, useState, useContext, useRef } from "react";
+// import API from "../api/api";
+// import { AuthContext } from "../context/AuthContext";
+// import { Link } from "react-router-dom";
+// import ProfileSkeleton from "../components/skeletons/ProfileSkeleton";
+// import React from "react";
+// import {
+//   FiUser,
+//   FiSettings,
+//   FiCreditCard,
+//   FiEdit3,
+//   FiLogOut,
+//   FiCamera,
+//   FiEye,
+//   FiX,
+// } from "react-icons/fi";
+
+// export default function Profile() {
+//   const [data, setData] = useState(null);
+//   const [uploading, setUploading] = useState(false);
+//   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+//   const [showAvatarPreview, setShowAvatarPreview] = useState(false);
+
+//   const fileInputRef = useRef(null);
+//   const avatarMenuRef = useRef(null);
+
+//   const hasFetched = useRef(false);
+
+//   const { setUser, logout } = useContext(AuthContext);
+
+//   useEffect(() => {
+//     if (hasFetched.current) return;
+//     hasFetched.current = true;
+
+//     const loadProfile = async () => {
+//       try {
+//         const res = await API.get("/auth/myprofile");
+
+//         if (res?.data?.user) {
+//           setData({ user: res.data.user });
+//           setUser(res.data.user);
+//         }
+//       } catch (err) {
+//         console.error("Profile load error:", err);
+//       }
+//     };
+
+//     loadProfile();
+//   }, []);
+
+//   useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (
+//         avatarMenuRef.current &&
+//         !avatarMenuRef.current.contains(e.target)
+//       ) {
+//         setShowAvatarMenu(false);
+//       }
+//     };
+
+//     if (showAvatarMenu) {
+//       document.addEventListener("mousedown", handleClickOutside);
+//     }
+
+//     return () =>
+//       document.removeEventListener("mousedown", handleClickOutside);
+//   }, [showAvatarMenu]);
+
+//   if (!data || !data.user) return <ProfileSkeleton />;
+
+//   const handleAvatarUpload = async (e) => {
+//     const file = e.target.files?.[0];
+//     if (!file || !file.type.startsWith("image/")) return;
+
+//     const formData = new FormData();
+//     formData.append("avatar", file);
+
+//     try {
+//       setUploading(true);
+//       const res = await API.post("/users/avatar", formData);
+
+//       localStorage.setItem("avatar", res.data.avatar);
+
+//       setData((prev) => ({
+//         ...prev,
+//         user: { ...prev.user, avatar: res.data.avatar },
+//       }));
+//     } catch {
+//       alert("Avatar upload failed");
+//     } finally {
+//       setUploading(false);
+//       e.target.value = "";
+//     }
+//   };
+
+//   return (
+//     <div
+//       className="min-h-screen font-sans animate-fadeIn transition-colors duration-300"
+//       style={{
+//         backgroundColor: "var(--bg-primary)",
+//         color: "var(--text-primary)",
+//       }}
+//     >
+//       <div className="max-w-5xl mx-auto p-8 space-y-10">
+
+//         {/* HEADER */}
+//         <header className="flex items-center gap-4">
+//           <div
+//             className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/10"
+//             style={{ backgroundColor: "var(--accent)" }}
+//           >
+//             <FiUser size={28} />
+//           </div>
+//           <div>
+//             <h2 className="text-4xl font-black tracking-tight">
+//               Profile <span style={{ color: "var(--accent)" }}>Settings</span>
+//             </h2>
+//             <p className="font-medium text-[var(--text-secondary)]">
+//               Manage your identity and account preferences
+//             </p>
+//           </div>
+//         </header>
+
+//         {/* PROFILE CARD */}
+//         <div
+//           className="card rounded-[2.5rem] p-10 border border-[var(--border-color)]"
+//           style={{ backgroundColor: "var(--bg-card)" }}
+//         >
+//           <div className="flex flex-col md:flex-row items-center gap-8">
+//             <div className="relative" ref={avatarMenuRef}>
+
+//               {/* AVATAR */}
+//               <div
+//                 onClick={() => setShowAvatarMenu((p) => !p)}
+//                 className="group relative w-32 h-32 rounded-full overflow-hidden
+//                 border-4 shadow-lg flex items-center justify-center
+//                 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+//                 style={{
+//                   backgroundColor: "var(--bg-primary)",
+//                   borderColor: "var(--border-color)",
+//                 }}
+//               >
+//                 {data.user.avatar ? (
+//                   <img
+//                     src={data.user.avatar}
+//                     alt="avatar"
+//                     className="w-full h-full object-cover"
+//                   />
+//                 ) : (
+//                   <span className="text-4xl font-black text-[var(--text-secondary)]">
+//                     {data.user.name?.charAt(0)}
+//                   </span>
+//                 )}
+
+//                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+//                   <FiCamera className="text-white text-2xl" />
+//                 </div>
+//               </div>
+
+//               {/* DROPDOWN MENU */}
+//               {showAvatarMenu && (
+//                 <div
+//                   className="absolute left-1/2 -translate-x-1/2 mt-4 w-52
+//                   rounded-2xl shadow-2xl z-50 p-2 border border-[var(--border-color)]"
+//                   style={{ backgroundColor: "var(--bg-card)" }}
+//                 >
+//                   <button
+//                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
+//                     onClick={() => {
+//                       setShowAvatarPreview(true);
+//                       setShowAvatarMenu(false);
+//                     }}
+//                   >
+//                     <FiEye className="text-indigo-400" /> View Avatar
+//                   </button>
+
+//                   <button
+//                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
+//                     onClick={() => {
+//                       fileInputRef.current?.click();
+//                       setShowAvatarMenu(false);
+//                     }}
+//                   >
+//                     <FiCamera className="text-indigo-400" /> Change Avatar
+//                   </button>
+//                 </div>
+//               )}
+
+//               <input
+//                 ref={fileInputRef}
+//                 type="file"
+//                 accept="image/*"
+//                 className="hidden"
+//                 onChange={handleAvatarUpload}
+//               />
+//             </div>
+
+//             {/* USER INFO */}
+//             <div className="text-center md:text-left">
+//               <h3 className="text-3xl font-black tracking-tight">
+//                 {data.user.name}
+//               </h3>
+
+//               <p className="font-medium text-lg text-[var(--text-secondary)]">
+//                 @{data.user.username}
+//               </p>
+
+//               {uploading && (
+//                 <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">
+//                   Updating cloud assets...
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* ACTIONS GRID */}
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//           <ActionCard
+//             title="Account Security"
+//             desc="Update your password and login methods"
+//             link="/settings"
+//             icon={<FiSettings className="text-blue-400" />}
+//           />
+//           <ActionCard
+//             title="Credit Wallet"
+//             desc="View token history and balance"
+//             link="/credit-history"
+//             icon={<FiCreditCard className="text-indigo-400" />}
+//           />
+//           <ActionCard
+//             title="Edit Identity"
+//             desc="Modify your public profile details"
+//             link="/settings"
+//             icon={<FiEdit3 className="text-emerald-400" />}
+//           />
+//         </div>
+
+//         {/* LOGOUT */}
+//         <div
+//           className="rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-rose-500/20"
+//           style={{ backgroundColor: "rgba(225, 29, 72, 0.03)" }}
+//         >
+//           <div>
+//             <h3 className="font-black text-xl text-rose-500">Sign Out</h3>
+//             <p className="text-sm font-medium mt-1 text-rose-400/70">
+//               Safely end your current session
+//             </p>
+//           </div>
+
+//           <button
+//             onClick={logout}
+//             className="flex items-center gap-3 px-10 py-4 rounded-2xl text-white font-bold shadow-lg shadow-rose-900/20 hover:bg-rose-700 active:scale-95"
+//             style={{ backgroundColor: "#e11d48" }}
+//           >
+//             <FiLogOut /> Logout
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* AVATAR PREVIEW MODAL */}
+//       {showAvatarPreview && (
+//         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+//           <div className="relative">
+//             <button
+//               onClick={() => setShowAvatarPreview(false)}
+//               className="absolute -top-10 right-0 text-white text-xl"
+//             >
+//               <FiX />
+//             </button>
+
+//             {data.user.avatar ? (
+//               <img
+//                 src={data.user.avatar}
+//                 alt="preview"
+//                 className="w-80 h-80 object-cover rounded-2xl"
+//               />
+//             ) : (
+//               <div className="w-80 h-80 flex items-center justify-center bg-gray-800 rounded-2xl text-white text-5xl font-bold">
+//                 {data.user.name?.charAt(0)}
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// function ActionCard({ title, desc, link, icon }) {
+//   return (
+//     <Link
+//       to={link}
+//       className="group card rounded-[2rem] p-8 shadow-sm hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-300"
+//       style={{
+//         backgroundColor: "var(--bg-card)",
+//         border: "1px solid var(--border-color)",
+//       }}
+//     >
+//       <div
+//         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-white/5"
+//         style={{ backgroundColor: "var(--bg-primary)" }}
+//       >
+//         {React.cloneElement(icon, { size: 24 })}
+//       </div>
+
+//       <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">
+//         {title}
+//       </h4>
+
+//       <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">
+//         {desc}
+//       </p>
+//     </Link>
+//   );
+// }
+
 import { useEffect, useState, useContext, useRef } from "react";
 import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
@@ -1219,27 +2120,18 @@ import {
   FiLogOut,
   FiCamera,
   FiEye,
+  FiX,
 } from "react-icons/fi";
 
 export default function Profile() {
-  const [data, setData] = useState(null);
+  const { user, setUser, logout } = useContext(AuthContext);
+
   const [uploading, setUploading] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showAvatarPreview, setShowAvatarPreview] = useState(false);
 
   const fileInputRef = useRef(null);
   const avatarMenuRef = useRef(null);
-
-  const { user, logout } = useContext(AuthContext);
-
-  /* ✅ FIX: REMOVE EXTRA API CALL
-     Now Profile reads from AuthContext only
-  */
-  useEffect(() => {
-    if (user) {
-      setData({ user });
-    }
-  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -1259,7 +2151,8 @@ export default function Profile() {
       document.removeEventListener("mousedown", handleClickOutside);
   }, [showAvatarMenu]);
 
-  if (!data || !data.user) return <ProfileSkeleton />;
+  // ✅ Now using context user
+  if (!user) return <ProfileSkeleton />;
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -1274,9 +2167,10 @@ export default function Profile() {
 
       localStorage.setItem("avatar", res.data.avatar);
 
-      setData((prev) => ({
+      // ✅ update global context user (no local data state)
+      setUser((prev) => ({
         ...prev,
-        user: { ...prev.user, avatar: res.data.avatar },
+        avatar: res.data.avatar,
       }));
     } catch {
       alert("Avatar upload failed");
@@ -1295,6 +2189,7 @@ export default function Profile() {
       }}
     >
       <div className="max-w-5xl mx-auto p-8 space-y-10">
+
         {/* HEADER */}
         <header className="flex items-center gap-4">
           <div
@@ -1304,16 +2199,10 @@ export default function Profile() {
             <FiUser size={28} />
           </div>
           <div>
-            <h2
-              className="text-4xl font-black tracking-tight"
-              style={{ color: "var(--text-primary)" }}
-            >
+            <h2 className="text-4xl font-black tracking-tight">
               Profile <span style={{ color: "var(--accent)" }}>Settings</span>
             </h2>
-            <p
-              style={{ color: "var(--text-secondary)" }}
-              className="font-medium"
-            >
+            <p className="font-medium text-[var(--text-secondary)]">
               Manage your identity and account preferences
             </p>
           </div>
@@ -1326,6 +2215,8 @@ export default function Profile() {
         >
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative" ref={avatarMenuRef}>
+
+              {/* AVATAR */}
               <div
                 onClick={() => setShowAvatarMenu((p) => !p)}
                 className="group relative w-32 h-32 rounded-full overflow-hidden
@@ -1336,18 +2227,15 @@ export default function Profile() {
                   borderColor: "var(--border-color)",
                 }}
               >
-                {data.user.avatar ? (
+                {user.avatar ? (
                   <img
-                    src={data.user.avatar}
+                    src={user.avatar}
                     alt="avatar"
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span
-                    className="text-4xl font-black"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    {data.user.name?.charAt(0)}
+                  <span className="text-4xl font-black text-[var(--text-secondary)]">
+                    {user.name?.charAt(0)}
                   </span>
                 )}
 
@@ -1356,15 +2244,15 @@ export default function Profile() {
                 </div>
               </div>
 
+              {/* DROPDOWN MENU */}
               {showAvatarMenu && (
                 <div
                   className="absolute left-1/2 -translate-x-1/2 mt-4 w-52
-                  rounded-2xl shadow-2xl z-50 p-2 animate-fadeIn border border-[var(--border-color)]"
+                  rounded-2xl shadow-2xl z-50 p-2 border border-[var(--border-color)]"
                   style={{ backgroundColor: "var(--bg-card)" }}
                 >
                   <button
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-colors hover:bg-white/5"
-                    style={{ color: "var(--text-primary)" }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
                     onClick={() => {
                       setShowAvatarPreview(true);
                       setShowAvatarMenu(false);
@@ -1374,8 +2262,7 @@ export default function Profile() {
                   </button>
 
                   <button
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-colors hover:bg-white/5"
-                    style={{ color: "var(--text-primary)" }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
                     onClick={() => {
                       fileInputRef.current?.click();
                       setShowAvatarMenu(false);
@@ -1395,42 +2282,15 @@ export default function Profile() {
               />
             </div>
 
+            {/* USER INFO */}
             <div className="text-center md:text-left">
-              <h3
-                className="text-3xl font-black tracking-tight"
-                style={{ color: "var(--text-primary)" }}
-              >
-                {data.user.name}
+              <h3 className="text-3xl font-black tracking-tight">
+                {user.name}
               </h3>
 
-              <p
-                className="font-medium text-lg"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                @{data.user.username}
+              <p className="font-medium text-lg text-[var(--text-secondary)]">
+                @{user.username}
               </p>
-
-              <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
-                <span
-                  className="px-3 py-1 text-[10px] font-bold rounded-full border border-indigo-500/20 uppercase tracking-widest"
-                  style={{
-                    backgroundColor: "rgba(129, 140, 248, 0.1)",
-                    color: "var(--accent)",
-                  }}
-                >
-                  Candidate
-                </span>
-
-                <span
-                  className="px-3 py-1 text-[10px] font-bold rounded-full border border-emerald-500/20 uppercase tracking-widest"
-                  style={{
-                    backgroundColor: "rgba(16, 185, 129, 0.1)",
-                    color: "#10b981",
-                  }}
-                >
-                  Verified
-                </span>
-              </div>
 
               {uploading && (
                 <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">
@@ -1477,13 +2337,39 @@ export default function Profile() {
 
           <button
             onClick={logout}
-            className="flex items-center gap-3 px-10 py-4 rounded-2xl text-white font-bold shadow-lg shadow-rose-900/20 transition-all hover:bg-rose-700 active:scale-95"
+            className="flex items-center gap-3 px-10 py-4 rounded-2xl text-white font-bold shadow-lg shadow-rose-900/20 hover:bg-rose-700 active:scale-95"
             style={{ backgroundColor: "#e11d48" }}
           >
             <FiLogOut /> Logout
           </button>
         </div>
       </div>
+
+      {/* AVATAR PREVIEW MODAL */}
+      {showAvatarPreview && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="relative">
+            <button
+              onClick={() => setShowAvatarPreview(false)}
+              className="absolute -top-10 right-0 text-white text-xl"
+            >
+              <FiX />
+            </button>
+
+            {user.avatar ? (
+              <img
+                src={user.avatar}
+                alt="preview"
+                className="w-80 h-80 object-cover rounded-2xl"
+              />
+            ) : (
+              <div className="w-80 h-80 flex items-center justify-center bg-gray-800 rounded-2xl text-white text-5xl font-bold">
+                {user.name?.charAt(0)}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1499,7 +2385,7 @@ function ActionCard({ title, desc, link, icon }) {
       }}
     >
       <div
-        className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors group-hover:bg-white/5"
+        className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-white/5"
         style={{ backgroundColor: "var(--bg-primary)" }}
       >
         {React.cloneElement(icon, { size: 24 })}

@@ -225,6 +225,172 @@
 //   );
 // }
 
+// import React, { useState, useEffect, useRef } from "react";
+// import { FiRefreshCw, FiLoader, FiCloudOff, FiActivity, FiZap } from "react-icons/fi";
+
+// export default function ServerOffline({ onRetry }) {
+//   const [isRetrying, setIsRetrying] = useState(false);
+//   const timerRef = useRef(null);
+
+//   const handleRetry = async () => {
+//     if (isRetrying) return;
+
+//     setIsRetrying(true);
+
+//     try {
+//       // Background trigger for actual auth check
+//       onRetry(); 
+//     } catch (err) {
+//       console.error("Manual sync failed:", err);
+//     }
+
+//     // Fixed 10s visual lock to provide consistent user feedback
+//     timerRef.current = setTimeout(() => {
+//       setIsRetrying(false);
+//     }, 10000);
+//   };
+
+//   useEffect(() => {
+//     return () => {
+//       if (timerRef.current) clearTimeout(timerRef.current);
+//     };
+//   }, []);
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center p-6 bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30 overflow-hidden relative">
+      
+//       {/* BACKGROUND ETHER: Sophisticated radial layers */}
+//       <div className="absolute top-[-15%] left-[-10%] w-[65%] h-[65%] bg-indigo-600/10 blur-[140px] rounded-full animate-pulse" />
+//       <div className="absolute bottom-[-15%] right-[-10%] w-[65%] h-[65%] bg-blue-600/10 blur-[140px] rounded-full animate-pulse" />
+      
+//       {/* 2026 MESH: Technical structural grid */}
+//       <div className="absolute inset-0 opacity-[0.04] bg-[size:40px_40px] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)]" />
+
+//       <div className="max-w-md w-full text-center space-y-12 relative z-10 animate-fadeIn">
+        
+//         {/* CORE INTERFACE: Glassmorphic Hub */}
+//         <div className="relative inline-block group">
+//           <div className="absolute inset-[-10px] bg-indigo-500/20 blur-3xl rounded-full group-hover:bg-indigo-500/30 transition-all duration-700" />
+//           <div className="relative bg-slate-900/40 backdrop-blur-3xl border border-white/10 p-12 rounded-[3.5rem] shadow-2xl transition-all duration-500 group-hover:scale-105 overflow-hidden">
+            
+//             {/* Dynamic Scanning Light Effect */}
+//             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent h-1/2 w-full animate-scan pointer-events-none" />
+
+//             {isRetrying ? (
+//               <div className="relative scale-110">
+//                 <FiLoader size={64} className="text-indigo-400 mx-auto animate-spin" />
+//                 <div className="absolute inset-0 flex items-center justify-center">
+//                    <div className="w-3 h-3 bg-indigo-400 rounded-full animate-pulse shadow-[0_0_20px_rgba(129,140,248,0.8)]" />
+//                 </div>
+//               </div>
+//             ) : (
+//               <div className="relative">
+//                 <FiCloudOff size={64} className="text-slate-400 mx-auto opacity-30 group-hover:opacity-60 transition-opacity duration-700" />
+//               </div>
+//             )}
+//           </div>
+//         </div>
+
+//         {/* TYPOGRAPHY: High-definition clarity */}
+//         <div className="space-y-6">
+//           <div className="space-y-4">
+//             <h1 className="text-5xl font-black tracking-tighter text-white leading-tight">
+//               {isRetrying ? (
+//                 <>Syncing <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400 animate-gradient-x">engine.</span></>
+//               ) : (
+//                 <>Just a <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 animate-gradient-x">moment.</span></>
+//               )}
+//             </h1>
+//             <p className="text-xl font-bold text-slate-200">
+//               {isRetrying ? "Establishing secure handshake..." : "Thank you for your patience."}
+//             </p>
+//           </div>
+          
+//           <p className="text-slate-400 text-base leading-relaxed max-w-xs mx-auto font-medium opacity-70">
+//             {isRetrying 
+//               ? "Re-aligning Neural Net parameters. This process ensures peak inference performance." 
+//               : "Our systems are currently busy or under maintenance. We are working to restore your dashboard connectivity."}
+//           </p>
+//         </div>
+
+//         {/* INTERACTION: High-intent action */}
+//         <div className="flex flex-col items-center gap-10">
+//           <button
+//             onClick={handleRetry}
+//             disabled={isRetrying}
+//             className={`
+//               relative group flex items-center gap-4 px-12 py-5 rounded-[2.2rem] font-black text-lg transition-all active:scale-95
+//               ${isRetrying 
+//                 ? "bg-slate-900/50 text-slate-600 cursor-not-allowed border border-white/5" 
+//                 : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_20px_60px_-12px_rgba(79,70,229,0.6)]"}
+//             `}
+//           >
+//             <FiRefreshCw className={`text-xl ${isRetrying ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-1000"}`} />
+//             {isRetrying ? "Attempting Sync..." : "Check Connection Again"}
+//             {!isRetrying && (
+//               <div className="absolute inset-0 rounded-[2.2rem] bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+//             )}
+//           </button>
+
+//           {/* TELEMETRY FOOTER */}
+//           <div className="flex flex-col items-center gap-5">
+//             <div className="flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-white/[0.03] border border-white/5 backdrop-blur-xl">
+//                <FiActivity size={14} className={isRetrying ? "text-cyan-400 animate-pulse" : "text-amber-500"} />
+//                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">
+//                  {isRetrying ? 'System Handshake Active' : 'Waiting for Response'}
+//                </span>
+//             </div>
+            
+//             {/* Visual Feedback: High-fidelity progress */}
+//             {isRetrying && (
+//                <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden shadow-inner">
+//                   <div 
+//                     className="h-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 shadow-[0_0_15px_rgba(129,140,248,0.4)]" 
+//                     style={{ 
+//                       width: '100%',
+//                       animation: 'progressAnim 10s linear forwards' 
+//                     }} 
+//                   />
+//                </div>
+//             )}
+
+//             {/* <div className="flex items-center gap-3 opacity-30">
+//                <FiZap size={10} className="text-indigo-400" />
+//                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.4em]">
+//                  PrepVision Core v3.2
+//                </p>
+//             </div> */}
+//           </div>
+//         </div>
+//       </div>
+      
+//       {/* 2026 Obsidian Keyframes */}
+//       <style>{`
+//         @keyframes progressAnim {
+//           0% { width: 0%; }
+//           100% { width: 100%; }
+//         }
+//         @keyframes gradient-x {
+//           0%, 100% { background-size: 200% 200%; background-position: left center; }
+//           50% { background-size: 200% 200%; background-position: right center; }
+//         }
+//         @keyframes scan {
+//           0% { transform: translateY(-100%); }
+//           100% { transform: translateY(200%); }
+//         }
+//         .animate-gradient-x {
+//           animation: gradient-x 3s ease infinite;
+//         }
+//         .animate-scan {
+//           animation: scan 4s linear infinite;
+//         }
+//       `}</style>
+//     </div>
+//   );
+// }
+
+
+//before this is live
 import React, { useState, useEffect, useRef } from "react";
 import { FiRefreshCw, FiLoader, FiCloudOff, FiActivity, FiZap } from "react-icons/fi";
 
@@ -238,16 +404,15 @@ export default function ServerOffline({ onRetry }) {
     setIsRetrying(true);
 
     try {
-      // Background trigger for actual auth check
-      onRetry(); 
+      onRetry();
     } catch (err) {
       console.error("Manual sync failed:", err);
     }
 
-    // Fixed 10s visual lock to provide consistent user feedback
+    // ✅ Changed to 5 seconds
     timerRef.current = setTimeout(() => {
       setIsRetrying(false);
-    }, 10000);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -259,21 +424,17 @@ export default function ServerOffline({ onRetry }) {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30 overflow-hidden relative">
       
-      {/* BACKGROUND ETHER: Sophisticated radial layers */}
       <div className="absolute top-[-15%] left-[-10%] w-[65%] h-[65%] bg-indigo-600/10 blur-[140px] rounded-full animate-pulse" />
       <div className="absolute bottom-[-15%] right-[-10%] w-[65%] h-[65%] bg-blue-600/10 blur-[140px] rounded-full animate-pulse" />
       
-      {/* 2026 MESH: Technical structural grid */}
       <div className="absolute inset-0 opacity-[0.04] bg-[size:40px_40px] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)]" />
 
       <div className="max-w-md w-full text-center space-y-12 relative z-10 animate-fadeIn">
         
-        {/* CORE INTERFACE: Glassmorphic Hub */}
         <div className="relative inline-block group">
           <div className="absolute inset-[-10px] bg-indigo-500/20 blur-3xl rounded-full group-hover:bg-indigo-500/30 transition-all duration-700" />
           <div className="relative bg-slate-900/40 backdrop-blur-3xl border border-white/10 p-12 rounded-[3.5rem] shadow-2xl transition-all duration-500 group-hover:scale-105 overflow-hidden">
             
-            {/* Dynamic Scanning Light Effect */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent h-1/2 w-full animate-scan pointer-events-none" />
 
             {isRetrying ? (
@@ -291,7 +452,6 @@ export default function ServerOffline({ onRetry }) {
           </div>
         </div>
 
-        {/* TYPOGRAPHY: High-definition clarity */}
         <div className="space-y-6">
           <div className="space-y-4">
             <h1 className="text-5xl font-black tracking-tighter text-white leading-tight">
@@ -313,7 +473,6 @@ export default function ServerOffline({ onRetry }) {
           </p>
         </div>
 
-        {/* INTERACTION: High-intent action */}
         <div className="flex flex-col items-center gap-10">
           <button
             onClick={handleRetry}
@@ -332,7 +491,6 @@ export default function ServerOffline({ onRetry }) {
             )}
           </button>
 
-          {/* TELEMETRY FOOTER */}
           <div className="flex flex-col items-center gap-5">
             <div className="flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-white/[0.03] border border-white/5 backdrop-blur-xl">
                <FiActivity size={14} className={isRetrying ? "text-cyan-400 animate-pulse" : "text-amber-500"} />
@@ -341,30 +499,21 @@ export default function ServerOffline({ onRetry }) {
                </span>
             </div>
             
-            {/* Visual Feedback: High-fidelity progress */}
             {isRetrying && (
                <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden shadow-inner">
                   <div 
                     className="h-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 shadow-[0_0_15px_rgba(129,140,248,0.4)]" 
                     style={{ 
                       width: '100%',
-                      animation: 'progressAnim 10s linear forwards' 
+                      animation: 'progressAnim 5s linear forwards' // ✅ changed to 5s
                     }} 
                   />
                </div>
             )}
-
-            {/* <div className="flex items-center gap-3 opacity-30">
-               <FiZap size={10} className="text-indigo-400" />
-               <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.4em]">
-                 PrepVision Core v3.2
-               </p>
-            </div> */}
           </div>
         </div>
       </div>
       
-      {/* 2026 Obsidian Keyframes */}
       <style>{`
         @keyframes progressAnim {
           0% { width: 0%; }

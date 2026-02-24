@@ -156,9 +156,104 @@
 //   );
 // }
 
+// import React, { createContext, useState, useEffect, useRef } from "react";
+// import API from "../api/api";
+// import { useNavigate } from "react-router-dom";
+
+// export const AuthContext = createContext();
+
+// export function AuthProvider({ children }) {
+//   const [user, setUser] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [isServerOff, setIsServerOff] = useState(false);
+//   const navigate = useNavigate();
+
+//   const hasLoaded = useRef(false); // ✅ prevent double call
+
+//   const loadUser = async () => {
+//     try {
+//       setLoading(true);
+
+//       const token = localStorage.getItem("token");
+//       if (!token) {
+//         setLoading(false);
+//         return;
+//       }
+
+//       const res = await API.get("/auth/myprofile"); // ✅ UPDATED
+
+//       if (res?.data?.user) {
+//         setUser(res.data.user);
+//         setIsServerOff(false);
+//       }
+//     } catch (err) {
+//       console.error("loadUser error:", err);
+
+//       if (!err.response) {
+//         setIsServerOff(true);
+//       } else {
+//         localStorage.removeItem("token");
+//         setUser(null);
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (hasLoaded.current) return;
+//     hasLoaded.current = true;
+
+//     loadUser();
+//   }, []);
+
+//   const logout = () => {
+//     localStorage.removeItem("token");
+//     sessionStorage.removeItem("announcement_closed");
+//     setUser(null);
+//     navigate("/");
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{ user, setUser, logout, loadUser, loading, isServerOff }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// }
+
+//before this is final live
+
+// import React, { createContext, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+
+// export const AuthContext = createContext();
+
+// export function AuthProvider({ children }) {
+//   const [user, setUser] = useState(null);
+//   const [isServerOff, setIsServerOff] = useState(false);
+//   const navigate = useNavigate();
+
+//   const logout = () => {
+//     localStorage.removeItem("token");
+//     sessionStorage.removeItem("announcement_closed");
+//     setUser(null);
+//     navigate("/");
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{ user, setUser, logout, isServerOff }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// }
+
 import React, { createContext, useState, useEffect, useRef } from "react";
-import API from "../api/api";
 import { useNavigate } from "react-router-dom";
+import API from "../api/api";
 
 export const AuthContext = createContext();
 
@@ -166,45 +261,69 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isServerOff, setIsServerOff] = useState(false);
+
   const navigate = useNavigate();
+  const hasLoaded = useRef(false);
 
-  const hasLoaded = useRef(false); // ✅ prevent double call
-
-  const loadUser = async () => {
+  const checkServer = async () => {
     try {
-      setLoading(true);
+      const base =
+        (import.meta.env.VITE_API_URL || "http://localhost:4000/api")
+          .replace("/api", "");
 
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      const res = await API.get("/auth/myprofile"); // ✅ UPDATED
-
-      if (res?.data?.user) {
-        setUser(res.data.user);
-        setIsServerOff(false);
-      }
-    } catch (err) {
-      console.error("loadUser error:", err);
-
-      if (!err.response) {
-        setIsServerOff(true);
-      } else {
-        localStorage.removeItem("token");
-        setUser(null);
-      }
-    } finally {
-      setLoading(false);
+      await fetch(`${base}/health`);
+      return true;
+    } catch {
+      return false;
     }
   };
 
-  useEffect(() => {
-    if (hasLoaded.current) return;
-    hasLoaded.current = true;
+ const loadUser = async () => {
+  try {
+    // ❌ REMOVE setLoading(true) from retry
+    const alive = await checkServer();
 
-    loadUser();
+    if (!alive) {
+      setIsServerOff(true);
+      return;
+    }
+
+    setIsServerOff(false);
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const res = await API.get("/auth/myprofile");
+
+    if (res?.data?.user) {
+      setUser(res.data.user);
+    }
+  } catch (err) {
+    if (!err.response) {
+      setIsServerOff(true);
+    }
+  }
+};
+useEffect(() => {
+  if (hasLoaded.current) return;
+  hasLoaded.current = true;
+
+  const init = async () => {
+    setLoading(true);
+    await loadUser();
+    setLoading(false);
+  };
+
+  init();
+}, []);
+
+  useEffect(() => {
+    const handleOffline = () => setIsServerOff(true);
+
+    window.addEventListener("server-offline", handleOffline);
+
+    return () =>
+      window.removeEventListener("server-offline", handleOffline);
   }, []);
 
   const logout = () => {
@@ -216,7 +335,14 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, logout, loadUser, loading, isServerOff }}
+      value={{
+        user,
+        setUser,
+        logout,
+        loadUser,
+        loading,
+        isServerOff,
+      }}
     >
       {children}
     </AuthContext.Provider>
