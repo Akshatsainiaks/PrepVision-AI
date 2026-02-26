@@ -251,6 +251,105 @@
 //   );
 // }
 
+// import React, { createContext, useState, useEffect, useRef } from "react";
+// import { useNavigate } from "react-router-dom";
+// import API from "../api/api";
+
+// export const AuthContext = createContext();
+
+// export function AuthProvider({ children }) {
+//   const [user, setUser] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [isServerOff, setIsServerOff] = useState(false);
+
+//   const navigate = useNavigate();
+//   const hasLoaded = useRef(false);
+
+//   const checkServer = async () => {
+//     try {
+//       const base =
+//         (import.meta.env.VITE_API_URL || "http://localhost:4000/api")
+//           .replace("/api", "");
+
+//       await fetch(`${base}/health`);
+//       return true;
+//     } catch {
+//       return false;
+//     }
+//   };
+
+//  const loadUser = async () => {
+//   try {
+//     // ❌ REMOVE setLoading(true) from retry
+//     const alive = await checkServer();
+
+//     if (!alive) {
+//       setIsServerOff(true);
+//       return;
+//     }
+
+//     setIsServerOff(false);
+
+//     const token = localStorage.getItem("token");
+//     if (!token) return;
+
+//     const res = await API.get("/auth/myprofile");
+
+//     if (res?.data?.user) {
+//       setUser(res.data.user);
+//     }
+//   } catch (err) {
+//     if (!err.response) {
+//       setIsServerOff(true);
+//     }
+//   }
+// };
+// useEffect(() => {
+//   if (hasLoaded.current) return;
+//   hasLoaded.current = true;
+
+//   const init = async () => {
+//     setLoading(true);
+//     await loadUser();
+//     setLoading(false);
+//   };
+
+//   init();
+// }, []);
+
+//   useEffect(() => {
+//     const handleOffline = () => setIsServerOff(true);
+
+//     window.addEventListener("server-offline", handleOffline);
+
+//     return () =>
+//       window.removeEventListener("server-offline", handleOffline);
+//   }, []);
+
+//   const logout = () => {
+//     localStorage.removeItem("token");
+//     sessionStorage.removeItem("announcement_closed");
+//     setUser(null);
+//     navigate("/");
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         user,
+//         setUser,
+//         logout,
+//         loadUser,
+//         loading,
+//         isServerOff,
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// }
+
+
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
@@ -267,63 +366,61 @@ export function AuthProvider({ children }) {
 
   const checkServer = async () => {
     try {
-      const base =
-        (import.meta.env.VITE_API_URL || "http://localhost:4000/api")
-          .replace("/api", "");
+      const base = (
+        import.meta.env.VITE_API_URL || "http://localhost:4000/api"
+      ).replace("/api", "");
 
-      await fetch(`${base}/health`);
-      return true;
+      const res = await fetch(`${base}/health`);
+      return res.ok;
     } catch {
       return false;
     }
   };
 
- const loadUser = async () => {
-  try {
-    // ❌ REMOVE setLoading(true) from retry
-    const alive = await checkServer();
+  // ✅ Uses /auth/checkuser — lightweight, only for auth verification
+  const loadUser = async () => {
+    try {
+      const alive = await checkServer();
 
-    if (!alive) {
-      setIsServerOff(true);
-      return;
+      if (!alive) {
+        setIsServerOff(true);
+        return;
+      }
+
+      setIsServerOff(false);
+
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await API.get("/auth/checkuser"); // ✅ NEW endpoint
+
+      if (res?.data?.user) {
+        setUser(res.data.user);
+      }
+    } catch (err) {
+      if (!err.response) {
+        setIsServerOff(true);
+      }
     }
-
-    setIsServerOff(false);
-
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const res = await API.get("/auth/myprofile");
-
-    if (res?.data?.user) {
-      setUser(res.data.user);
-    }
-  } catch (err) {
-    if (!err.response) {
-      setIsServerOff(true);
-    }
-  }
-};
-useEffect(() => {
-  if (hasLoaded.current) return;
-  hasLoaded.current = true;
-
-  const init = async () => {
-    setLoading(true);
-    await loadUser();
-    setLoading(false);
   };
 
-  init();
-}, []);
+  useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
+    const init = async () => {
+      setLoading(true);
+      await loadUser();
+      setLoading(false);
+    };
+
+    init();
+  }, []);
 
   useEffect(() => {
     const handleOffline = () => setIsServerOff(true);
-
     window.addEventListener("server-offline", handleOffline);
-
-    return () =>
-      window.removeEventListener("server-offline", handleOffline);
+    return () => window.removeEventListener("server-offline", handleOffline);
   }, []);
 
   const logout = () => {
@@ -333,6 +430,19 @@ useEffect(() => {
     navigate("/");
   };
 
+  // ✅ After login:
+  // 1. Set user instantly from login response (no flicker/delay)
+  // 2. Always call checkuser so it shows in network tab + syncs latest data
+  const loginAndLoad = async (token, userFromResponse = null) => {
+    localStorage.setItem("token", token);
+
+    if (userFromResponse) {
+      setUser(userFromResponse); // instant — no waiting
+    }
+
+    await loadUser(); // calls /auth/checkuser — visible in network tab ✅
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -340,6 +450,7 @@ useEffect(() => {
         setUser,
         logout,
         loadUser,
+        loginAndLoad,
         loading,
         isServerOff,
       }}

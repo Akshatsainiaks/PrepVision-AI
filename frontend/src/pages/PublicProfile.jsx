@@ -656,6 +656,345 @@
 //   );
 // }
 
+// import { useEffect, useState, useContext, useRef } from "react";
+// import { useParams, useNavigate } from "react-router-dom";
+// import Navbar from "../components/Navbar";
+// import API from "../api/api";
+// import { AuthContext } from "../context/AuthContext";
+// import ProfileSkeleton from "../components/skeletons/ProfileSkeleton";
+// import React from "react";
+// import {
+//   FiUserPlus,
+//   FiUserMinus,
+//   FiMessageSquare,
+//   FiTrendingUp,
+//   FiAward,
+//   FiCalendar,
+//   FiUser,
+// } from "react-icons/fi";
+
+// export default function PublicProfile() {
+//   const { username } = useParams();
+//   const navigate = useNavigate();
+//   const { user: me } = useContext(AuthContext);
+
+//   const myId = me?.id ?? me?._id ?? localStorage.getItem("userId");
+
+//   const [data, setData] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [followLoading, setFollowLoading] = useState(false);
+
+//   const fetchedRef = useRef(false); // ✅ prevent double API call
+
+//   useEffect(() => {
+//     if (fetchedRef.current) return;
+//     fetchedRef.current = true;
+
+//     const fetchProfile = async () => {
+//       try {
+//         // ✅ CLEAN API (no username in URL)
+//         const res = await API.get("/users/userprofile", {
+//           params: { username },
+//         });
+
+//         setData(res.data?.user || null);
+//       } catch (err) {
+//         console.error("User profile error:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchProfile();
+//   }, [username]);
+
+//   if (loading) return <ProfileSkeleton />;
+
+//   if (!data)
+//     return (
+//       <div
+//         className="min-h-screen transition-colors duration-300"
+//         style={{ backgroundColor: "var(--bg-primary)" }}
+//       >
+//         <Navbar />
+//         <div
+//           className="max-w-md mx-auto mt-10 p-12 text-center rounded-[2.5rem] border shadow-2xl"
+//           style={{
+//             backgroundColor: "var(--bg-card)",
+//             borderColor: "var(--border-color)",
+//           }}
+//         >
+//           <div
+//             className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 opacity-20"
+//             style={{
+//               backgroundColor: "var(--bg-primary)",
+//               color: "var(--text-secondary)",
+//             }}
+//           >
+//             <FiUser size={40} />
+//           </div>
+//           <h2
+//             className="text-2xl font-black"
+//             style={{ color: "var(--text-primary)" }}
+//           >
+//             User not found
+//           </h2>
+//           <p
+//             className="mt-2 font-medium"
+//             style={{ color: "var(--text-secondary)" }}
+//           >
+//             The profile you are looking for doesn't exist.
+//           </p>
+//           <button
+//             onClick={() => navigate(-1)}
+//             className="mt-8 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95 hover:brightness-110"
+//           >
+//             Go Back
+//           </button>
+//         </div>
+//       </div>
+//     );
+
+//   // ✅ use user_id instead of _id
+//   const isMe = String(data.user_id) === String(myId);
+
+//   const toggleFollow = async () => {
+//     try {
+//       setFollowLoading(true);
+
+//       if (data.isFollowing) {
+//         await API.post(`/users/${data.user_id}/unfollow`);
+//         setData((p) => ({
+//           ...p,
+//           isFollowing: false,
+//           followersCount: Math.max(0, (p.followersCount || 0) - 1),
+//         }));
+//       } else {
+//         await API.post(`/users/${data.user_id}/follow`);
+//         setData((p) => ({
+//           ...p,
+//           isFollowing: true,
+//           followersCount: (p.followersCount || 0) + 1,
+//         }));
+//       }
+//     } catch {
+//       alert("Action failed");
+//     } finally {
+//       setFollowLoading(false);
+//     }
+//   };
+
+//   const startMessage = () => {
+//     navigate("/chat", { state: { username: data.username } });
+//   };
+
+//   return (
+//     <div
+//       className="min-h-screen transition-colors duration-300 font-sans selection:bg-indigo-500/30"
+//       style={{
+//         backgroundColor: "var(--bg-primary)",
+//         color: "var(--text-primary)",
+//       }}
+//     >
+//       <Navbar />
+
+//       <div className="max-w-5xl mx-auto p-8 space-y-10">
+
+//         {/* HEADER */}
+//         <header className="flex items-center gap-5">
+//           <div
+//             className="p-4 rounded-[2rem] text-white shadow-xl shadow-indigo-900/40"
+//             style={{ backgroundColor: "var(--accent)" }}
+//           >
+//             <FiUser size={32} />
+//           </div>
+//           <div>
+//             <h2 className="text-4xl font-black tracking-tight uppercase">
+//               @{data.username}
+//             </h2>
+//             <p
+//               className="text-sm font-bold tracking-widest uppercase"
+//               style={{ color: "var(--accent)" }}
+//             >
+//               Public Expert Profile
+//             </p>
+//           </div>
+//         </header>
+
+//         {/* PROFILE CARD */}
+//         <div
+//           className="card rounded-[2.5rem] p-10 relative overflow-hidden border"
+//           style={{
+//             backgroundColor: "var(--bg-card)",
+//             borderColor: "var(--border-color)",
+//           }}
+//         >
+//           <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl" />
+
+//           <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-10">
+//             <div
+//               className="w-32 h-32 rounded-[2.5rem] overflow-hidden shadow-2xl flex items-center justify-center text-5xl font-black border-4"
+//               style={{
+//                 backgroundColor: "var(--bg-primary)",
+//                 borderColor: "var(--bg-card)",
+//                 color: "var(--text-secondary)",
+//               }}
+//             >
+//               {data.avatar ? (
+//                 <img
+//                   src={data.avatar}
+//                   alt="avatar"
+//                   className="w-full h-full object-cover"
+//                 />
+//               ) : (
+//                 data.name?.charAt(0)
+//               )}
+//             </div>
+
+//             <div className="flex-1 text-center md:text-left">
+//               <h3 className="text-3xl font-black tracking-tight mb-2">
+//                 {data.name}
+//               </h3>
+
+//               <div className="flex justify-center md:justify-start gap-8 text-sm">
+//                 <div className="flex flex-col">
+//                   <span className="text-2xl font-black">
+//                     {data.followersCount ?? 0}
+//                   </span>
+//                   <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">
+//                     Followers
+//                   </span>
+//                 </div>
+
+//                 <div className="flex flex-col">
+//                   <span className="text-2xl font-black">
+//                     {data.followingCount ?? 0}
+//                   </span>
+//                   <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">
+//                     Following
+//                   </span>
+//                 </div>
+//               </div>
+
+//               {!isMe && (
+//                 <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-8">
+//                   <button
+//                     onClick={toggleFollow}
+//                     disabled={followLoading}
+//                     className={`flex items-center gap-2 px-8 py-3.5 rounded-2xl font-bold transition-all active:scale-95 border
+//                       ${
+//                         data.isFollowing
+//                           ? "bg-white/5 text-[var(--text-primary)] border-white/10"
+//                           : "bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-500/20 hover:brightness-110"
+//                       }
+//                     `}
+//                   >
+//                     {data.isFollowing ? <FiUserMinus /> : <FiUserPlus />}
+//                     {data.isFollowing ? "Unfollow" : "Follow"}
+//                   </button>
+
+//                   <button
+//                     onClick={startMessage}
+//                     className="flex items-center gap-2 px-8 py-3.5 rounded-2xl border transition-all active:scale-95 shadow-lg"
+//                     style={{
+//                       backgroundColor: "var(--bg-primary)",
+//                       borderColor: "var(--border-color)",
+//                       color: "var(--text-primary)",
+//                     }}
+//                   >
+//                     <FiMessageSquare style={{ color: "var(--accent)" }} />
+//                     Message
+//                   </button>
+//                 </div>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* STATS GRID */}
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//           <StatCard title="Total Credits" value={data.credits ?? 0} icon={<FiTrendingUp />} />
+//           <StatCard title="Global Rank" value={`#${data.rank ?? "—"}`} icon={<FiAward />} />
+//           <StatCard
+//             title="Member Since"
+//             value={data.createdAt ? new Date(data.createdAt).toLocaleDateString() : "—"}
+//             icon={<FiCalendar />}
+//           />
+//         </div>
+
+//         {/* RECENT ACTIVITY (UNCHANGED) */}
+//         <div
+//           className="card rounded-[2.5rem] p-10 shadow-sm border"
+//           style={{
+//             backgroundColor: "var(--bg-card)",
+//             borderColor: "var(--border-color)",
+//           }}
+//         >
+//           <div className="flex items-center gap-3 mb-6">
+//             <h3 className="text-xl font-black tracking-tight">
+//               Recent Activity
+//             </h3>
+//             <div
+//               className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg"
+//               style={{
+//                 backgroundColor: "var(--bg-primary)",
+//                 color: "var(--text-secondary)",
+//               }}
+//             >
+//               Feed
+//             </div>
+//           </div>
+
+//           <div
+//             className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-[2rem]"
+//             style={{
+//               backgroundColor: "rgba(2, 6, 23, 0.3)",
+//               borderColor: "var(--border-color)",
+//             }}
+//           >
+//             <p
+//               className="font-bold italic"
+//               style={{ color: "var(--text-secondary)" }}
+//             >
+//               Activity feed coming soon to public profiles...
+//             </p>
+//           </div>
+//         </div>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+// function StatCard({ title, value, icon }) {
+//   return (
+//     <div
+//       className="card rounded-3xl p-8 flex flex-col items-center text-center shadow-lg transition-all border group hover:-translate-y-1"
+//       style={{
+//         backgroundColor: "var(--bg-card)",
+//         borderColor: "var(--border-color)",
+//       }}
+//     >
+//       <div
+//         className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
+//         style={{ backgroundColor: "var(--bg-primary)" }}
+//       >
+//         {React.cloneElement(icon, { size: 24 })}
+//       </div>
+
+//       <div className="text-[11px] font-black uppercase tracking-[0.15em] mb-1 text-[var(--text-secondary)]">
+//         {title}
+//       </div>
+
+//       <div className="text-3xl font-black tracking-tight">
+//         {value}
+//       </div>
+//     </div>
+//   );
+// }
+
+//before is live
+
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -684,19 +1023,23 @@ export default function PublicProfile() {
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
 
-  const fetchedRef = useRef(false); // ✅ prevent double API call
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
+    // ✅ Self-redirect: if viewing your own public profile → go to /profile
+    if (me?.username && me.username === username) {
+      navigate("/profile", { replace: true });
+      return;
+    }
+
     if (fetchedRef.current) return;
     fetchedRef.current = true;
 
     const fetchProfile = async () => {
       try {
-        // ✅ CLEAN API (no username in URL)
         const res = await API.get("/users/userprofile", {
           params: { username },
         });
-
         setData(res.data?.user || null);
       } catch (err) {
         console.error("User profile error:", err);
@@ -706,7 +1049,7 @@ export default function PublicProfile() {
     };
 
     fetchProfile();
-  }, [username]);
+  }, [username, me]);
 
   if (loading) return <ProfileSkeleton />;
 
@@ -755,13 +1098,11 @@ export default function PublicProfile() {
       </div>
     );
 
-  // ✅ use user_id instead of _id
   const isMe = String(data.user_id) === String(myId);
 
   const toggleFollow = async () => {
     try {
       setFollowLoading(true);
-
       if (data.isFollowing) {
         await API.post(`/users/${data.user_id}/unfollow`);
         setData((p) => ({
@@ -858,21 +1199,12 @@ export default function PublicProfile() {
 
               <div className="flex justify-center md:justify-start gap-8 text-sm">
                 <div className="flex flex-col">
-                  <span className="text-2xl font-black">
-                    {data.followersCount ?? 0}
-                  </span>
-                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">
-                    Followers
-                  </span>
+                  <span className="text-2xl font-black">{data.followersCount ?? 0}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">Followers</span>
                 </div>
-
                 <div className="flex flex-col">
-                  <span className="text-2xl font-black">
-                    {data.followingCount ?? 0}
-                  </span>
-                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">
-                    Following
-                  </span>
+                  <span className="text-2xl font-black">{data.followingCount ?? 0}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">Following</span>
                 </div>
               </div>
 
@@ -882,12 +1214,10 @@ export default function PublicProfile() {
                     onClick={toggleFollow}
                     disabled={followLoading}
                     className={`flex items-center gap-2 px-8 py-3.5 rounded-2xl font-bold transition-all active:scale-95 border
-                      ${
-                        data.isFollowing
-                          ? "bg-white/5 text-[var(--text-primary)] border-white/10"
-                          : "bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-500/20 hover:brightness-110"
-                      }
-                    `}
+                      ${data.isFollowing
+                        ? "bg-white/5 text-[var(--text-primary)] border-white/10"
+                        : "bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-500/20 hover:brightness-110"
+                      }`}
                   >
                     {data.isFollowing ? <FiUserMinus /> : <FiUserPlus />}
                     {data.isFollowing ? "Unfollow" : "Follow"}
@@ -922,7 +1252,7 @@ export default function PublicProfile() {
           />
         </div>
 
-        {/* RECENT ACTIVITY (UNCHANGED) */}
+        {/* RECENT ACTIVITY */}
         <div
           className="card rounded-[2.5rem] p-10 shadow-sm border"
           style={{
@@ -931,9 +1261,7 @@ export default function PublicProfile() {
           }}
         >
           <div className="flex items-center gap-3 mb-6">
-            <h3 className="text-xl font-black tracking-tight">
-              Recent Activity
-            </h3>
+            <h3 className="text-xl font-black tracking-tight">Recent Activity</h3>
             <div
               className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg"
               style={{
@@ -952,10 +1280,7 @@ export default function PublicProfile() {
               borderColor: "var(--border-color)",
             }}
           >
-            <p
-              className="font-bold italic"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <p className="font-bold italic" style={{ color: "var(--text-secondary)" }}>
               Activity feed coming soon to public profiles...
             </p>
           </div>
@@ -981,14 +1306,10 @@ function StatCard({ title, value, icon }) {
       >
         {React.cloneElement(icon, { size: 24 })}
       </div>
-
       <div className="text-[11px] font-black uppercase tracking-[0.15em] mb-1 text-[var(--text-secondary)]">
         {title}
       </div>
-
-      <div className="text-3xl font-black tracking-tight">
-        {value}
-      </div>
+      <div className="text-3xl font-black tracking-tight">{value}</div>
     </div>
   );
 }

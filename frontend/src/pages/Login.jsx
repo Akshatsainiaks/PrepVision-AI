@@ -224,74 +224,221 @@
 // }
 
 //dark mode
-import { useState } from "react";
+// import { useState } from "react";
+// import API from "../api/api";
+// import { useNavigate, Link } from "react-router-dom";
+// import React from "react";
+// import { FiMail, FiLock, FiArrowRight, FiShield } from "react-icons/fi";
+
+// export default function Login() {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const navigate = useNavigate();
+
+//   const handleLogin = async () => {
+//     try {
+//       const res = await API.post("/auth/login", { email, password });
+//       localStorage.setItem("token", res.data.token);
+//       localStorage.setItem("userId", res.data.user.id);
+//       localStorage.setItem("name", res.data.user.name);
+//       navigate("/dashboard");
+//     } catch (err) {
+//       alert(err.response?.data?.message || "Login error");
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex transition-colors duration-500 font-sans selection:bg-indigo-500/30" 
+//          style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
+      
+//       {/* LEFT SECTION — Modern Dark Brand */}
+//       <div className="hidden lg:flex flex-col justify-center px-20 w-1/2 relative overflow-hidden">
+        
+//         {/* Dynamic Background Blurs */}
+//         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] animate-pulse"></div>
+//         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-600/10 rounded-full blur-[100px]"></div>
+
+//         <div className="z-10">
+//           {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-6">
+//             <FiShield /> Secure AI Gateway
+//           </div> */}
+          
+//           <h1 className="text-7xl font-black tracking-tighter leading-[0.95]">
+//             Master Your <br />
+//             <span style={{ color: "var(--accent)" }}>Interview Skills</span>
+//           </h1>
+
+//           <p className="mt-8 text-lg max-w-md leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+//             Unlock your potential with real-time AI simulations, 
+//             technical drills, and deep behavioral analysis.
+//           </p>
+
+//           {/* <div className="mt-12 flex items-center gap-4">
+//              <div className="flex -space-x-3">
+//                 {[1,2,3,4].map(i => (
+//                   <div key={i} className="w-10 h-10 rounded-full border-2 border-[var(--bg-primary)] bg-slate-800 flex items-center justify-center text-[10px] font-bold">
+//                     {String.fromCharCode(64 + i)}
+//                   </div>
+//                 ))}
+//              </div>
+//              <p className="text-sm font-bold" style={{ color: "var(--text-secondary)" }}>
+//                 Joined by <span className="text-[var(--text-primary)]">5,000+</span> candidates
+//              </p>
+//           </div> */}
+//         </div>
+//       </div>
+
+//       {/* RIGHT SECTION — DARK LOGIN CARD */}
+//       <div className="flex justify-center items-center w-full lg:w-1/2 p-6 relative">
+        
+//         {/* Mobile-only background glow */}
+//         <div className="lg:hidden absolute inset-0 bg-indigo-600/5 blur-3xl -z-10"></div>
+
+//         <div className="w-full max-w-[440px] rounded-[2.5rem] p-10 shadow-2xl border transition-all"
+//              style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+
+//           <div className="mb-10">
+//             <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>Welcome Back</h2>
+//             <p className="mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>
+//               Sign in to your PrepVision account.
+//             </p>
+//           </div>
+
+//           <div className="space-y-6">
+//             {/* EMAIL INPUT */}
+//             <div className="space-y-2">
+//               <label className="text-xs font-black uppercase tracking-widest ml-1" style={{ color: "var(--text-secondary)" }}>Email Address</label>
+//               <div className="relative group">
+//                 <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]" style={{ color: "var(--text-secondary)" }} />
+//                 <input
+//                   type="email"
+//                   className="w-full pl-12 pr-4 py-4 rounded-2xl outline-none transition-all border font-medium"
+//                   style={{ 
+//                     backgroundColor: "var(--bg-primary)", 
+//                     borderColor: "var(--border-color)",
+//                     color: "var(--text-primary)"
+//                   }}
+//                   placeholder="name@company.com"
+//                   value={email}
+//                   onChange={(e) => setEmail(e.target.value)}
+//                 />
+//               </div>
+//             </div>
+
+//             {/* PASSWORD INPUT */}
+//             <div className="space-y-2">
+//               <div className="flex justify-between items-center ml-1">
+//                 <label className="text-xs font-black uppercase tracking-widest" style={{ color: "var(--text-secondary)" }}>Password</label>
+//                 <Link to="/forgot" className="text-[10px] font-black uppercase tracking-tighter hover:text-[var(--accent)] transition-colors" style={{ color: "var(--text-secondary)" }}>Forgot?</Link>
+//               </div>
+//               <div className="relative group">
+//                 <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]" style={{ color: "var(--text-secondary)" }} />
+//                 <input
+//                   type="password"
+//                   className="w-full pl-12 pr-4 py-4 rounded-2xl outline-none transition-all border font-medium"
+//                   style={{ 
+//                     backgroundColor: "var(--bg-primary)", 
+//                     borderColor: "var(--border-color)",
+//                     color: "var(--text-primary)"
+//                   }}
+//                   placeholder="••••••••"
+//                   value={password}
+//                   onChange={(e) => setPassword(e.target.value)}
+//                 />
+//               </div>
+//             </div>
+
+//             {/* LOGIN BUTTON */}
+//             <button
+//               onClick={handleLogin}
+//               className="group w-full py-4 mt-4 rounded-2xl font-black text-lg text-white shadow-xl transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3"
+//               style={{ 
+//                 backgroundColor: "var(--accent)",
+//                 boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.3)"
+//               }}
+//             >
+//               Sign In <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+//             </button>
+//           </div>
+
+//           {/* Separator */}
+//           <div className="relative my-10">
+//             <div className="absolute inset-0 flex items-center">
+//               <div className="w-full border-t" style={{ borderColor: "var(--border-color)" }}></div>
+//             </div>
+//             <div className="relative flex justify-center text-xs">
+//               <span className="px-4 font-black uppercase tracking-widest" style={{ backgroundColor: "var(--bg-card)", color: "var(--text-secondary)" }}>OR</span>
+//             </div>
+//           </div>
+
+//           <p className="text-center font-medium" style={{ color: "var(--text-secondary)" }}>
+//             New to the platform?{" "}
+//             <Link to="/register" className="font-black hover:brightness-125 transition-all" style={{ color: "var(--accent)" }}>
+//               Create Account
+//             </Link>
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+//before is live
+
+import { useState, useContext } from "react";
 import API from "../api/api";
 import { useNavigate, Link } from "react-router-dom";
 import React from "react";
-import { FiMail, FiLock, FiArrowRight, FiShield } from "react-icons/fi";
+import { FiMail, FiLock, FiArrowRight } from "react-icons/fi";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loadingLogin, setLoadingLogin] = useState(false);
   const navigate = useNavigate();
+  const { loginAndLoad } = useContext(AuthContext);
 
   const handleLogin = async () => {
     try {
+      setLoadingLogin(true);
       const res = await API.post("/auth/login", { email, password });
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("userId", res.data.user.id);
-      localStorage.setItem("name", res.data.user.name);
+
+      // ✅ sets user instantly from login response
+      // ✅ ALSO calls /auth/checkuser (visible in network tab)
+      await loginAndLoad(res.data.token, res.data.user);
+
       navigate("/dashboard");
     } catch (err) {
       alert(err.response?.data?.message || "Login error");
+    } finally {
+      setLoadingLogin(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex transition-colors duration-500 font-sans selection:bg-indigo-500/30" 
+    <div className="min-h-screen flex transition-colors duration-500 font-sans selection:bg-indigo-500/30"
          style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
-      
-      {/* LEFT SECTION — Modern Dark Brand */}
+
+      {/* LEFT SECTION */}
       <div className="hidden lg:flex flex-col justify-center px-20 w-1/2 relative overflow-hidden">
-        
-        {/* Dynamic Background Blurs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] animate-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-600/10 rounded-full blur-[100px]"></div>
 
         <div className="z-10">
-          {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-6">
-            <FiShield /> Secure AI Gateway
-          </div> */}
-          
           <h1 className="text-7xl font-black tracking-tighter leading-[0.95]">
             Master Your <br />
             <span style={{ color: "var(--accent)" }}>Interview Skills</span>
           </h1>
-
           <p className="mt-8 text-lg max-w-md leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-            Unlock your potential with real-time AI simulations, 
+            Unlock your potential with real-time AI simulations,
             technical drills, and deep behavioral analysis.
           </p>
-
-          {/* <div className="mt-12 flex items-center gap-4">
-             <div className="flex -space-x-3">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-[var(--bg-primary)] bg-slate-800 flex items-center justify-center text-[10px] font-bold">
-                    {String.fromCharCode(64 + i)}
-                  </div>
-                ))}
-             </div>
-             <p className="text-sm font-bold" style={{ color: "var(--text-secondary)" }}>
-                Joined by <span className="text-[var(--text-primary)]">5,000+</span> candidates
-             </p>
-          </div> */}
         </div>
       </div>
 
-      {/* RIGHT SECTION — DARK LOGIN CARD */}
+      {/* RIGHT SECTION */}
       <div className="flex justify-center items-center w-full lg:w-1/2 p-6 relative">
-        
-        {/* Mobile-only background glow */}
         <div className="lg:hidden absolute inset-0 bg-indigo-600/5 blur-3xl -z-10"></div>
 
         <div className="w-full max-w-[440px] rounded-[2.5rem] p-10 shadow-2xl border transition-all"
@@ -305,69 +452,81 @@ export default function Login() {
           </div>
 
           <div className="space-y-6">
-            {/* EMAIL INPUT */}
+            {/* EMAIL */}
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest ml-1" style={{ color: "var(--text-secondary)" }}>Email Address</label>
+              <label className="text-xs font-black uppercase tracking-widest ml-1" style={{ color: "var(--text-secondary)" }}>
+                Email Address
+              </label>
               <div className="relative group">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]" style={{ color: "var(--text-secondary)" }} />
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]"
+                        style={{ color: "var(--text-secondary)" }} />
                 <input
                   type="email"
                   className="w-full pl-12 pr-4 py-4 rounded-2xl outline-none transition-all border font-medium"
-                  style={{ 
-                    backgroundColor: "var(--bg-primary)", 
+                  style={{
+                    backgroundColor: "var(--bg-primary)",
                     borderColor: "var(--border-color)",
                     color: "var(--text-primary)"
                   }}
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 />
               </div>
             </div>
 
-            {/* PASSWORD INPUT */}
+            {/* PASSWORD */}
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-black uppercase tracking-widest" style={{ color: "var(--text-secondary)" }}>Password</label>
-                <Link to="/forgot" className="text-[10px] font-black uppercase tracking-tighter hover:text-[var(--accent)] transition-colors" style={{ color: "var(--text-secondary)" }}>Forgot?</Link>
+                <label className="text-xs font-black uppercase tracking-widest" style={{ color: "var(--text-secondary)" }}>
+                  Password
+                </label>
+                <Link to="/forgot" className="text-[10px] font-black uppercase tracking-tighter hover:text-[var(--accent)] transition-colors"
+                      style={{ color: "var(--text-secondary)" }}>
+                  Forgot?
+                </Link>
               </div>
               <div className="relative group">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]" style={{ color: "var(--text-secondary)" }} />
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]"
+                        style={{ color: "var(--text-secondary)" }} />
                 <input
                   type="password"
                   className="w-full pl-12 pr-4 py-4 rounded-2xl outline-none transition-all border font-medium"
-                  style={{ 
-                    backgroundColor: "var(--bg-primary)", 
+                  style={{
+                    backgroundColor: "var(--bg-primary)",
                     borderColor: "var(--border-color)",
                     color: "var(--text-primary)"
                   }}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 />
               </div>
             </div>
 
-            {/* LOGIN BUTTON */}
+            {/* BUTTON */}
             <button
               onClick={handleLogin}
-              className="group w-full py-4 mt-4 rounded-2xl font-black text-lg text-white shadow-xl transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3"
-              style={{ 
+              disabled={loadingLogin}
+              className="group w-full py-4 mt-4 rounded-2xl font-black text-lg text-white shadow-xl transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+              style={{
                 backgroundColor: "var(--accent)",
                 boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.3)"
               }}
             >
-              Sign In <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+              {loadingLogin ? "Signing in..." : <>Sign In <FiArrowRight className="group-hover:translate-x-1 transition-transform" /></>}
             </button>
           </div>
 
-          {/* Separator */}
           <div className="relative my-10">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t" style={{ borderColor: "var(--border-color)" }}></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-4 font-black uppercase tracking-widest" style={{ backgroundColor: "var(--bg-card)", color: "var(--text-secondary)" }}>OR</span>
+              <span className="px-4 font-black uppercase tracking-widest"
+                    style={{ backgroundColor: "var(--bg-card)", color: "var(--text-secondary)" }}>OR</span>
             </div>
           </div>
 

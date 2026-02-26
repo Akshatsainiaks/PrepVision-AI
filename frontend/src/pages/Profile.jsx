@@ -2106,6 +2106,303 @@
 //   );
 // }
 
+// import { useEffect, useState, useContext, useRef } from "react";
+// import API from "../api/api";
+// import { AuthContext } from "../context/AuthContext";
+// import { Link } from "react-router-dom";
+// import ProfileSkeleton from "../components/skeletons/ProfileSkeleton";
+// import React from "react";
+// import {
+//   FiUser,
+//   FiSettings,
+//   FiCreditCard,
+//   FiEdit3,
+//   FiLogOut,
+//   FiCamera,
+//   FiEye,
+//   FiX,
+// } from "react-icons/fi";
+
+// export default function Profile() {
+//   const { user, setUser, logout } = useContext(AuthContext);
+
+//   const [uploading, setUploading] = useState(false);
+//   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+//   const [showAvatarPreview, setShowAvatarPreview] = useState(false);
+
+//   const fileInputRef = useRef(null);
+//   const avatarMenuRef = useRef(null);
+
+//   useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (
+//         avatarMenuRef.current &&
+//         !avatarMenuRef.current.contains(e.target)
+//       ) {
+//         setShowAvatarMenu(false);
+//       }
+//     };
+
+//     if (showAvatarMenu) {
+//       document.addEventListener("mousedown", handleClickOutside);
+//     }
+
+//     return () =>
+//       document.removeEventListener("mousedown", handleClickOutside);
+//   }, [showAvatarMenu]);
+
+//   // ✅ Now using context user
+//   if (!user) return <ProfileSkeleton />;
+
+//   const handleAvatarUpload = async (e) => {
+//     const file = e.target.files?.[0];
+//     if (!file || !file.type.startsWith("image/")) return;
+
+//     const formData = new FormData();
+//     formData.append("avatar", file);
+
+//     try {
+//       setUploading(true);
+//       const res = await API.post("/users/avatar", formData);
+
+//       localStorage.setItem("avatar", res.data.avatar);
+
+//       // ✅ update global context user (no local data state)
+//       setUser((prev) => ({
+//         ...prev,
+//         avatar: res.data.avatar,
+//       }));
+//     } catch {
+//       alert("Avatar upload failed");
+//     } finally {
+//       setUploading(false);
+//       e.target.value = "";
+//     }
+//   };
+
+//   return (
+//     <div
+//       className="min-h-screen font-sans animate-fadeIn transition-colors duration-300"
+//       style={{
+//         backgroundColor: "var(--bg-primary)",
+//         color: "var(--text-primary)",
+//       }}
+//     >
+//       <div className="max-w-5xl mx-auto p-8 space-y-10">
+
+//         {/* HEADER */}
+//         <header className="flex items-center gap-4">
+//           <div
+//             className="p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/10"
+//             style={{ backgroundColor: "var(--accent)" }}
+//           >
+//             <FiUser size={28} />
+//           </div>
+//           <div>
+//             <h2 className="text-4xl font-black tracking-tight">
+//               Profile <span style={{ color: "var(--accent)" }}>Settings</span>
+//             </h2>
+//             <p className="font-medium text-[var(--text-secondary)]">
+//               Manage your identity and account preferences
+//             </p>
+//           </div>
+//         </header>
+
+//         {/* PROFILE CARD */}
+//         <div
+//           className="card rounded-[2.5rem] p-10 border border-[var(--border-color)]"
+//           style={{ backgroundColor: "var(--bg-card)" }}
+//         >
+//           <div className="flex flex-col md:flex-row items-center gap-8">
+//             <div className="relative" ref={avatarMenuRef}>
+
+//               {/* AVATAR */}
+//               <div
+//                 onClick={() => setShowAvatarMenu((p) => !p)}
+//                 className="group relative w-32 h-32 rounded-full overflow-hidden
+//                 border-4 shadow-lg flex items-center justify-center
+//                 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+//                 style={{
+//                   backgroundColor: "var(--bg-primary)",
+//                   borderColor: "var(--border-color)",
+//                 }}
+//               >
+//                 {user.avatar ? (
+//                   <img
+//                     src={user.avatar}
+//                     alt="avatar"
+//                     className="w-full h-full object-cover"
+//                   />
+//                 ) : (
+//                   <span className="text-4xl font-black text-[var(--text-secondary)]">
+//                     {user.name?.charAt(0)}
+//                   </span>
+//                 )}
+
+//                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+//                   <FiCamera className="text-white text-2xl" />
+//                 </div>
+//               </div>
+
+//               {/* DROPDOWN MENU */}
+//               {showAvatarMenu && (
+//                 <div
+//                   className="absolute left-1/2 -translate-x-1/2 mt-4 w-52
+//                   rounded-2xl shadow-2xl z-50 p-2 border border-[var(--border-color)]"
+//                   style={{ backgroundColor: "var(--bg-card)" }}
+//                 >
+//                   <button
+//                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
+//                     onClick={() => {
+//                       setShowAvatarPreview(true);
+//                       setShowAvatarMenu(false);
+//                     }}
+//                   >
+//                     <FiEye className="text-indigo-400" /> View Avatar
+//                   </button>
+
+//                   <button
+//                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
+//                     onClick={() => {
+//                       fileInputRef.current?.click();
+//                       setShowAvatarMenu(false);
+//                     }}
+//                   >
+//                     <FiCamera className="text-indigo-400" /> Change Avatar
+//                   </button>
+//                 </div>
+//               )}
+
+//               <input
+//                 ref={fileInputRef}
+//                 type="file"
+//                 accept="image/*"
+//                 className="hidden"
+//                 onChange={handleAvatarUpload}
+//               />
+//             </div>
+
+//             {/* USER INFO */}
+//             <div className="text-center md:text-left">
+//               <h3 className="text-3xl font-black tracking-tight">
+//                 {user.name}
+//               </h3>
+
+//               <p className="font-medium text-lg text-[var(--text-secondary)]">
+//                 @{user.username}
+//               </p>
+
+//               {uploading && (
+//                 <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">
+//                   Updating cloud assets...
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* ACTIONS GRID */}
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+//           <ActionCard
+//             title="Account Security"
+//             desc="Update your password and login methods"
+//             link="/settings"
+//             icon={<FiSettings className="text-blue-400" />}
+//           />
+//           <ActionCard
+//             title="Credit Wallet"
+//             desc="View token history and balance"
+//             link="/credit-history"
+//             icon={<FiCreditCard className="text-indigo-400" />}
+//           />
+//           <ActionCard
+//             title="Edit Identity"
+//             desc="Modify your public profile details"
+//             link="/settings"
+//             icon={<FiEdit3 className="text-emerald-400" />}
+//           />
+//         </div>
+
+//         {/* LOGOUT */}
+//         <div
+//           className="rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-rose-500/20"
+//           style={{ backgroundColor: "rgba(225, 29, 72, 0.03)" }}
+//         >
+//           <div>
+//             <h3 className="font-black text-xl text-rose-500">Sign Out</h3>
+//             <p className="text-sm font-medium mt-1 text-rose-400/70">
+//               Safely end your current session
+//             </p>
+//           </div>
+
+//           <button
+//             onClick={logout}
+//             className="flex items-center gap-3 px-10 py-4 rounded-2xl text-white font-bold shadow-lg shadow-rose-900/20 hover:bg-rose-700 active:scale-95"
+//             style={{ backgroundColor: "#e11d48" }}
+//           >
+//             <FiLogOut /> Logout
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* AVATAR PREVIEW MODAL */}
+//       {showAvatarPreview && (
+//         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+//           <div className="relative">
+//             <button
+//               onClick={() => setShowAvatarPreview(false)}
+//               className="absolute -top-10 right-0 text-white text-xl"
+//             >
+//               <FiX />
+//             </button>
+
+//             {user.avatar ? (
+//               <img
+//                 src={user.avatar}
+//                 alt="preview"
+//                 className="w-80 h-80 object-cover rounded-2xl"
+//               />
+//             ) : (
+//               <div className="w-80 h-80 flex items-center justify-center bg-gray-800 rounded-2xl text-white text-5xl font-bold">
+//                 {user.name?.charAt(0)}
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// function ActionCard({ title, desc, link, icon }) {
+//   return (
+//     <Link
+//       to={link}
+//       className="group card rounded-[2rem] p-8 shadow-sm hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-300"
+//       style={{
+//         backgroundColor: "var(--bg-card)",
+//         border: "1px solid var(--border-color)",
+//       }}
+//     >
+//       <div
+//         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-white/5"
+//         style={{ backgroundColor: "var(--bg-primary)" }}
+//       >
+//         {React.cloneElement(icon, { size: 24 })}
+//       </div>
+
+//       <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">
+//         {title}
+//       </h4>
+
+//       <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">
+//         {desc}
+//       </p>
+//     </Link>
+//   );
+// }
+
+//before is live
 import { useEffect, useState, useContext, useRef } from "react";
 import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
@@ -2121,72 +2418,98 @@ import {
   FiCamera,
   FiEye,
   FiX,
+  FiTrash2,
 } from "react-icons/fi";
 
 export default function Profile() {
-  const { user, setUser, logout } = useContext(AuthContext);
+  const { setUser, logout } = useContext(AuthContext);
 
+  const [profile, setProfile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showAvatarPreview, setShowAvatarPreview] = useState(false);
 
   const fileInputRef = useRef(null);
   const avatarMenuRef = useRef(null);
+  const hasFetched = useRef(false);
+  const isUploading = useRef(false); // ✅ guards double upload trigger
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        avatarMenuRef.current &&
-        !avatarMenuRef.current.contains(e.target)
-      ) {
-        setShowAvatarMenu(false);
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
+    const fetchProfile = async () => {
+      try {
+        const res = await API.get("/auth/myprofile");
+        if (res?.data?.user) setProfile(res.data.user);
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
       }
     };
 
-    if (showAvatarMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    fetchProfile();
+  }, []);
 
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target)) {
+        setShowAvatarMenu(false);
+      }
+    };
+    if (showAvatarMenu) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showAvatarMenu]);
 
-  // ✅ Now using context user
-  if (!user) return <ProfileSkeleton />;
+  if (!profile) return <ProfileSkeleton />;
 
+  // ✅ Fixed: guard double call + explicit multipart header
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) return;
+    if (isUploading.current) return;
+    isUploading.current = true;
 
     const formData = new FormData();
     formData.append("avatar", file);
 
     try {
       setUploading(true);
-      const res = await API.post("/users/avatar", formData);
+      const res = await API.post("/users/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" }, // ✅ fix "no file uploaded"
+      });
 
-      localStorage.setItem("avatar", res.data.avatar);
-
-      // ✅ update global context user (no local data state)
-      setUser((prev) => ({
-        ...prev,
-        avatar: res.data.avatar,
-      }));
+      setProfile((prev) => ({ ...prev, avatar: res.data.avatar }));
+      setUser((prev) => ({ ...prev, avatar: res.data.avatar }));
     } catch {
       alert("Avatar upload failed");
     } finally {
       setUploading(false);
+      isUploading.current = false;
       e.target.value = "";
+    }
+  };
+
+  // ✅ NEW: Remove avatar
+  const handleRemoveAvatar = async () => {
+    if (!profile.avatar) return;
+    setShowAvatarMenu(false);
+    try {
+      setRemoving(true);
+      await API.delete("/users/avatar");
+      setProfile((prev) => ({ ...prev, avatar: "" }));
+      setUser((prev) => ({ ...prev, avatar: "" }));
+    } catch {
+      alert("Failed to remove avatar");
+    } finally {
+      setRemoving(false);
     }
   };
 
   return (
     <div
       className="min-h-screen font-sans animate-fadeIn transition-colors duration-300"
-      style={{
-        backgroundColor: "var(--bg-primary)",
-        color: "var(--text-primary)",
-      }}
+      style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}
     >
       <div className="max-w-5xl mx-auto p-8 space-y-10">
 
@@ -2216,7 +2539,7 @@ export default function Profile() {
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative" ref={avatarMenuRef}>
 
-              {/* AVATAR */}
+              {/* AVATAR CIRCLE */}
               <div
                 onClick={() => setShowAvatarMenu((p) => !p)}
                 className="group relative w-32 h-32 rounded-full overflow-hidden
@@ -2227,18 +2550,13 @@ export default function Profile() {
                   borderColor: "var(--border-color)",
                 }}
               >
-                {user.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt="avatar"
-                    className="w-full h-full object-cover"
-                  />
+                {profile.avatar ? (
+                  <img src={profile.avatar} alt="avatar" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-4xl font-black text-[var(--text-secondary)]">
-                    {user.name?.charAt(0)}
+                    {profile.name?.charAt(0)}
                   </span>
                 )}
-
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                   <FiCamera className="text-white text-2xl" />
                 </div>
@@ -2247,29 +2565,37 @@ export default function Profile() {
               {/* DROPDOWN MENU */}
               {showAvatarMenu && (
                 <div
-                  className="absolute left-1/2 -translate-x-1/2 mt-4 w-52
-                  rounded-2xl shadow-2xl z-50 p-2 border border-[var(--border-color)]"
+                  className="absolute left-1/2 -translate-x-1/2 mt-4 w-52 rounded-2xl shadow-2xl z-50 p-2 border border-[var(--border-color)]"
                   style={{ backgroundColor: "var(--bg-card)" }}
                 >
+                  {/* View — only if avatar exists */}
+                  {profile.avatar && (
+                    <button
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
+                      onClick={() => { setShowAvatarPreview(true); setShowAvatarMenu(false); }}
+                    >
+                      <FiEye className="text-indigo-400" /> View Avatar
+                    </button>
+                  )}
+
+                  {/* Upload / Change */}
                   <button
                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
-                    onClick={() => {
-                      setShowAvatarPreview(true);
-                      setShowAvatarMenu(false);
-                    }}
+                    onClick={() => { fileInputRef.current?.click(); setShowAvatarMenu(false); }}
                   >
-                    <FiEye className="text-indigo-400" /> View Avatar
+                    <FiCamera className="text-indigo-400" />
+                    {profile.avatar ? "Change Avatar" : "Upload Avatar"}
                   </button>
 
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
-                    onClick={() => {
-                      fileInputRef.current?.click();
-                      setShowAvatarMenu(false);
-                    }}
-                  >
-                    <FiCamera className="text-indigo-400" /> Change Avatar
-                  </button>
+                  {/* Remove — only if avatar exists */}
+                  {profile.avatar && (
+                    <button
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-rose-500/10 text-rose-400"
+                      onClick={handleRemoveAvatar}
+                    >
+                      <FiTrash2 className="text-rose-400" /> Remove Avatar
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -2284,18 +2610,27 @@ export default function Profile() {
 
             {/* USER INFO */}
             <div className="text-center md:text-left">
-              <h3 className="text-3xl font-black tracking-tight">
-                {user.name}
-              </h3>
+              <h3 className="text-3xl font-black tracking-tight">{profile.name}</h3>
+              <p className="font-medium text-lg text-[var(--text-secondary)]">@{profile.username}</p>
 
-              <p className="font-medium text-lg text-[var(--text-secondary)]">
-                @{user.username}
-              </p>
+              {/* ✅ Followers / Following */}
+              <div className="flex justify-center md:justify-start gap-8 mt-5">
+                <div className="flex flex-col">
+                  <span className="text-2xl font-black">{profile.followersCount ?? 0}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">Followers</span>
+                </div>
+                <div className="w-px bg-[var(--border-color)]" />
+                <div className="flex flex-col">
+                  <span className="text-2xl font-black">{profile.followingCount ?? 0}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">Following</span>
+                </div>
+              </div>
 
               {uploading && (
-                <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">
-                  Updating cloud assets...
-                </p>
+                <p className="text-xs font-bold mt-4 animate-pulse text-indigo-400">Uploading avatar...</p>
+              )}
+              {removing && (
+                <p className="text-xs font-bold mt-4 animate-pulse text-rose-400">Removing avatar...</p>
               )}
             </div>
           </div>
@@ -2303,24 +2638,9 @@ export default function Profile() {
 
         {/* ACTIONS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ActionCard
-            title="Account Security"
-            desc="Update your password and login methods"
-            link="/settings"
-            icon={<FiSettings className="text-blue-400" />}
-          />
-          <ActionCard
-            title="Credit Wallet"
-            desc="View token history and balance"
-            link="/credit-history"
-            icon={<FiCreditCard className="text-indigo-400" />}
-          />
-          <ActionCard
-            title="Edit Identity"
-            desc="Modify your public profile details"
-            link="/settings"
-            icon={<FiEdit3 className="text-emerald-400" />}
-          />
+          <ActionCard title="Account Security" desc="Update your password and login methods" link="/settings" icon={<FiSettings className="text-blue-400" />} />
+          <ActionCard title="Credit Wallet" desc="View token history and balance" link="/credit-history" icon={<FiCreditCard className="text-indigo-400" />} />
+          <ActionCard title="Edit Identity" desc="Modify your public profile details" link="/settings" icon={<FiEdit3 className="text-emerald-400" />} />
         </div>
 
         {/* LOGOUT */}
@@ -2330,11 +2650,8 @@ export default function Profile() {
         >
           <div>
             <h3 className="font-black text-xl text-rose-500">Sign Out</h3>
-            <p className="text-sm font-medium mt-1 text-rose-400/70">
-              Safely end your current session
-            </p>
+            <p className="text-sm font-medium mt-1 text-rose-400/70">Safely end your current session</p>
           </div>
-
           <button
             onClick={logout}
             className="flex items-center gap-3 px-10 py-4 rounded-2xl text-white font-bold shadow-lg shadow-rose-900/20 hover:bg-rose-700 active:scale-95"
@@ -2349,22 +2666,14 @@ export default function Profile() {
       {showAvatarPreview && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="relative">
-            <button
-              onClick={() => setShowAvatarPreview(false)}
-              className="absolute -top-10 right-0 text-white text-xl"
-            >
+            <button onClick={() => setShowAvatarPreview(false)} className="absolute -top-10 right-0 text-white text-xl">
               <FiX />
             </button>
-
-            {user.avatar ? (
-              <img
-                src={user.avatar}
-                alt="preview"
-                className="w-80 h-80 object-cover rounded-2xl"
-              />
+            {profile.avatar ? (
+              <img src={profile.avatar} alt="preview" className="w-80 h-80 object-cover rounded-2xl" />
             ) : (
               <div className="w-80 h-80 flex items-center justify-center bg-gray-800 rounded-2xl text-white text-5xl font-bold">
-                {user.name?.charAt(0)}
+                {profile.name?.charAt(0)}
               </div>
             )}
           </div>
@@ -2379,10 +2688,7 @@ function ActionCard({ title, desc, link, icon }) {
     <Link
       to={link}
       className="group card rounded-[2rem] p-8 shadow-sm hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-300"
-      style={{
-        backgroundColor: "var(--bg-card)",
-        border: "1px solid var(--border-color)",
-      }}
+      style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-color)" }}
     >
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-white/5"
@@ -2390,14 +2696,8 @@ function ActionCard({ title, desc, link, icon }) {
       >
         {React.cloneElement(icon, { size: 24 })}
       </div>
-
-      <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">
-        {title}
-      </h4>
-
-      <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">
-        {desc}
-      </p>
+      <h4 className="font-black text-xl mb-2 text-[var(--text-primary)]">{title}</h4>
+      <p className="text-sm font-medium leading-relaxed text-[var(--text-secondary)]">{desc}</p>
     </Link>
   );
 }
