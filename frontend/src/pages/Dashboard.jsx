@@ -867,6 +867,133 @@
 // }
 
 //dark mode
+// import React, { useContext } from "react";
+// import API from "../api/api";
+// import { useQuery } from "@tanstack/react-query";
+// import { AuthContext } from "../context/AuthContext";
+// import { Link } from "react-router-dom";
+
+// import CreditProgressBar from "../components/dashboard/CreditProgressBar";
+// import AnalyticsCharts from "../components/dashboard/AnalyticsCharts";
+// import StreakCard from "../components/dashboard/StreakCard";
+// import WeaknessInsights from "../components/dashboard/WeaknessInsights";
+// import LearningRoadmap from "../components/dashboard/LearningRoadmap";
+// import RecentAttempts from "../components/dashboard/RecentAttempts";
+// import DashboardSkeleton from "../components/skeletons/DashboardSkeleton";
+
+// export default function Dashboard() {
+//   const { user } = useContext(AuthContext);
+//   const userName = user?.name || "User";
+
+//   // Query for Questions
+//   const { data: questions = [], isLoading: isQuestionsLoading, isError: isQuestionsError } = useQuery({
+//     queryKey: ["questions"],
+//     queryFn: async () => {
+//       const res = await API.get("/questions");
+//       return res.data.questions;
+//     },
+//     retry: 1,
+//   });
+
+//   // Query for Streak
+//   const { data: streakData, isLoading: isStreakLoading, isError: isStreakError } = useQuery({
+//     queryKey: ["streak"],
+//     queryFn: async () => {
+//       const res = await API.get("/streak");
+//       return res.data;
+//     },
+//     retry: 1,
+//   });
+
+//   if (isQuestionsLoading || isStreakLoading || isQuestionsError || isStreakError) {
+//     return <DashboardSkeleton />;
+//   }
+
+//   return (
+//     <div className="animate-fadeIn pb-12 px-4 lg:px-8">
+//       {/* HEADER */}
+//       <header className="mb-10 pt-6">
+//         <h1 className="text-4xl lg:text-5xl font-black tracking-tight mb-3 text-[var(--text-primary)]">
+//           Welcome back, <span className="text-[var(--accent)]">{userName}</span> 👋
+//         </h1>
+//         <p className="text-lg max-w-2xl font-medium text-[var(--text-secondary)]">
+//           Your interview readiness, progress, and performance — all in one place.
+//         </p>
+//       </header>
+
+//       {/* 4-CARD METRIC GRID */}
+//       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+//         {[
+//           { label: "Credits", value: <CreditProgressBar credits={user?.credits ?? 0} />, sub: "Used for mock interviews", color: "var(--text-secondary)" },
+//           { label: "Question Bank", value: questions.length, sub: "Interview questions", color: "var(--accent)" },
+//           { label: "Today’s Goal", value: "1 Mock", sub: "Daily practice goal", color: "#10b981" }, 
+//           { label: "Performance", value: "78%", sub: "Avg accuracy score", color: "#3b82f6" }  
+//         ].map((card, idx) => (
+//           <div key={idx} className="card p-6 shadow-sm hover:border-[var(--accent)] transition-all duration-300 h-64 flex flex-col group">
+//             <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{card.label}</h2>
+//             <div className="flex-1 flex flex-col justify-center">
+//               {typeof card.value === "string" || typeof card.value === "number" ? (
+//                 <p className="text-5xl font-black tracking-tighter" style={{ color: card.color }}>{card.value}</p>
+//               ) : (
+//                 card.value
+//               )}
+//             </div>
+//             <p className="text-[10px] mt-4 uppercase font-bold text-[var(--text-secondary)]">{card.sub}</p>
+//           </div>
+//         ))}
+//       </section>
+
+//       {/* ACTION BUTTONS */}
+//       <section className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+//         <Link to="/mock" className="flex items-center justify-center py-5 rounded-2xl text-white font-bold shadow-lg shadow-indigo-500/10 transition-all hover:-translate-y-1 hover:brightness-110 active:scale-95 bg-[var(--accent)]">
+//           🚀 Start Mock Interview
+//         </Link>
+//         <Link to="/questions" className="card flex items-center justify-center py-5 font-bold hover:bg-white/5 transition-all text-[var(--text-primary)]">
+//           📚 Browse Questions
+//         </Link>
+//         <Link to="/history" className="card flex items-center justify-center py-5 font-bold hover:bg-white/5 transition-all text-[var(--text-primary)]">
+//           📊 Interview History
+//         </Link>
+//       </section>
+
+//       {/* CHARTS & ANALYTICS */}
+//       <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-12">
+//         <div className="card p-2 overflow-hidden h-96">
+//             <StreakCard streak={streakData?.streak ?? 0} />
+//         </div>
+//         <div className="card p-6 h-96">
+//             <AnalyticsCharts />
+//         </div>
+//       </section>
+
+//       {/* INSIGHTS & ROADMAP */}
+//       <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
+//         <div className="card p-6">
+//             <WeaknessInsights />
+//         </div>
+//         <div className="card p-6">
+//             <LearningRoadmap />
+//         </div>
+//       </section>
+
+//       {/* RECENT ACTIVITY */}
+//       <section className="mt-12 mb-10">
+//         <div className="flex items-center justify-between mb-6 px-2">
+//           <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">Recent Activity</h2>
+//           <Link to="/activity" className="text-xs font-bold uppercase tracking-widest transition-all px-4 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-[var(--accent)] hover:bg-indigo-500/20">
+//             View all →
+//           </Link>
+//         </div>
+//         <div className="card overflow-hidden">
+//             <RecentAttempts />
+//         </div>
+//       </section>
+//     </div>
+//   );
+// }
+
+//before is live fixed new changes
+
 import React, { useContext } from "react";
 import API from "../api/api";
 import { useQuery } from "@tanstack/react-query";
@@ -885,8 +1012,12 @@ export default function Dashboard() {
   const { user } = useContext(AuthContext);
   const userName = user?.name || "User";
 
-  // Query for Questions
-  const { data: questions = [], isLoading: isQuestionsLoading, isError: isQuestionsError } = useQuery({
+  // ── Questions ──
+  const {
+    data: questions = [],
+    isLoading: isQuestionsLoading,
+    isError: isQuestionsError,
+  } = useQuery({
     queryKey: ["questions"],
     queryFn: async () => {
       const res = await API.get("/questions");
@@ -895,8 +1026,12 @@ export default function Dashboard() {
     retry: 1,
   });
 
-  // Query for Streak
-  const { data: streakData, isLoading: isStreakLoading, isError: isStreakError } = useQuery({
+  // ── Streak ──
+  const {
+    data: streakData,
+    isLoading: isStreakLoading,
+    isError: isStreakError,
+  } = useQuery({
     queryKey: ["streak"],
     queryFn: async () => {
       const res = await API.get("/streak");
@@ -905,12 +1040,44 @@ export default function Dashboard() {
     retry: 1,
   });
 
-  if (isQuestionsLoading || isStreakLoading || isQuestionsError || isStreakError) {
+  // ✅ NEW: Dashboard Summary — performance, todayMocks, totalSessions
+  const {
+    data: summary,
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+  } = useQuery({
+    queryKey: ["dashboard-summary"],
+    queryFn: async () => {
+      const res = await API.get("/dashboard/summary");
+      return res.data;
+    },
+    retry: 1,
+    staleTime: 1000 * 60 * 2, // cache 2 min
+  });
+
+  if (
+    isQuestionsLoading ||
+    isStreakLoading ||
+    isSummaryLoading ||
+    isQuestionsError ||
+    isStreakError ||
+    isSummaryError
+  ) {
     return <DashboardSkeleton />;
   }
 
+  // ✅ Real values from API
+  const performance = summary?.performance ?? 0;
+  const todayMocks = summary?.todayMocks ?? 0;
+  const DAILY_GOAL = 1; // daily mock target
+
+  // Today's goal display
+  const goalDisplay = `${todayMocks}/${DAILY_GOAL}`;
+  const goalDone = todayMocks >= DAILY_GOAL;
+
   return (
     <div className="animate-fadeIn pb-12 px-4 lg:px-8">
+
       {/* HEADER */}
       <header className="mb-10 pt-6">
         <h1 className="text-4xl lg:text-5xl font-black tracking-tight mb-3 text-[var(--text-primary)]">
@@ -923,35 +1090,131 @@ export default function Dashboard() {
 
       {/* 4-CARD METRIC GRID */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          { label: "Credits", value: <CreditProgressBar credits={user?.credits ?? 0} />, sub: "Used for mock interviews", color: "var(--text-secondary)" },
-          { label: "Question Bank", value: questions.length, sub: "Interview questions", color: "var(--accent)" },
-          { label: "Today’s Goal", value: "1 Mock", sub: "Daily practice goal", color: "#10b981" }, 
-          { label: "Performance", value: "78%", sub: "Avg accuracy score", color: "#3b82f6" }  
-        ].map((card, idx) => (
-          <div key={idx} className="card p-6 shadow-sm hover:border-[var(--accent)] transition-all duration-300 h-64 flex flex-col group">
-            <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{card.label}</h2>
-            <div className="flex-1 flex flex-col justify-center">
-              {typeof card.value === "string" || typeof card.value === "number" ? (
-                <p className="text-5xl font-black tracking-tighter" style={{ color: card.color }}>{card.value}</p>
-              ) : (
-                card.value
-              )}
-            </div>
-            <p className="text-[10px] mt-4 uppercase font-bold text-[var(--text-secondary)]">{card.sub}</p>
+
+        {/* CARD 1 — Credits */}
+        <div className="card p-6 shadow-sm hover:border-[var(--accent)] transition-all duration-300 h-64 flex flex-col group">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            Credits
+          </h2>
+          <div className="flex-1 flex flex-col justify-center">
+            <CreditProgressBar credits={user?.credits ?? 0} />
           </div>
-        ))}
+          <p className="text-[10px] mt-4 uppercase font-bold text-[var(--text-secondary)]">
+            Used for mock interviews
+          </p>
+        </div>
+
+        {/* CARD 2 — Question Bank */}
+        <div className="card p-6 shadow-sm hover:border-[var(--accent)] transition-all duration-300 h-64 flex flex-col group">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            Question Bank
+          </h2>
+          <div className="flex-1 flex flex-col justify-center">
+            <p className="text-5xl font-black tracking-tighter" style={{ color: "var(--accent)" }}>
+              {questions.length}
+            </p>
+          </div>
+          <p className="text-[10px] mt-4 uppercase font-bold text-[var(--text-secondary)]">
+            Interview questions
+          </p>
+        </div>
+
+        {/* CARD 3 — Today's Goal ✅ REAL DATA */}
+        <div className="card p-6 shadow-sm hover:border-[var(--accent)] transition-all duration-300 h-64 flex flex-col group">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            Today's Goal
+          </h2>
+          <div className="flex-1 flex flex-col justify-center gap-3">
+            <p className="text-5xl font-black tracking-tighter" style={{ color: "#10b981" }}>
+              {goalDisplay}
+              <span className="text-xl ml-1 font-bold opacity-60">Mock</span>
+            </p>
+            {/* Progress bar */}
+            <div className="w-full h-2 rounded-full bg-[var(--bg-primary)] border border-[var(--border-color)] overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${Math.min((todayMocks / DAILY_GOAL) * 100, 100)}%`,
+                  backgroundColor: goalDone ? "#10b981" : "var(--accent)",
+                }}
+              />
+            </div>
+            {goalDone && (
+              <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest animate-pulse">
+                ✅ Goal achieved!
+              </p>
+            )}
+          </div>
+          <p className="text-[10px] mt-4 uppercase font-bold text-[var(--text-secondary)]">
+            Daily practice goal
+          </p>
+        </div>
+
+        {/* CARD 4 — Performance ✅ REAL DATA */}
+        <div className="card p-6 shadow-sm hover:border-[var(--accent)] transition-all duration-300 h-64 flex flex-col group">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            Performance
+          </h2>
+          <div className="flex-1 flex flex-col justify-center gap-3">
+            <p
+              className="text-5xl font-black tracking-tighter"
+              style={{
+                color:
+                  performance >= 70
+                    ? "#10b981"
+                    : performance >= 40
+                    ? "#f59e0b"
+                    : "#ef4444",
+              }}
+            >
+              {performance}%
+            </p>
+            {/* Color label */}
+            <p
+              className="text-[10px] font-black uppercase tracking-widest"
+              style={{
+                color:
+                  performance >= 70
+                    ? "#10b981"
+                    : performance >= 40
+                    ? "#f59e0b"
+                    : "#ef4444",
+              }}
+            >
+              {performance >= 70
+                ? "🟢 Strong"
+                : performance >= 40
+                ? "🟡 Improving"
+                : performance === 0
+                ? "— No sessions yet"
+                : "🔴 Needs work"}
+            </p>
+          </div>
+          <p className="text-[10px] mt-4 uppercase font-bold text-[var(--text-secondary)]">
+            Avg accuracy score
+          </p>
+        </div>
+
       </section>
 
       {/* ACTION BUTTONS */}
       <section className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link to="/mock" className="flex items-center justify-center py-5 rounded-2xl text-white font-bold shadow-lg shadow-indigo-500/10 transition-all hover:-translate-y-1 hover:brightness-110 active:scale-95 bg-[var(--accent)]">
+        <Link
+          to="/mock"
+          className="flex items-center justify-center py-5 rounded-2xl text-white font-bold shadow-lg shadow-indigo-500/10 transition-all hover:-translate-y-1 hover:brightness-110 active:scale-95 bg-[var(--accent)]"
+        >
           🚀 Start Mock Interview
         </Link>
-        <Link to="/questions" className="card flex items-center justify-center py-5 font-bold hover:bg-white/5 transition-all text-[var(--text-primary)]">
+        <Link
+          to="/questions"
+          className="card flex items-center justify-center py-5 font-bold hover:bg-white/5 transition-all text-[var(--text-primary)]"
+        >
           📚 Browse Questions
         </Link>
-        <Link to="/history" className="card flex items-center justify-center py-5 font-bold hover:bg-white/5 transition-all text-[var(--text-primary)]">
+        <Link
+          to="/history"
+          className="card flex items-center justify-center py-5 font-bold hover:bg-white/5 transition-all text-[var(--text-primary)]"
+        >
           📊 Interview History
         </Link>
       </section>
@@ -959,33 +1222,41 @@ export default function Dashboard() {
       {/* CHARTS & ANALYTICS */}
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-12">
         <div className="card p-2 overflow-hidden h-96">
-            <StreakCard streak={streakData?.streak ?? 0} />
+          <StreakCard
+            streak={streakData?.streak ?? 0}
+            activeDaysThisWeek={streakData?.activeDaysThisWeek ?? []}
+          />
         </div>
         <div className="card p-6 h-96">
-            <AnalyticsCharts />
+          <AnalyticsCharts />
         </div>
       </section>
 
       {/* INSIGHTS & ROADMAP */}
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
         <div className="card p-6">
-            <WeaknessInsights />
+          <WeaknessInsights />
         </div>
         <div className="card p-6">
-            <LearningRoadmap />
+          <LearningRoadmap />
         </div>
       </section>
 
       {/* RECENT ACTIVITY */}
       <section className="mt-12 mb-10">
         <div className="flex items-center justify-between mb-6 px-2">
-          <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">Recent Activity</h2>
-          <Link to="/activity" className="text-xs font-bold uppercase tracking-widest transition-all px-4 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-[var(--accent)] hover:bg-indigo-500/20">
+          <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">
+            Recent Activity
+          </h2>
+          <Link
+            to="/activity"
+            className="text-xs font-bold uppercase tracking-widest transition-all px-4 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-[var(--accent)] hover:bg-indigo-500/20"
+          >
             View all →
           </Link>
         </div>
         <div className="card overflow-hidden">
-            <RecentAttempts />
+          <RecentAttempts />
         </div>
       </section>
     </div>
