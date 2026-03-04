@@ -168,7 +168,94 @@
 // }
 
 
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
+// import { useLocation } from "react-router-dom";
+// import Sidebar from "../Sidebar";
+// import Navbar from "../Navbar";
+// import AnnouncementBar from "../dashboard/AnnouncementBar";
+// import React from "react";
+
+// export default function Layout({ children }) {
+//   const [collapsed, setCollapsed] = useState(false);
+//   const [isAtTop, setIsAtTop] = useState(true);
+//   const location = useLocation();
+
+//   // Detect chat page
+//   const isChatPage = location.pathname.startsWith("/chat");
+
+//   // Track scroll position to hide/show announcement bar
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       if (window.scrollY > 10) {
+//         setIsAtTop(false);
+//       } else {
+//         setIsAtTop(true);
+//       }
+//     };
+
+//     window.addEventListener("scroll", handleScroll);
+//     return () => window.removeEventListener("scroll", handleScroll);
+//   }, []);
+
+//   return (
+//     <div
+//       className="min-h-screen flex flex-col font-sans selection:bg-indigo-500/30"
+//       style={{
+//         backgroundColor: "var(--bg-primary)",
+//         color: "var(--text-primary)",
+//       }}
+//     >
+//       {/* Navbar always visible */}
+//       <Navbar />
+
+//       <div className="flex flex-1 pt-16">
+        
+//         {/* Hide Sidebar on Chat Page */}
+//         {!isChatPage && (
+//           <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+//         )}
+
+//         <main
+//           className={`flex-1 transition-all duration-300 ease-in-out min-w-0 flex flex-col
+//             ${
+//               isChatPage
+//                 ? "ml-0" // No margin on chat
+//                 : collapsed
+//                 ? "ml-20"
+//                 : "ml-64"
+//             }
+//           `}
+//         >
+//           {/* Hide AnnouncementBar on Chat */}
+//           {!isChatPage && (
+//             <div
+//               className={`transition-all duration-500 ease-in-out overflow-hidden ${
+//                 isAtTop
+//                   ? "max-h-20 opacity-100 mt-4"
+//                   : "max-h-0 opacity-0 mt-0"
+//               }`}
+//             >
+//               <AnnouncementBar />
+//             </div>
+//           )}
+
+//           <div
+//             className={`${
+//               isChatPage
+//                 ? "p-0 h-[calc(100vh-4rem)]"
+//                 : "p-6 lg:p-10 max-w-[1600px] mx-auto w-full min-h-[calc(100vh-4rem)]"
+//             }`}
+//           >
+//             {children}
+//           </div>
+//         </main>
+//       </div>
+//     </div>
+//   );
+// }
+
+//annocemnet bar fixed
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import Navbar from "../Navbar";
@@ -177,25 +264,10 @@ import React from "react";
 
 export default function Layout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [isAtTop, setIsAtTop] = useState(true);
   const location = useLocation();
 
   // Detect chat page
   const isChatPage = location.pathname.startsWith("/chat");
-
-  // Track scroll position to hide/show announcement bar
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsAtTop(false);
-      } else {
-        setIsAtTop(true);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <div
@@ -205,6 +277,9 @@ export default function Layout({ children }) {
         color: "var(--text-primary)",
       }}
     >
+      {/* Announcement Bar (Full Width - Only Once Per Session) */}
+      <AnnouncementBar />
+
       {/* Navbar always visible */}
       <Navbar />
 
@@ -219,26 +294,13 @@ export default function Layout({ children }) {
           className={`flex-1 transition-all duration-300 ease-in-out min-w-0 flex flex-col
             ${
               isChatPage
-                ? "ml-0" // No margin on chat
+                ? "ml-0"
                 : collapsed
                 ? "ml-20"
                 : "ml-64"
             }
           `}
         >
-          {/* Hide AnnouncementBar on Chat */}
-          {!isChatPage && (
-            <div
-              className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                isAtTop
-                  ? "max-h-20 opacity-100 mt-4"
-                  : "max-h-0 opacity-0 mt-0"
-              }`}
-            >
-              <AnnouncementBar />
-            </div>
-          )}
-
           <div
             className={`${
               isChatPage

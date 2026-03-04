@@ -610,12 +610,15 @@ export default function Register() {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10}$/;
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-={}[\]|\\:;"'<>,./]).{8,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-={}[\]|\\:;"'<>,./]).{8,}$/;
 
     if (!name.trim()) newErrors.name = "Full name is required";
     if (!emailRegex.test(email)) newErrors.email = "Enter a valid email address";
     if (!phoneRegex.test(phone)) newErrors.phone = "Enter a valid 10-digit phone number";
-    if (!passwordRegex.test(password)) newErrors.password = "Password must be at least 8 characters with mixed cases & symbols";
+    if (!passwordRegex.test(password))
+      newErrors.password =
+        "Password must be at least 8 characters with mixed cases & symbols";
 
     if (Object.keys(newErrors).length) {
       setErrors(newErrors);
@@ -623,45 +626,52 @@ export default function Register() {
     }
 
     try {
-      const res = await API.post("/auth/register", {
+      await API.post("/auth/register", {
         name: name.trim(),
         email: email.toLowerCase(),
         phone,
         password,
       });
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("userId", res.data.user.id);
-      localStorage.setItem("name", res.data.user.name);
-      navigate("/dashboard");
+      // ✅ Redirect to login page after successful registration
+      navigate("/login");
+
     } catch (err) {
-      setErrors({ api: err.response?.data?.message || "Registration failed" });
+      setErrors({
+        api: err.response?.data?.message || "Registration failed",
+      });
     }
   };
 
   const inputWrapper = (error) => `
     flex items-center rounded-2xl border transition-all 
-    bg-[var(--bg-primary)] ${error ? 'border-rose-500/50' : 'border-[var(--border-color)]'}
+    bg-[var(--bg-primary)] ${
+      error ? "border-rose-500/50" : "border-[var(--border-color)]"
+    }
     focus-within:border-[var(--accent)] focus-within:ring-4 focus-within:ring-indigo-500/10
   `;
 
   return (
-    <div className="min-h-screen flex transition-colors duration-500 font-sans selection:bg-indigo-500/30" 
-         style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
-      
+    <div
+      className="min-h-screen flex transition-colors duration-500 font-sans selection:bg-indigo-500/30"
+      style={{
+        backgroundColor: "var(--bg-primary)",
+        color: "var(--text-primary)",
+      }}
+    >
       {/* LEFT SECTION */}
       <div className="hidden lg:flex flex-col justify-center px-20 w-1/2 relative overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px]"></div>
-        
+
         <div className="z-10">
-          {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-6">
-            <FiShield /> Future-Proof Your Career
-          </div> */}
           <h1 className="text-7xl font-black tracking-tighter leading-[0.95]">
             Join the <br />
             <span style={{ color: "var(--accent)" }}>AI Revolution</span>
           </h1>
-          <p className="mt-8 text-lg max-w-md leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+          <p
+            className="mt-8 text-lg max-w-md leading-relaxed"
+            style={{ color: "var(--text-secondary)" }}
+          >
             Build your professional profile and start practicing with AI-driven
             simulations tailored to your career trajectory.
           </p>
@@ -670,16 +680,35 @@ export default function Register() {
 
       {/* RIGHT SECTION */}
       <div className="flex justify-center items-center w-full lg:w-1/2 p-6 overflow-y-auto">
-        <div className="w-full max-w-[460px] rounded-[2.5rem] p-10 shadow-2xl border transition-all my-8"
-             style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}>
-          
-          <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>Create Account</h2>
-          <p className="mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>Start your journey to your dream job.</p>
+        <div
+          className="w-full max-w-[460px] rounded-[2.5rem] p-10 shadow-2xl border transition-all my-8"
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border-color)",
+          }}
+        >
+          <h2
+            className="text-3xl font-black tracking-tight"
+            style={{ color: "var(--text-primary)" }}
+          >
+            Create Account
+          </h2>
+          <p
+            className="mt-2 font-medium"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Start your journey to your dream job.
+          </p>
 
           <div className="space-y-4 mt-8">
             {/* Name */}
             <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-widest ml-1" style={{ color: "var(--text-secondary)" }}>Full Name</label>
+              <label
+                className="text-xs font-black uppercase tracking-widest ml-1"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Full Name
+              </label>
               <div className={inputWrapper(errors.name)}>
                 <FiUser className="ml-4 text-[var(--text-secondary)]" />
                 <input
@@ -689,12 +718,21 @@ export default function Register() {
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-              {errors.name && <p className="text-rose-400 text-[10px] font-bold ml-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-rose-400 text-[10px] font-bold ml-1">
+                  {errors.name}
+                </p>
+              )}
             </div>
 
             {/* Email */}
             <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-widest ml-1" style={{ color: "var(--text-secondary)" }}>Email</label>
+              <label
+                className="text-xs font-black uppercase tracking-widest ml-1"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Email
+              </label>
               <div className={inputWrapper(errors.email)}>
                 <FiMail className="ml-4 text-[var(--text-secondary)]" />
                 <input
@@ -704,14 +742,29 @@ export default function Register() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              {errors.email && <p className="text-rose-400 text-[10px] font-bold ml-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-rose-400 text-[10px] font-bold ml-1">
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             {/* Phone */}
             <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-widest ml-1" style={{ color: "var(--text-secondary)" }}>Phone Number</label>
+              <label
+                className="text-xs font-black uppercase tracking-widest ml-1"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Phone Number
+              </label>
               <div className={inputWrapper(errors.phone)}>
-                <div className="pl-4 pr-3 border-r text-[10px] font-bold tracking-tighter" style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
+                <div
+                  className="pl-4 pr-3 border-r text-[10px] font-bold tracking-tighter"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    color: "var(--text-secondary)",
+                  }}
+                >
                   🇮🇳 +91
                 </div>
                 <input
@@ -719,15 +772,26 @@ export default function Register() {
                   maxLength={10}
                   className="flex-1 p-4 bg-transparent outline-none text-sm font-medium"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  onChange={(e) =>
+                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                  }
                 />
               </div>
-              {errors.phone && <p className="text-rose-400 text-[10px] font-bold ml-1">{errors.phone}</p>}
+              {errors.phone && (
+                <p className="text-rose-400 text-[10px] font-bold ml-1">
+                  {errors.phone}
+                </p>
+              )}
             </div>
 
             {/* Password */}
             <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-widest ml-1" style={{ color: "var(--text-secondary)" }}>Password</label>
+              <label
+                className="text-xs font-black uppercase tracking-widest ml-1"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Password
+              </label>
               <div className={inputWrapper(errors.password)}>
                 <FiLock className="ml-4 text-[var(--text-secondary)]" />
                 <input
@@ -746,23 +810,42 @@ export default function Register() {
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
-              {errors.password && <p className="text-rose-400 text-[10px] font-bold leading-tight ml-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-rose-400 text-[10px] font-bold leading-tight ml-1">
+                  {errors.password}
+                </p>
+              )}
             </div>
 
-            {errors.api && <p className="text-rose-500 text-xs text-center font-bold p-3 rounded-xl bg-rose-500/5 border border-rose-500/10">{errors.api}</p>}
+            {errors.api && (
+              <p className="text-rose-500 text-xs text-center font-bold p-3 rounded-xl bg-rose-500/5 border border-rose-500/10">
+                {errors.api}
+              </p>
+            )}
 
             <button
               onClick={handleSubmit}
               className="group w-full py-4 mt-4 rounded-2xl font-black text-lg text-white shadow-xl transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3"
-              style={{ backgroundColor: "var(--accent)", boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.3)" }}
+              style={{
+                backgroundColor: "var(--accent)",
+                boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.3)",
+              }}
             >
-              Get Started <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+              Get Started{" "}
+              <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
-          <p className="text-center mt-8 font-medium" style={{ color: "var(--text-secondary)" }}>
+          <p
+            className="text-center mt-8 font-medium"
+            style={{ color: "var(--text-secondary)" }}
+          >
             Already have an account?{" "}
-            <Link to="/login" className="font-black hover:brightness-125 transition-all" style={{ color: "var(--accent)" }}>
+            <Link
+              to="/login"
+              className="font-black hover:brightness-125 transition-all"
+              style={{ color: "var(--accent)" }}
+            >
               Sign In
             </Link>
           </p>

@@ -47,8 +47,14 @@ const LiveInterviewSessionSchema = new mongoose.Schema(
     role:       { type: String, default: "" },
     difficulty: { type: String, enum: ["Easy", "Medium", "Hard"], default: "Medium" },
 
-    // AI-generated questions at session start
+    // AI-generated question pool
     generatedQuestions: [{ type: String }],
+
+    // Tracks every question asked — used to prevent repeats
+    askedQuestions: [{ type: String }],
+
+    // Target number of questions for this session
+    totalQuestions: { type: Number, default: 9 },
 
     // Hint tracking
     hintsUsed:        { type: Number, default: 0 },

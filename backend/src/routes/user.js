@@ -44,6 +44,7 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middlewares/auth");
 const multer = require("multer");
+const User = require("../models/User");
 
 const {
   getUserProfile,
@@ -76,10 +77,23 @@ router.put("/preferences", auth, updatePreferences);
 /* ===== USER PROFILE ===== */
 router.get("/userprofile", auth, getUserProfile);
 
+router.get("/all", auth, async (req, res) => {
+  res.set("Cache-Control", "no-store, no-cache");
+  try {
+    const users = await User.find({ _id: { $ne: req.user._id } })
+      .select("name avatar username _id").lean();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 /* ===== FOLLOW ===== */
 router.post("/:id/follow", auth, followUser);
 
 /* ===== UNFOLLOW ===== */
 router.post("/:id/unfollow", auth, unfollowUser);
+
+
 
 module.exports = router;

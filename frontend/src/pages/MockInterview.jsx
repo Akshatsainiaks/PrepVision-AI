@@ -558,11 +558,12 @@
 // }
 
 //next acc claude code
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaKeyboard, FaVideo } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../api/api";
+import { saveStream } from "./streamStore";
 import { FiCheckCircle, FiInfo, FiX, FiLoader, FiChevronDown } from "react-icons/fi";
 
 /* ── Config options ── */
@@ -599,21 +600,100 @@ export default function MockInterviewHome() {
     setShowModal(true);
   };
 
+  // Permission flow state
+  const [permStep, setPermStep]       = useState("idle"); // idle | checking | sound | starting
+  const [permError, setPermError]     = useState("");
+  const [soundTested, setSoundTested] = useState(false);
+  const [soundPlaying, setSoundPlaying] = useState(false);
+  const [camOk, setCamOk]             = useState(false);
+  const [micOk, setMicOk]             = useState(false);
+  const permStreamRef                 = useRef(null);
+  const permVideoRef                  = useRef(null);
+
+  const checkPermissions = async () => {
+    setPermStep("checking");
+    setPermError("");
+    const withTimeout = (p, ms) => Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error("timeout")), ms))]);
+    try {
+      const stream = await withTimeout(navigator.mediaDevices.getUserMedia({ video: true, audio: true }), 3000);
+      permStreamRef.current = stream;
+      setCamOk(true); setMicOk(true);
+      setPermStep("sound");
+      setTimeout(() => { if (permVideoRef.current) permVideoRef.current.srcObject = stream; }, 100);
+    } catch {
+      try {
+        const audio = await withTimeout(navigator.mediaDevices.getUserMedia({ video: false, audio: true }), 3000);
+        permStreamRef.current = audio;
+        setCamOk(false); setMicOk(true);
+        setPermStep("sound");
+      } catch (e) {
+        setPermError(e.message === "timeout"
+          ? "Browser timed out. Go to chrome://settings/content/camera and allow this site, then try again."
+          : e.name === "NotAllowedError"
+          ? "Permission denied. Click the 🔒 icon in address bar → Allow Camera & Microphone."
+          : "Could not access mic. Close other apps using it and try again."
+        );
+        setPermStep("idle");
+      }
+    }
+  };
+
+  const testSound = () => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    setSoundPlaying(true);
+
+    const speak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const u = new SpeechSynthesisUtterance(
+        "Hello! I am Alex, your interviewer today. We will be conducting a technical interview. Can you hear me clearly?"
+      );
+      u.volume = 1;
+      // Pick deepest available voice
+      const pick =
+        voices.find(v => v.name === "Google UK English Male") ||
+        voices.find(v => v.name === "Microsoft David - English (United States)") ||
+        voices.find(v => v.name === "Daniel") ||
+        voices.find(v => /male/i.test(v.name) && v.lang.startsWith("en")) ||
+        voices.find(v => v.lang === "en-GB") ||
+        voices.find(v => v.lang === "en-US") ||
+        voices.find(v => v.lang.startsWith("en")) ||
+        voices[0];
+      if (pick) { u.voice = pick; u.lang = pick.lang; }
+      else { u.lang = "en-US"; }
+      u.rate  = pick?.name?.includes("Google") ? 0.85 : 0.9;
+      u.pitch = 0.85;
+      u.onend = u.onerror = () => { setSoundPlaying(false); setSoundTested(true); };
+      window.speechSynthesis.speak(u);
+    };
+
+    if (window.speechSynthesis.getVoices().length > 0) speak();
+    else { window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; speak(); }; }
+  };
+
   const startLiveInterview = async () => {
+    // Must pass permission check first
+    if (permStep !== "sound") { checkPermissions(); return; }
+    window.speechSynthesis.cancel();
+    setPermStep("starting");
     setIsStarting(true);
     setError("");
     try {
       const res = await API.post("/live-interview/start", { topic, role, difficulty });
-
-      // Controller returns { sessionId, questions, topic, role, difficulty, ... }
-      const sessionId = res.data.sessionId;
+      const { sessionId, firstQuestion, timerPerQuestion, totalHints, totalQuestions, introSpeech } = res.data;
       if (!sessionId) throw new Error("No session ID returned");
-
       setShowModal(false);
-      navigate(`/mock/live/session/${sessionId}`);
+      setPermStep("idle");
+      // Store stream so LiveInterview can access it after navigation
+      saveStream(permStreamRef.current);
+      window.__permStream = permStreamRef.current; // fallback
+      navigate(`/mock/live/session/${sessionId}`, {
+        state: { firstQuestion, introSpeech, topic, role, difficulty, timerPerQuestion, totalHints, totalQuestions }
+      });
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to start interview. Please try again.");
+      setPermStep("sound");
     } finally {
       setIsStarting(false);
     }
@@ -814,19 +894,81 @@ export default function MockInterviewHome() {
                 </div>
               )}
 
-              {/* Start button */}
-              <button
-                onClick={startLiveInterview}
-                disabled={isStarting}
-                className="w-full py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-70 shadow-xl"
-                style={{ backgroundColor: "var(--accent)" }}
-              >
-                {isStarting ? (
-                  <><FiLoader className="animate-spin" /> AI is generating questions...</>
-                ) : (
-                  <><FaVideo /> Start Live Interview</>
-                )}
-              </button>
+              {/* ── PERMISSION FLOW ── */}
+              {permStep === "idle" && (
+                <>
+                  {permError && (
+                    <div className="p-3 rounded-2xl text-sm border mb-2" style={{ backgroundColor: "rgba(244,63,94,0.05)", borderColor: "rgba(244,63,94,0.3)", color: "#f43f5e" }}>
+                      <p className="font-black mb-1">❌ Permission Required</p>
+                      <p className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>{permError}</p>
+                    </div>
+                  )}
+                  <button onClick={checkPermissions}
+                    className="w-full py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 active:scale-95 shadow-xl"
+                    style={{ backgroundColor: "var(--accent)" }}>
+                    <FaVideo /> Check Camera & Mic
+                  </button>
+                </>
+              )}
+
+              {permStep === "checking" && (
+                <div className="w-full py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 opacity-80"
+                     style={{ backgroundColor: "var(--accent)" }}>
+                  <FiLoader className="animate-spin" /> Checking permissions...
+                </div>
+              )}
+
+              {permStep === "sound" && (
+                <div className="space-y-3">
+                  {/* Status */}
+                  <div className="flex gap-2">
+                    {[{ label: "Camera", ok: camOk }, { label: "Mic", ok: micOk }].map(({ label, ok }) => (
+                      <div key={label} className="flex-1 py-2 rounded-xl text-center text-xs font-black border"
+                           style={{ borderColor: ok ? "rgba(16,185,129,0.4)" : "rgba(244,63,94,0.3)", backgroundColor: ok ? "rgba(16,185,129,0.08)" : "rgba(244,63,94,0.05)", color: ok ? "#10b981" : "#f43f5e" }}>
+                        {ok ? `✓ ${label}` : `✗ ${label}`}
+                      </div>
+                    ))}
+                    <div className="flex-1 py-2 rounded-xl text-center text-xs font-black border"
+                         style={{ borderColor: soundTested ? "rgba(16,185,129,0.4)" : "rgba(99,102,241,0.3)", backgroundColor: soundTested ? "rgba(16,185,129,0.08)" : "rgba(99,102,241,0.05)", color: soundTested ? "#10b981" : "var(--accent)" }}>
+                      {soundTested ? "✓ Sound" : "? Sound"}
+                    </div>
+                  </div>
+                  {/* Video preview */}
+                  {camOk && (
+                    <div className="rounded-2xl overflow-hidden border h-32" style={{ borderColor: "rgba(16,185,129,0.3)" }}>
+                      <video ref={permVideoRef} autoPlay muted playsInline className="w-full h-full object-cover bg-slate-900" />
+                    </div>
+                  )}
+                  {/* Sound test */}
+                  {!soundTested && (
+                    <button onClick={testSound} disabled={soundPlaying}
+                      className="w-full py-3 rounded-2xl font-black text-sm border flex items-center justify-center gap-2 disabled:opacity-60"
+                      style={{ borderColor: "rgba(99,102,241,0.4)", backgroundColor: "rgba(99,102,241,0.08)", color: "var(--accent)" }}>
+                      {soundPlaying ? "🔊 Speaking..." : "🔊 Test Sound (Required)"}
+                    </button>
+                  )}
+                  {soundTested && !micOk && (
+                    <div className="p-3 rounded-xl text-xs font-bold text-center" style={{ backgroundColor: "rgba(244,63,94,0.08)", color: "#f43f5e" }}>
+                      ⚠️ Microphone not granted — interview requires mic
+                    </div>
+                  )}
+                  {/* Start — only if mic + sound both ok */}
+                  {soundTested && micOk && (
+                    <button onClick={startLiveInterview} disabled={isStarting}
+                      className="w-full py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 active:scale-95 shadow-xl disabled:opacity-70"
+                      style={{ backgroundColor: "var(--accent)" }}>
+                      {isStarting ? <><FiLoader className="animate-spin" /> Generating questions...</> : <><FaVideo /> Start Interview</>}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {permStep === "starting" && (
+                <div className="w-full py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 opacity-80"
+                     style={{ backgroundColor: "var(--accent)" }}>
+                  <FiLoader className="animate-spin" /> Generating your questions...
+                </div>
+              )}
 
               {isStarting && (
                 <p className="text-center text-xs font-bold mt-3" style={{ color: "var(--text-secondary)" }}>

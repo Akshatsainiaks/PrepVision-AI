@@ -419,6 +419,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const path = require("path");
+const jwt = require("jsonwebtoken");
 
 const connectDB = require("./config/db");
 const auth = require("./middlewares/auth");
@@ -443,7 +444,7 @@ const userRoutes = require("./routes/user");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const socketHandler = require("./socket/socketHandler");
 const settingsRoutes = require("./routes/settings");
-
+const groupRoutes = require("./routes/group")
 const PORT = process.env.PORT || 4000;
 const UPLOADS_PATH = path.join(__dirname, "uploads");
 
@@ -453,7 +454,6 @@ async function main() {
   const app = express();
 
   /* ================= CORS CONFIG ================= */
-
   const allowedOrigins = [
     "http://localhost:5173",
     "https://prep-vision-ai.vercel.app",
@@ -462,7 +462,7 @@ async function main() {
   app.use(
     cors({
       origin: (origin, callback) => {
-        if (!origin) return callback(null, true); // Postman / mobile apps
+        if (!origin) return callback(null, true);
         if (allowedOrigins.includes(origin)) {
           callback(null, origin);
         } else {
@@ -470,65 +470,58 @@ async function main() {
         }
       },
       credentials: true,
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // ✅ added PATCH
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       allowedHeaders: [
         "Content-Type",
         "Authorization",
-        "Cache-Control", // ✅ added
-        "Pragma",        // ✅ added
-        "Expires",       // ✅ added
+        "Cache-Control",
+        "Pragma",
+        "Expires",
       ],
     })
   );
 
-  // ✅ Handle OPTIONS preflight for all routes explicitly
   app.options("*", cors());
-
   app.use(express.json());
   app.set("trust proxy", 1);
 
   /* ================= STATIC FILES ================= */
-
   app.use("/uploads", express.static(UPLOADS_PATH));
 
   /* ================= ROUTES ================= */
-
   app.get("/health", (req, res) => {
     res.status(200).json({ status: "OK" });
   });
 
-  app.use("/api/auth", authRoutes);
-  app.use("/api/questions", questionRoutes);
-  app.use("/api/interview", interviewRoutes);
-  app.use("/api/credits", creditRoutes);
-  app.use("/api/leaderboard", leaderboardRoutes);
-  app.use("/api/chat", chatRoutes);
-  app.use("/api/uploads", uploadRoutes);
-  app.use("/api/notifications", notificationRoutes);
-  app.use("/api/streak", streakRoutes);
+  app.use("/api/auth",              authRoutes);
+  app.use("/api/questions",         questionRoutes);
+  app.use("/api/interview",         interviewRoutes);
+  app.use("/api/credits",           creditRoutes);
+  app.use("/api/leaderboard",       leaderboardRoutes);
+  app.use("/api/chat",              chatRoutes);
+  app.use("/api/uploads",           uploadRoutes);
+  app.use("/api/notifications",     notificationRoutes);
+  app.use("/api/streak",            streakRoutes);
   app.use("/api/interview-history", interviewHistoryRoutes);
-  app.use("/api/dashboard", analyticsRoutes);
+  app.use("/api/dashboard",         analyticsRoutes);
   app.use("/api/weakness-insights", weaknessRoutes);
-  app.use("/api/learning-roadmap", learningRoadmapRoutes);
+  app.use("/api/learning-roadmap",  learningRoadmapRoutes);
   app.use("/api/written-interview", writtenInterviewRoutes);
-  app.use("/api/live-interview", liveInterviewRoutes);
-  app.use("/api/users", userRoutes);
-  app.use("/api/dashboard", dashboardRoutes);
-  app.use("/api/settings", settingsRoutes);
-
+  app.use("/api/live-interview",    liveInterviewRoutes);
+  app.use("/api/users",             userRoutes);
+  app.use("/api/dashboard",         dashboardRoutes);
+  app.use("/api/settings",          settingsRoutes);
+  app.use("/api/groups",            groupRoutes);
 
   /* ================= TEST AUTH ================= */
-
   app.get("/api/test-auth", auth, (req, res) => {
     res.json({ message: "Token working", user: req.user });
   });
 
   /* ================= ERROR HANDLER ================= */
-
   app.use(require("./middlewares/errorHandler"));
 
   /* ================= SOCKET.IO ================= */
-
   const server = http.createServer(app);
 
   const io = new Server(server, {
@@ -538,10 +531,40 @@ async function main() {
     },
   });
 
+  // ── Socket JWT Auth Middleware ──────────────────────────────
+  // Runs before any socket event. Decodes JWT and attaches
+  // the real userId to socket.data — never trusted from client.
+  io.use((socket, next) => {
+    try {
+      const token =
+        socket.handshake.auth?.token ||
+        socket.handshake.headers?.authorization?.replace("Bearer ", "");
+
+      if (!token) {
+        socket.data.userId = null;
+        return next();
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      // authController signs JWT as { user_id }
+      socket.data.userId = (
+        decoded.user_id ||
+        decoded._id ||
+        decoded.id ||
+        decoded.userId ||
+        null
+      )?.toString();
+
+      next();
+    } catch (err) {
+      socket.data.userId = null;
+      next();
+    }
+  });
+
   socketHandler(io);
 
   /* ================= START SERVER ================= */
-
   server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });

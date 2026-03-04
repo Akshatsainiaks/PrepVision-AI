@@ -1010,7 +1010,14 @@ import DashboardSkeleton from "../components/skeletons/DashboardSkeleton";
 
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
-  const userName = user?.name || "User";
+
+  // ✅ Proper Case Name Formatting
+  const userName =
+    user?.name
+      ?.toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ") || "User";
 
   // ── Questions ──
   const {
@@ -1040,7 +1047,7 @@ export default function Dashboard() {
     retry: 1,
   });
 
-  // ✅ NEW: Dashboard Summary — performance, todayMocks, totalSessions
+  // ── Dashboard Summary ──
   const {
     data: summary,
     isLoading: isSummaryLoading,
@@ -1052,7 +1059,7 @@ export default function Dashboard() {
       return res.data;
     },
     retry: 1,
-    staleTime: 1000 * 60 * 2, // cache 2 min
+    staleTime: 1000 * 60 * 2,
   });
 
   if (
@@ -1066,12 +1073,10 @@ export default function Dashboard() {
     return <DashboardSkeleton />;
   }
 
-  // ✅ Real values from API
   const performance = summary?.performance ?? 0;
   const todayMocks = summary?.todayMocks ?? 0;
-  const DAILY_GOAL = 1; // daily mock target
+  const DAILY_GOAL = 1;
 
-  // Today's goal display
   const goalDisplay = `${todayMocks}/${DAILY_GOAL}`;
   const goalDone = todayMocks >= DAILY_GOAL;
 
@@ -1119,7 +1124,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* CARD 3 — Today's Goal ✅ REAL DATA */}
+        {/* CARD 3 — Today's Goal */}
         <div className="card p-6 shadow-sm hover:border-[var(--accent)] transition-all duration-300 h-64 flex flex-col group">
           <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
             Today's Goal
@@ -1129,7 +1134,6 @@ export default function Dashboard() {
               {goalDisplay}
               <span className="text-xl ml-1 font-bold opacity-60">Mock</span>
             </p>
-            {/* Progress bar */}
             <div className="w-full h-2 rounded-full bg-[var(--bg-primary)] border border-[var(--border-color)] overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700"
@@ -1150,7 +1154,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* CARD 4 — Performance ✅ REAL DATA */}
+        {/* CARD 4 — Performance */}
         <div className="card p-6 shadow-sm hover:border-[var(--accent)] transition-all duration-300 h-64 flex flex-col group">
           <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
             Performance
@@ -1169,7 +1173,6 @@ export default function Dashboard() {
             >
               {performance}%
             </p>
-            {/* Color label */}
             <p
               className="text-[10px] font-black uppercase tracking-widest"
               style={{
@@ -1219,7 +1222,7 @@ export default function Dashboard() {
         </Link>
       </section>
 
-      {/* CHARTS & ANALYTICS */}
+      {/* Remaining sections unchanged */}
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-12">
         <div className="card p-2 overflow-hidden h-96">
           <StreakCard
@@ -1232,7 +1235,6 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* INSIGHTS & ROADMAP */}
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
         <div className="card p-6">
           <WeaknessInsights />
@@ -1242,7 +1244,6 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* RECENT ACTIVITY */}
       <section className="mt-12 mb-10">
         <div className="flex items-center justify-between mb-6 px-2">
           <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">
@@ -1259,6 +1260,7 @@ export default function Dashboard() {
           <RecentAttempts />
         </div>
       </section>
+
     </div>
   );
 }

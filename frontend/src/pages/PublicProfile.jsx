@@ -1026,7 +1026,6 @@ export default function PublicProfile() {
   const fetchedRef = useRef(false);
 
   useEffect(() => {
-    // ✅ Self-redirect: if viewing your own public profile → go to /profile
     if (me?.username && me.username === username) {
       navigate("/profile", { replace: true });
       return;
@@ -1076,16 +1075,10 @@ export default function PublicProfile() {
           >
             <FiUser size={40} />
           </div>
-          <h2
-            className="text-2xl font-black"
-            style={{ color: "var(--text-primary)" }}
-          >
+          <h2 className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>
             User not found
           </h2>
-          <p
-            className="mt-2 font-medium"
-            style={{ color: "var(--text-secondary)" }}
-          >
+          <p className="mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>
             The profile you are looking for doesn't exist.
           </p>
           <button
@@ -1099,6 +1092,14 @@ export default function PublicProfile() {
     );
 
   const isMe = String(data.user_id) === String(myId);
+
+  // ✅ Proper Case Name
+  const formattedName =
+    data.name
+      ?.toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ") || "User";
 
   const toggleFollow = async () => {
     try {
@@ -1188,13 +1189,13 @@ export default function PublicProfile() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                data.name?.charAt(0)
+                formattedName.charAt(0)
               )}
             </div>
 
             <div className="flex-1 text-center md:text-left">
               <h3 className="text-3xl font-black tracking-tight mb-2">
-                {data.name}
+                {formattedName}
               </h3>
 
               <div className="flex justify-center md:justify-start gap-8 text-sm">

@@ -350,67 +350,170 @@
 // }
 
 
+// import React, { createContext, useState, useEffect, useRef } from "react";
+// import { useNavigate } from "react-router-dom";
+// import API from "../api/api";
+
+// export const AuthContext = createContext();
+
+// export function AuthProvider({ children }) {
+//   const [user, setUser] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [isServerOff, setIsServerOff] = useState(false);
+
+//   const navigate = useNavigate();
+//   const hasLoaded = useRef(false);
+
+//   const checkServer = async () => {
+//     try {
+//       const base = (
+//         import.meta.env.VITE_API_URL || "http://localhost:4000/api"
+//       ).replace("/api", "");
+
+//       const res = await fetch(`${base}/health`);
+//       return res.ok;
+//     } catch {
+//       return false;
+//     }
+//   };
+
+//   // ✅ Uses /auth/checkuser — lightweight, only for auth verification
+//   const loadUser = async () => {
+//     try {
+//       const alive = await checkServer();
+
+//       if (!alive) {
+//         setIsServerOff(true);
+//         return;
+//       }
+
+//       setIsServerOff(false);
+
+//       const token = localStorage.getItem("token");
+//       if (!token) return;
+
+//       const res = await API.get("/auth/checkuser"); // ✅ NEW endpoint
+
+//       if (res?.data?.user) {
+//         setUser(res.data.user);
+//       }
+//     } catch (err) {
+//       if (!err.response) {
+//         setIsServerOff(true);
+//       }
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (hasLoaded.current) return;
+//     hasLoaded.current = true;
+
+//     const init = async () => {
+//       setLoading(true);
+//       await loadUser();
+//       setLoading(false);
+//     };
+
+//     init();
+//   }, []);
+
+//   useEffect(() => {
+//     const handleOffline = () => setIsServerOff(true);
+//     window.addEventListener("server-offline", handleOffline);
+//     return () => window.removeEventListener("server-offline", handleOffline);
+//   }, []);
+
+//   const logout = () => {
+//     localStorage.removeItem("token");
+//     sessionStorage.removeItem("announcement_closed");
+//     setUser(null);
+//     navigate("/");
+//   };
+
+//   // ✅ After login:
+//   // 1. Set user instantly from login response (no flicker/delay)
+//   // 2. Always call checkuser so it shows in network tab + syncs latest data
+//   const loginAndLoad = async (token, userFromResponse = null) => {
+//     localStorage.setItem("token", token);
+
+//     if (userFromResponse) {
+//       setUser(userFromResponse); // instant — no waiting
+//     }
+
+//     await loadUser(); // calls /auth/checkuser — visible in network tab ✅
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         user,
+//         setUser,
+//         logout,
+//         loadUser,
+//         loginAndLoad,
+//         loading,
+//         isServerOff,
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// }
+
+//new
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
+import { tokenStore } from "../api/tokenStore";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser]           = useState(null);
+  const [loading, setLoading]     = useState(true);
   const [isServerOff, setIsServerOff] = useState(false);
 
-  const navigate = useNavigate();
-  const hasLoaded = useRef(false);
+  const navigate    = useNavigate();
+  const hasLoaded   = useRef(false);
 
   const checkServer = async () => {
     try {
-      const base = (
-        import.meta.env.VITE_API_URL || "http://localhost:4000/api"
-      ).replace("/api", "");
-
+      const base = (import.meta.env.VITE_API_URL || "http://localhost:4000/api").replace("/api", "");
       const res = await fetch(`${base}/health`);
       return res.ok;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   };
 
-  // ✅ Uses /auth/checkuser — lightweight, only for auth verification
   const loadUser = async () => {
     try {
       const alive = await checkServer();
-
-      if (!alive) {
-        setIsServerOff(true);
-        return;
-      }
-
+      if (!alive) { setIsServerOff(true); return; }
       setIsServerOff(false);
 
-      const token = localStorage.getItem("token");
+      const token = tokenStore.get();
       if (!token) return;
 
-      const res = await API.get("/auth/checkuser"); // ✅ NEW endpoint
-
+      const res = await API.get("/auth/checkuser");
       if (res?.data?.user) {
         setUser(res.data.user);
       }
     } catch (err) {
-      if (!err.response) {
-        setIsServerOff(true);
-      }
+      if (!err.response) setIsServerOff(true);
     }
   };
 
+  // On mount — restore session from sessionStorage or localStorage
   useEffect(() => {
     if (hasLoaded.current) return;
     hasLoaded.current = true;
 
     const init = async () => {
       setLoading(true);
-      await loadUser();
+      const saved = sessionStorage.getItem("_at") || localStorage.getItem("token");
+      if (saved) {
+        tokenStore.set(saved);
+        await loadUser();
+      }
       setLoading(false);
     };
 
@@ -424,37 +527,25 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("announcement_closed");
+    tokenStore.clear();
+    try { sessionStorage.removeItem("_at"); } catch {}
+    try { localStorage.removeItem("token"); } catch {}
+    try { sessionStorage.removeItem("announcement_closed"); } catch {}
     setUser(null);
     navigate("/");
   };
 
-  // ✅ After login:
-  // 1. Set user instantly from login response (no flicker/delay)
-  // 2. Always call checkuser so it shows in network tab + syncs latest data
   const loginAndLoad = async (token, userFromResponse = null) => {
-    localStorage.setItem("token", token);
+    tokenStore.set(token);
+    try { sessionStorage.setItem("_at", token); } catch {}
+    try { localStorage.setItem("token", token); } catch {}
 
-    if (userFromResponse) {
-      setUser(userFromResponse); // instant — no waiting
-    }
-
-    await loadUser(); // calls /auth/checkuser — visible in network tab ✅
+    if (userFromResponse) setUser(userFromResponse);
+    await loadUser();
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        setUser,
-        logout,
-        loadUser,
-        loginAndLoad,
-        loading,
-        isServerOff,
-      }}
-    >
+    <AuthContext.Provider value={{ user, setUser, logout, loadUser, loginAndLoad, loading, isServerOff }}>
       {children}
     </AuthContext.Provider>
   );

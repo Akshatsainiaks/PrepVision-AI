@@ -437,7 +437,7 @@
 
 //next acc claude code
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -445,6 +445,7 @@ import {
   FiCheckCircle, FiAlertCircle, FiAward, FiX, FiClock,
   FiZap, FiTrendingUp, FiTrendingDown, FiVideo, FiVideoOff,
 } from "react-icons/fi";
+import { takeStream } from "./streamStore";
 
 /* ── Score color ── */
 const scoreColor = (s) => s >= 8 ? "#10b981" : s >= 5 ? "#f59e0b" : "#f43f5e";
@@ -463,578 +464,292 @@ const diffStyle = {
    Interview CANNOT proceed if camera/mic denied.
 ════════════════════════════════════════════════ */
 /* ── Browser-specific camera permission guides ── */
-function BrowserGuides() {
-  const [open, setOpen] = useState(null);
-  const guides = [
-    {
-      browser: "Chrome", icon: "🟡",
-      link: "chrome://settings/content/camera",
-      steps: ["Click 🔒 in address bar", "Click 'Site settings'", "Set Camera & Mic to Allow", "Refresh page"],
-    },
-    {
-      browser: "Firefox", icon: "🦊",
-      link: "about:preferences#privacy",
-      steps: ["Click 🔒 in address bar", "Click the blocked camera/mic icon", "Select 'Allow'", "Refresh page"],
-    },
-    {
-      browser: "Safari", icon: "🧭",
-      link: null,
-      steps: ["Safari menu → Settings for This Website", "Set Camera & Microphone to Allow", "Refresh page"],
-    },
-    {
-      browser: "Edge", icon: "🔵",
-      link: "edge://settings/content/camera",
-      steps: ["Click 🔒 in address bar", "Click 'Permissions for this site'", "Set Camera & Mic to Allow", "Refresh page"],
-    },
-  ];
-  return (
-    <div className="space-y-2">
-      {guides.map(({ browser, icon, link, steps }) => (
-        <div key={browser} className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border-color)" }}>
-          <button
-            onClick={() => setOpen(open === browser ? null : browser)}
-            className="w-full flex items-center gap-3 p-4 font-black text-sm text-left"
-            style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
-            <span className="text-lg">{icon}</span>
-            <span className="flex-1">{browser}</span>
-            <span className="text-xs font-bold" style={{ color: "var(--text-secondary)" }}>
-              {open === browser ? "▲" : "▾"}
-            </span>
-          </button>
-          {open === browser && (
-            <div className="px-4 pb-4 pt-1" style={{ backgroundColor: "var(--bg-primary)" }}>
-              <ol className="space-y-1.5 mb-3">
-                {steps.map((s, i) => (
-                  <li key={i} className="flex gap-2 text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                    <span className="font-black shrink-0" style={{ color: "var(--accent)" }}>{i + 1}.</span> {s}
-                  </li>
-                ))}
-              </ol>
-              {link && (
-                <button
-                  onClick={() => { try { window.open(link, "_blank"); } catch(e) {} }}
-                  className="w-full py-2 rounded-xl text-xs font-black border flex items-center justify-center gap-2"
-                  style={{ borderColor: "rgba(99,102,241,0.3)", color: "var(--accent)", backgroundColor: "rgba(99,102,241,0.05)" }}>
-                  🔗 Open {browser} Settings
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function PermissionGate({ onGranted, onDenied }) {
-  const [step, setStep]               = useState("camera"); // camera | sound
-  const [status, setStatus]           = useState("idle");   // idle | requesting | granted | denied | notfound | error
-  const [soundTested, setSoundTested] = useState(false);
-  const [soundPlaying, setSoundPlaying] = useState(false);
-  const videoPreviewRef               = useRef(null);
-  const streamRef                     = useRef(null);
+  const [status, setStatus] = useState("requesting"); // requesting | denied
 
-  const requestPermissions = async () => {
-    setStatus("requesting");
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      streamRef.current = stream;
-      if (videoPreviewRef.current) videoPreviewRef.current.srcObject = stream;
-      setStatus("granted");
-      setTimeout(() => setStep("sound"), 900);
-    } catch (err) {
-      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") setStatus("denied");
-      else if (err.name === "NotFoundError") setStatus("notfound");
-      else setStatus("error");
-    }
-  };
+  useEffect(() => {
+    const withTimeout = (p, ms) => Promise.race([
+      p, new Promise((_, r) => setTimeout(() => r(new Error("timeout")), ms))
+    ]);
 
-  const testSound = () => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    setSoundPlaying(true);
-    const u = new SpeechSynthesisUtterance(
-      "Hello! I am your AI interviewer. Your interview is about to begin. Good luck!"
-    );
-    u.lang = "en-US"; u.rate = 0.9; u.pitch = 1; u.volume = 1;
-    const voices = window.speechSynthesis.getVoices();
-    const eng = voices.find(v => v.lang.startsWith("en"));
-    if (eng) u.voice = eng;
-    u.onend   = () => { setSoundPlaying(false); setSoundTested(true); };
-    u.onerror = () => { setSoundPlaying(false); setSoundTested(true); };
-    window.speechSynthesis.speak(u);
-  };
+    withTimeout(navigator.mediaDevices?.getUserMedia({ video: true, audio: true }), 3000)
+      .then(stream => onGranted(stream))
+      .catch(() => {
+        withTimeout(navigator.mediaDevices?.getUserMedia({ video: false, audio: true }), 3000)
+          .then(stream => onGranted(stream))
+          .catch(() => setStatus("denied"));
+      });
+  }, []);
 
-  const proceedToInterview = () => {
-    window.speechSynthesis.cancel();
-    onGranted(streamRef.current);
-  };
-
-  const isIdle    = status === "idle";
-  const isPending = status === "requesting";
-  const isGranted = status === "granted";
-
-  /* ════════════ STEP 2: SOUND CHECK ════════════ */
-  if (step === "sound") {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6"
-           style={{ backgroundColor: "var(--bg-primary)" }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                    className="w-full max-w-md">
-          <div className="card p-10 rounded-[2.5rem] text-center">
-
-            {/* Step indicator */}
-            <div className="flex items-center justify-center gap-2 mb-8">
-              <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white"
-                     style={{ backgroundColor: "#10b981" }}>✓</div>
-                <span className="text-xs font-black" style={{ color: "#10b981" }}>Camera & Mic</span>
-              </div>
-              <div className="w-8 h-0.5 rounded-full" style={{ backgroundColor: "var(--accent)" }} />
-              <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white"
-                     style={{ backgroundColor: "var(--accent)" }}>2</div>
-                <span className="text-xs font-black" style={{ color: "var(--accent)" }}>Sound Check</span>
-              </div>
-            </div>
-
-            <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 text-4xl"
-                 style={{ backgroundColor: "rgba(99,102,241,0.1)", border: "2px solid rgba(99,102,241,0.3)" }}>
-              🔊
-            </div>
-
-            <h2 className="text-2xl font-black mb-2" style={{ color: "var(--text-primary)" }}>
-              Sound Check
-            </h2>
-            <p className="font-medium text-sm mb-6 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              The AI interviewer speaks questions aloud. Test the sound before starting.
+  if (status === "denied") return (
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: "var(--bg-primary)" }}>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-md">
+        <div className="card p-10 rounded-[2.5rem] text-center border" style={{ borderColor: "rgba(244,63,94,0.4)" }}>
+          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 text-4xl"
+               style={{ backgroundColor: "rgba(244,63,94,0.1)" }}>🚫</div>
+          <h2 className="text-2xl font-black mb-3" style={{ color: "#f43f5e" }}>Interview Terminated</h2>
+          <p className="text-sm font-medium mb-6 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+            Camera and microphone access were denied or blocked.<br/>
+            A live interview <strong style={{ color: "var(--text-primary)" }}>requires both</strong> to proceed.
+          </p>
+          <div className="p-4 rounded-2xl mb-6 border text-left" style={{ backgroundColor: "rgba(244,63,94,0.05)", borderColor: "rgba(244,63,94,0.2)" }}>
+            <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: "#f43f5e" }}>⚠️ Violation Recorded</p>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              This attempt has been flagged. Blocking camera/mic during an interview is considered a violation of interview integrity guidelines.
             </p>
-
-            {/* How to fix sound — always visible */}
-            <div className="p-4 rounded-2xl text-left mb-6 border"
-                 style={{ backgroundColor: "rgba(245,158,11,0.05)", borderColor: "rgba(245,158,11,0.25)" }}>
-              <p className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: "#f59e0b" }}>
-                🔇 Can't hear anything? Fix it:
-              </p>
-              <ol className="space-y-2 text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                <li className="flex gap-2">
-                  <span className="font-black shrink-0" style={{ color: "#f59e0b" }}>1.</span>
-                  Check your <strong style={{ color: "var(--text-primary)" }}>device volume</strong> is not muted
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-black shrink-0" style={{ color: "#f59e0b" }}>2.</span>
-                  Right-click browser tab →
-                  <strong style={{ color: "var(--text-primary)" }}> "Unmute tab"</strong>
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-black shrink-0" style={{ color: "#f59e0b" }}>3.</span>
-                  Look for <strong style={{ color: "var(--text-primary)" }}>🔇 in address bar</strong> and click to unmute
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-black shrink-0" style={{ color: "#f59e0b" }}>4.</span>
-                  Ensure headphones or speakers are plugged in
-                </li>
-              </ol>
-            </div>
-
-            {/* Test sound button */}
-            <button onClick={testSound} disabled={soundPlaying}
-              className="w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 border-2 transition-all active:scale-95 mb-3 disabled:opacity-60"
-              style={{
-                borderColor:     soundTested ? "rgba(16,185,129,0.5)" : "rgba(99,102,241,0.4)",
-                backgroundColor: soundTested ? "rgba(16,185,129,0.08)" : "rgba(99,102,241,0.08)",
-                color:           soundTested ? "#10b981" : "var(--accent)",
-              }}>
-              {soundPlaying
-                ? <><span className="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse inline-block" /> AI is speaking...</>
-                : soundTested
-                  ? <><FiCheckCircle size={18} /> Heard it! Sound is working</>
-                  : <>🔊 Play Test Voice</>}
-            </button>
-
-            {/* Start button */}
-            <button onClick={proceedToInterview}
-              className="w-full py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl mb-3"
-              style={{ backgroundColor: "var(--accent)" }}>
-              {soundTested ? "✅ Start Interview" : "Start Without Sound Test"}
-            </button>
-
-            {!soundTested && (
-              <p className="text-xs font-bold mb-3" style={{ color: "var(--text-secondary)" }}>
-                Recommended: test sound first so you can hear the questions
-              </p>
-            )}
-
-            <button onClick={onDenied}
-              className="w-full py-2.5 rounded-2xl font-bold text-sm border hover:bg-white/5"
-              style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
-              Cancel
-            </button>
           </div>
-        </motion.div>
-      </div>
-    );
-  }
-
-  /* ════════════ STEP 1: CAMERA & MIC ════════════ */
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6"
-         style={{ backgroundColor: "var(--bg-primary)" }}>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                  className="w-full max-w-md">
-
-        {(isIdle || isPending || isGranted) && (
-          <div className="card p-10 rounded-[2.5rem] text-center">
-
-            {/* Step indicator */}
-            <div className="flex items-center justify-center gap-2 mb-8">
-              <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white"
-                     style={{ backgroundColor: "var(--accent)" }}>1</div>
-                <span className="text-xs font-black" style={{ color: "var(--accent)" }}>Camera & Mic</span>
-              </div>
-              <div className="w-8 h-0.5 rounded-full" style={{ backgroundColor: "var(--border-color)" }} />
-              <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border"
-                     style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>2</div>
-                <span className="text-xs font-bold" style={{ color: "var(--text-secondary)" }}>Sound Check</span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center gap-4 mb-8">
-              {[FiVideo, FiMic].map((Icon, i) => (
-                <React.Fragment key={i}>
-                  {i > 0 && <div className="w-4 h-0.5 rounded-full" style={{ backgroundColor: "var(--border-color)" }} />}
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all duration-500"
-                       style={{
-                         backgroundColor: isGranted ? "rgba(16,185,129,0.1)" : "rgba(99,102,241,0.1)",
-                         borderColor:     isGranted ? "rgba(16,185,129,0.4)" : "rgba(99,102,241,0.3)",
-                         color:           isGranted ? "#10b981" : "var(--accent)",
-                       }}>
-                    <Icon size={28} />
-                  </div>
-                </React.Fragment>
-              ))}
-            </div>
-
-            <h2 className="text-2xl font-black mb-2" style={{ color: "var(--text-primary)" }}>
-              Camera & Mic Required
-            </h2>
-            <p className="font-medium text-sm mb-8 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              This live interview requires your camera and microphone.
-              The interview <strong style={{ color: "var(--text-primary)" }}>will not start</strong> without both permissions.
-            </p>
-
-            <div className="space-y-3 mb-8 text-left">
-              {[
-                { icon: FiVideo, label: "Camera — for live video feed" },
-                { icon: FiMic,   label: "Microphone — for voice answers" },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-3 p-3.5 rounded-2xl border transition-all duration-500"
-                     style={{ borderColor: isGranted ? "rgba(16,185,129,0.3)" : "var(--border-color)", backgroundColor: "var(--bg-primary)" }}>
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-500"
-                       style={{ backgroundColor: isGranted ? "rgba(16,185,129,0.1)" : "rgba(99,102,241,0.1)", color: isGranted ? "#10b981" : "var(--accent)" }}>
-                    <Icon size={15} />
-                  </div>
-                  <span className="font-bold text-sm flex-1" style={{ color: "var(--text-primary)" }}>{label}</span>
-                  {isGranted && <FiCheckCircle size={16} style={{ color: "#10b981" }} />}
-                  {isPending && <FiLoader size={14} className="animate-spin" style={{ color: "var(--accent)" }} />}
-                </div>
-              ))}
-            </div>
-
-            <div className={`mb-6 rounded-2xl overflow-hidden border transition-all duration-500 ${isGranted ? "h-44 opacity-100" : "h-0 opacity-0"}`}
-                 style={{ borderColor: "rgba(16,185,129,0.3)" }}>
-              <video ref={videoPreviewRef} autoPlay muted playsInline className="w-full h-full object-cover bg-slate-900" />
-            </div>
-
-            {isIdle && (
-              <button onClick={requestPermissions}
-                className="w-full py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl"
-                style={{ backgroundColor: "var(--accent)" }}>
-                <FiVideo size={20} /> Allow Camera & Mic
-              </button>
-            )}
-            {isPending && (
-              <button disabled
-                className="w-full py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 opacity-70 cursor-not-allowed"
-                style={{ backgroundColor: "var(--accent)" }}>
-                <FiLoader className="animate-spin" size={20} /> Waiting for permission...
-              </button>
-            )}
-            {isGranted && (
-              <div className="py-3 font-black text-base flex items-center justify-center gap-3"
-                   style={{ color: "#10b981" }}>
-                <FiCheckCircle size={20} /> Granted — moving to sound check...
-              </div>
-            )}
-
-            <button onClick={onDenied}
-              className="mt-4 w-full py-3 rounded-2xl font-bold text-sm border transition-all hover:bg-white/5"
-              style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
-              Cancel Interview
-            </button>
-          </div>
-        )}
-
-        {status === "denied" && (
-          <div className="card rounded-[2.5rem] overflow-hidden border" style={{ borderColor: "rgba(244,63,94,0.3)" }}>
-            {/* Red header */}
-            <div className="p-8 text-center" style={{ backgroundColor: "rgba(244,63,94,0.07)" }}>
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: "rgba(244,63,94,0.15)" }}>
-                <FiVideoOff size={30} style={{ color: "#f43f5e" }} />
-              </div>
-              <h2 className="text-xl font-black mb-1" style={{ color: "var(--text-primary)" }}>Camera / Mic Blocked</h2>
-              <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                You blocked access. Here's how to enable it for each browser:
-              </p>
-            </div>
-
-            {/* Browser fix guides */}
-            <div className="p-6 space-y-3">
-              <BrowserGuides />
-            </div>
-
-            <div className="px-6 pb-6 space-y-2">
-              <button onClick={() => { setStatus("idle"); }}
-                className="w-full py-4 rounded-2xl text-white font-black active:scale-95 transition-all shadow-lg"
-                style={{ backgroundColor: "var(--accent)" }}>
-                ✅ I've enabled it — Try Again
-              </button>
-              <button onClick={onDenied}
-                className="w-full py-3 rounded-2xl font-bold text-sm border hover:bg-white/5"
-                style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
-                Go Back
-              </button>
-            </div>
-          </div>
-        )}
-
-        {status === "notfound" && (
-          <div className="card rounded-[2.5rem] overflow-hidden border" style={{ borderColor: "rgba(245,158,11,0.3)" }}>
-            <div className="p-8 text-center" style={{ backgroundColor: "rgba(245,158,11,0.07)" }}>
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: "rgba(245,158,11,0.15)" }}>
-                <FiAlertCircle size={30} style={{ color: "#f59e0b" }} />
-              </div>
-              <h2 className="text-xl font-black mb-1" style={{ color: "var(--text-primary)" }}>No Camera or Mic Detected</h2>
-              <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                Your device has no camera or microphone. Here's how to fix it:
-              </p>
-            </div>
-            <div className="p-6 space-y-3">
-              {[
-                { icon: "🎙️", title: "Use a USB or Bluetooth mic/headset", desc: "Plug in a headset or external microphone and refresh the page." },
-                { icon: "📷", title: "Use a USB webcam", desc: "Connect a USB webcam. Built-in laptop cameras work too — check if it's enabled in device manager." },
-                { icon: "📱", title: "Use your phone instead", desc: "Open this site on your phone — it has a built-in camera and mic." },
-                { icon: "⚙️", title: "Check device manager (Windows)", desc: "Search 'Device Manager' → Cameras / Audio inputs — make sure no device shows a ⚠️ icon.", link: "ms-settings:sound", linkLabel: "Open Sound Settings" },
-              ].map(({ icon, title, desc, link, linkLabel }) => (
-                <div key={title} className="p-4 rounded-2xl border" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-primary)" }}>
-                  <div className="flex items-start gap-3">
-                    <span className="text-xl shrink-0">{icon}</span>
-                    <div className="flex-1">
-                      <p className="font-black text-sm mb-1" style={{ color: "var(--text-primary)" }}>{title}</p>
-                      <p className="text-xs font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>{desc}</p>
-                      {link && (
-                        <button onClick={() => { try { window.open(link, "_blank"); } catch(e) {} }}
-                          className="mt-2 px-3 py-1.5 rounded-xl text-xs font-black border"
-                          style={{ borderColor: "rgba(99,102,241,0.3)", color: "var(--accent)" }}>
-                          🔗 {linkLabel}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="px-6 pb-6 space-y-2">
-              <button onClick={() => setStatus("idle")}
-                className="w-full py-4 rounded-2xl text-white font-black active:scale-95 shadow-lg"
-                style={{ backgroundColor: "var(--accent)" }}>
-                ✅ I've connected a device — Try Again
-              </button>
-              <button onClick={onDenied}
-                className="w-full py-3 rounded-2xl font-bold text-sm border hover:bg-white/5"
-                style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
-                Go Back
-              </button>
-            </div>
-          </div>
-        )}
-
-        {status === "error" && (
-          <div className="card rounded-[2.5rem] overflow-hidden border" style={{ borderColor: "rgba(244,63,94,0.2)" }}>
-            <div className="p-8 text-center" style={{ backgroundColor: "rgba(244,63,94,0.05)" }}>
-              <FiAlertCircle size={36} className="mx-auto mb-3" style={{ color: "#f43f5e" }} />
-              <h2 className="text-xl font-black mb-1" style={{ color: "var(--text-primary)" }}>Something Went Wrong</h2>
-              <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>An unexpected error occurred accessing your devices.</p>
-            </div>
-            <div className="p-6 space-y-3">
-              {[
-                { icon: "🔄", title: "Refresh and try again", desc: "Sometimes a simple page refresh resolves the issue." },
-                { icon: "🔒", title: "Check browser permissions", desc: "Click the 🔒 lock icon in the address bar and ensure camera & mic are set to Allow." },
-                { icon: "🌐", title: "Try a different browser", desc: "Chrome and Edge have the best support for camera/mic access. Try switching browsers." },
-                { icon: "🔌", title: "Restart your browser", desc: "Fully close and reopen your browser, then try again." },
-              ].map(({ icon, title, desc }) => (
-                <div key={title} className="p-4 rounded-2xl border flex items-start gap-3" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-primary)" }}>
-                  <span className="text-xl shrink-0">{icon}</span>
-                  <div>
-                    <p className="font-black text-sm mb-0.5" style={{ color: "var(--text-primary)" }}>{title}</p>
-                    <p className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="px-6 pb-6 space-y-2">
-              <button onClick={() => setStatus("idle")}
-                className="w-full py-4 rounded-2xl text-white font-black active:scale-95 shadow-lg"
-                style={{ backgroundColor: "var(--accent)" }}>
-                Try Again
-              </button>
-              <button onClick={onDenied}
-                className="w-full py-3 rounded-2xl font-bold text-sm border hover:bg-white/5"
-                style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
-                Go Back
-              </button>
-            </div>
-          </div>
-        )}
-
+          <button onClick={onDenied}
+            className="w-full py-4 rounded-2xl text-white font-black text-base active:scale-95"
+            style={{ backgroundColor: "#f43f5e" }}>
+            Back to Mock Interview
+          </button>
+        </div>
       </motion.div>
     </div>
   );
-}
 
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: "var(--bg-primary)" }}>
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-black text-xl"
+           style={{ backgroundColor: "var(--accent)" }}>AI</div>
+      <FiLoader className="w-8 h-8 animate-spin" style={{ color: "var(--accent)" }} />
+      <p className="font-bold text-sm" style={{ color: "var(--text-secondary)" }}>Connecting camera & mic...</p>
+    </div>
+  );
+}
 
 export default function LiveInterview() {
   const { sessionId } = useParams();
   const navigate      = useNavigate();
+  const location      = useLocation();
 
-  const videoRef        = useRef(null);
-  const recognitionRef  = useRef(null);
-  const mediaStreamRef  = useRef(null);
-  const timerRef        = useRef(null);
+  const videoRef       = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const timerRef       = useRef(null);
+  const recognitionRef = useRef(null);
+  const silenceRef     = useRef(null);   // silence detection timer
+  const answerRef      = useRef("");     // always up-to-date answer text
+  const questionRef    = useRef("");     // always up-to-date current question
 
-  /* ── Permission gate — must be granted before interview loads ── */
+  /* ── Permission gate ── */
   const [permissionGranted, setPermissionGranted] = useState(false);
 
-  /* ── Session state ── */
+  /* ── Session ── */
   const [session, setSession]         = useState(null);
-  const [questions, setQuestions]     = useState([]);
-  const [currentQ, setCurrentQ]       = useState(0);
-  const [currentDiff, setCurrentDiff] = useState("Medium");
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  // Keep ref in sync so submitAnswer always has the latest question
+  useEffect(() => { if (currentQuestion) questionRef.current = currentQuestion; }, [currentQuestion]);
+  const [questionNumber, setQuestionNumber]   = useState(1);
+  const [totalQuestions, setTotalQuestions]   = useState(9);
+  const [currentDiff, setCurrentDiff]         = useState("Medium");
 
-  /* ── Answer state ── */
-  const [listening, setListening]       = useState(false);
-  const [answerText, setAnswerText]     = useState("");
+  /* ── Mic / transcript ── */
+  const [listening, setListening]     = useState(false);
+  const [answerText, setAnswerText]   = useState("");
+  const [silenceCountdown, setSilenceCountdown] = useState(null); // 3..2..1 before auto-submit
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /* ── Evaluation state ── */
-  const [evaluation, setEvaluation]     = useState(null);
-  const [followUp, setFollowUp]         = useState(null);
-  const [showFollowUp, setShowFollowUp] = useState(false);
+  /* ── Evaluation ── */
+  const [evaluation, setEvaluation] = useState(null);
+  const [phase, setPhase]           = useState("answering"); // intro | answering | evaluating | evaluated | lastEvaluated | finished
+  const [aiSpeechText, setAiSpeechText] = useState(""); // what AI is currently saying
 
-  /* ── Timer state ── */
-  const [timeLeft, setTimeLeft] = useState(90);
-  const [timedOut, setTimedOut] = useState(false);
+  /* ── Timer ── */
+  const [timeLeft, setTimeLeft]   = useState(90);
+  const [timerActive, setTimerActive] = useState(false);
 
-  /* ── Hint state ── */
+  /* ── Hints ── */
   const [hintsLeft, setHintsLeft]         = useState(3);
   const [hint, setHint]                   = useState(null);
   const [hintLoading, setHintLoading]     = useState(false);
   const [hintUsedThisQ, setHintUsedThisQ] = useState(false);
 
-  /* ── UI state ── */
-  const [answeredAll, setAnsweredAll] = useState(false);
-  const [summary, setSummary]         = useState(null);
   const [isFinishing, setIsFinishing] = useState(false);
-  const [phase, setPhase]             = useState("answering"); // answering | evaluated
 
-  /* ── Permission granted: save stream, flip gate ── */
+  /* ── Speaking state ── */
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  /* ── Violation state ── */
+  const [violation, setViolation] = useState(null); // null | "camera_off" | "mic_off" | "tab_switch"
+
+  /* ════════════ SPEAK TEXT (generic) ════════════ */
+  const speakText = useCallback((text, onDone) => {
+    if (!text || !window.speechSynthesis) { onDone?.(); return; }
+    window.speechSynthesis.cancel();
+    setIsSpeaking(true);
+    setAiSpeechText(text);
+
+    const doSpeak = () => {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-US"; u.rate = 0.88; u.pitch = 1.05; u.volume = 1;
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.name.includes("Google") && v.lang.startsWith("en"))
+        || voices.find(v => v.lang === "en-US")
+        || voices.find(v => v.lang.startsWith("en"));
+      if (preferred) u.voice = preferred;
+      u.onend   = () => { setIsSpeaking(false); setAiSpeechText(""); onDone?.(); };
+      u.onerror = () => { setIsSpeaking(false); setAiSpeechText(""); onDone?.(); };
+      // Chrome bug: speechSynthesis pauses after ~15s — keep it alive
+      const keepAlive = setInterval(() => {
+        if (!window.speechSynthesis.speaking) { clearInterval(keepAlive); return; }
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      }, 10000);
+      window.speechSynthesis.speak(u);
+    };
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) doSpeak();
+    else { window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; doSpeak(); }; }
+  }, []);
+
+  /* ════════════ PERMISSION ════════════ */
   const handlePermissionGranted = useCallback((stream) => {
     mediaStreamRef.current = stream;
+    // Attach to video element immediately if already mounted
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
     setPermissionGranted(true);
   }, []);
 
-  /* ── Attach stream to video element once both are ready ── */
+  // Speak intro once session + permission are both ready
+  const introFiredRef = useRef(false);
   useEffect(() => {
-    if (!permissionGranted || !mediaStreamRef.current || !videoRef.current) return;
-    videoRef.current.srcObject = mediaStreamRef.current;
-  }, [permissionGranted, session]); // re-run when session loads so videoRef is mounted
+    if (!permissionGranted || introFiredRef.current) return;
+    const intro  = window.__introSpeech;
+    const firstQ = window.__firstQuestion;
+    if (!firstQ) return;
+    introFiredRef.current = true;
+    window.__introSpeech   = null;
+    window.__firstQuestion = null;
+    if (intro) {
+      setPhase("intro");
+      speakText(intro, () => {
+        setCurrentQuestion(firstQ);
+        setPhase("answering");
+      });
+    } else {
+      setCurrentQuestion(firstQ);
+      setPhase("answering");
+    }
+  }, [permissionGranted, session, speakText]);
 
-  /* ═══════════════ FETCH SESSION ═══════════════ */
+  // Attach stream to video as soon as both are available
+  const attachVideo = useCallback((el) => {
+    videoRef.current = el;
+    if (el && mediaStreamRef.current) {
+      el.srcObject = mediaStreamRef.current;
+      el.play().catch(() => {});
+    }
+  }, []);
+
+  /* ════════════ CLEANUP ════════════ */
+  useEffect(() => {
+    return () => {
+      mediaStreamRef.current?.getTracks().forEach(t => t.stop());
+      window.speechSynthesis?.cancel();
+      clearInterval(timerRef.current);
+      clearTimeout(silenceRef.current);
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
+  /* ════════════ TRACK MONITORING — detect mic/camera turned off ════════════ */
+  useEffect(() => {
+    if (!permissionGranted || !mediaStreamRef.current) return;
+    const stream = mediaStreamRef.current;
+
+    const handleTrackEnded = (track) => {
+      if (violation) return; // already violated
+      const type = track.kind === "video" ? "camera_off" : "mic_off";
+      setViolation(type);
+      window.speechSynthesis?.cancel();
+      recognitionRef.current?.stop();
+      mediaStreamRef.current?.getTracks().forEach(t => t.stop());
+    };
+
+    stream.getTracks().forEach(track => {
+      track.addEventListener("ended", () => handleTrackEnded(track));
+    });
+
+    return () => {
+      stream.getTracks().forEach(track => {
+        track.removeEventListener("ended", () => handleTrackEnded(track));
+      });
+    };
+  }, [permissionGranted, violation]);
+
+  /* Tab visibility — warn if user switches tab during interview */
+  useEffect(() => {
+    if (!permissionGranted) return;
+    const handleVisibility = () => {
+      if (document.hidden && phase === "answering" && !violation) {
+        setViolation("tab_switch");
+        window.speechSynthesis?.cancel();
+        recognitionRef.current?.stop();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [permissionGranted, phase, violation]);
+
+  /* ════════════ INIT FROM NAV STATE + SESSION FETCH ════════════ */
   useEffect(() => {
     if (!sessionId) return navigate("/mock");
+
+    // Use nav state for instant load (no extra fetch needed)
+    const state = location.state;
+    if (state?.firstQuestion) {
+      // Build a minimal session object from nav state
+      const s = {
+        _id:              sessionId,
+        topic:            state.topic,
+        role:             state.role,
+        difficulty:       state.difficulty    || "Medium",
+        timerPerQuestion: state.timerPerQuestion ?? 90,
+        totalHints:       state.totalHints    ?? 3,
+        totalQuestions:   state.totalQuestions ?? 9,
+      };
+      setSession(s);
+      setCurrentDiff(s.difficulty);
+      setHintsLeft(s.totalHints);
+      setTimeLeft(s.timerPerQuestion);
+      setTotalQuestions(s.totalQuestions);
+      // Store intro + first question — spoken after permissionGranted
+      window.__introSpeech   = state.introSpeech || null;
+      window.__firstQuestion = state.firstQuestion;
+      setCurrentQuestion(null); // will be set after intro
+      return;
+    }
+
+    // Fallback: fetch session from server if no nav state
     API.get(`/live-interview/session/${sessionId}`)
-      .then((res) => {
+      .then(res => {
         const s = res.data;
         setSession(s);
-        setQuestions(s.generatedQuestions || []);
         setCurrentDiff(s.difficulty || "Medium");
         setHintsLeft(s.totalHints ?? 3);
         setTimeLeft(s.timerPerQuestion ?? 90);
+        setTotalQuestions(s.totalQuestions ?? 9);
+        const first = s.askedQuestions?.[0] || s.generatedQuestions?.[0];
+        if (first) setCurrentQuestion(first);
+        else navigate("/mock");
       })
       .catch(() => navigate("/mock"));
   }, [sessionId, navigate]);
 
-  /* ═══════════════ CLEANUP ON UNMOUNT ═══════════════ */
-  useEffect(() => {
-    return () => {
-      mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
-      window.speechSynthesis?.cancel();
-      clearInterval(timerRef.current);
-    };
-  }, []);
 
-  /* ═══════════════ SPEAK QUESTION ═══════════════ */
-  const [isSpeaking, setIsSpeaking] = useState(false);
-
-  const speakQuestion = useCallback((text) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-
-    const speak = () => {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang   = "en-US";
-      u.rate   = 0.9;
-      u.pitch  = 1;
-      u.volume = 1;
-
-      // Pick first English voice available, else use browser default
-      const voices = window.speechSynthesis.getVoices();
-      const eng = voices.find((v) => v.lang.startsWith("en"));
-      if (eng) u.voice = eng;
-
-      u.onstart = () => setIsSpeaking(true);
-      u.onend   = () => setIsSpeaking(false);
-      u.onerror = (e) => { console.error("TTS error", e); setIsSpeaking(false); };
-
-      window.speechSynthesis.speak(u);
-    };
-
-    // If voices already loaded speak immediately, else wait
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      speak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        speak();
-      };
-    }
-  }, []);
-
-  /* ═══════════════ TIMER ═══════════════ */
+  /* ════════════ TIMER ════════════ */
   const startTimer = useCallback((duration) => {
     clearInterval(timerRef.current);
     setTimeLeft(duration);
-    setTimedOut(false);
+    setTimerActive(true);
     timerRef.current = setInterval(() => {
-      setTimeLeft((t) => {
+      setTimeLeft(t => {
         if (t <= 1) {
           clearInterval(timerRef.current);
-          setTimedOut(true);
-          recognitionRef.current?.stop();
-          setListening(false);
+          setTimerActive(false);
           return 0;
         }
         return t - 1;
@@ -1042,27 +757,46 @@ export default function LiveInterview() {
     }, 1000);
   }, []);
 
-  /* ═══════════════ NEW QUESTION SETUP ═══════════════ */
+  // Auto-submit when timer hits 0
   useEffect(() => {
-    // Only start question after permission is granted
-    if (!session || !permissionGranted || questions.length === 0 || answeredAll) return;
+    if (timeLeft === 0 && phase === "answering" && !isSubmitting) {
+      submitAnswer(answerRef.current || "[No answer — time expired]", true);
+    }
+  }, [timeLeft]);
+
+  /* ════════════ START QUESTION ════════════ */
+  useEffect(() => {
+    if (!session || !permissionGranted || !currentQuestion) return;
+    if (phase !== "answering") return;
+
+    answerRef.current = "";
     setAnswerText("");
     setEvaluation(null);
-    setFollowUp(null);
-    setShowFollowUp(false);
     setHint(null);
     setHintUsedThisQ(false);
-    setTimedOut(false);
-    setPhase("answering");
-    speakQuestion(questions[currentQ]);
-    startTimer(session.timerPerQuestion ?? 90);
-  }, [currentQ, session, permissionGranted, questions, answeredAll, speakQuestion, startTimer]);
+    setSilenceCountdown(null);
+    clearTimeout(silenceRef.current);
 
-  /* ═══════════════ SPEECH RECOGNITION ═══════════════ */
-  const startListening = () => {
-    if (timedOut) return;
+    // Speak question then auto-start mic
+    speakText(currentQuestion, () => {
+      startMic();
+    });
+  }, [currentQuestion, session, permissionGranted, phase]);
+
+  /* ════════════ MIC — AUTO START ════════════ */
+  const startMic = useCallback(async () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return alert("Speech recognition not supported. Please use Chrome.");
+    if (!SR) return;
+
+    // Request mic permission here — at interview time, triggered by user interaction (sound check button)
+    // This satisfies browser security requirements
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) {
+      console.warn("Mic permission denied:", e.message);
+    }
+
+    recognitionRef.current?.stop();
 
     const r          = new SR();
     r.lang           = "en-US";
@@ -1070,255 +804,276 @@ export default function LiveInterview() {
     r.interimResults = true;
 
     r.onresult = (e) => {
-      let t = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript;
-      setAnswerText(t);
+      let transcript = "";
+      for (let i = 0; i < e.results.length; i++) {
+        transcript += e.results[i][0].transcript;
+      }
+      answerRef.current = transcript;
+      setAnswerText(transcript);
+
+      // Silence detection — reset 3s countdown on every new word
+      clearTimeout(silenceRef.current);
+      setSilenceCountdown(null);
+
+      // Only auto-submit if they've said something substantial (>5 words)
+      if (transcript.trim().split(" ").length >= 5) {
+        startSilenceDetection();
+      }
     };
-    r.onerror = () => setListening(false);
+
+    r.onerror = (e) => {
+      if (e.error !== "no-speech") setListening(false);
+    };
+
+    r.onend = () => {
+      // Auto restart if still in answering phase
+      if (phase === "answering" && !isSubmitting) {
+        try { r.start(); } catch {}
+      }
+    };
+
     r.start();
     recognitionRef.current = r;
     setListening(true);
-  };
+  }, [phase, isSubmitting]);
 
-  const stopListening = () => {
+  const stopMic = useCallback(() => {
     recognitionRef.current?.stop();
+    recognitionRef.current = null;
     setListening(false);
-  };
+    clearTimeout(silenceRef.current);
+    setSilenceCountdown(null);
+  }, []);
 
-  /* ═══════════════ SUBMIT ANSWER ═══════════════ */
-  const submitAnswer = async (isTimedOut = false) => {
-    const answer = answerText.trim() || (isTimedOut ? "[No answer — time expired]" : "");
-    if (!answer && !isTimedOut) return;
+  /* ════════════ SILENCE DETECTION ════════════ */
+  // After 2.5s of silence, count down 3..2..1 then submit
+  const startSilenceDetection = useCallback(() => {
+    clearTimeout(silenceRef.current);
+    // 2.5s pause → start countdown
+    silenceRef.current = setTimeout(() => {
+      let count = 3;
+      setSilenceCountdown(count);
+      const tick = setInterval(() => {
+        count -= 1;
+        setSilenceCountdown(count);
+        if (count <= 0) {
+          clearInterval(tick);
+          setSilenceCountdown(null);
+          submitAnswer(answerRef.current);
+        }
+      }, 1000);
+    }, 2500);
+  }, []);
 
-    stopListening();
+  /* ════════════ SUBMIT ANSWER ════════════ */
+  const submitAnswer = useCallback(async (answer, timedOut = false) => {
+    if (isSubmitting) return;
+    stopMic();
     clearInterval(timerRef.current);
+    setTimerActive(false);
+    clearTimeout(silenceRef.current);
+    setSilenceCountdown(null);
     setIsSubmitting(true);
+    setPhase("evaluating");
+
+    const finalAnswer = (answer || "").trim() || (timedOut ? "[No answer — time expired]" : "[No answer]");
 
     try {
       const res = await API.post("/live-interview/answer", {
         sessionId,
-        questionIndex: currentQ,
-        question:      questions[currentQ],
-        answer,
-        topic:         session.topic,
-        role:          session.role,
-        difficulty:    currentDiff,
+        question:   questionRef.current || currentQuestion,
+        answer:     finalAnswer,
+        difficulty: currentDiff,
       });
+
       setEvaluation(res.data.evaluation);
-      setFollowUp(res.data.followUp || null);
-      if (res.data.evaluation?.adjustedDifficulty) setCurrentDiff(res.data.evaluation.adjustedDifficulty);
-      setPhase("evaluated");
+
+      if (res.data.evaluation?.adjustedDifficulty) {
+        setCurrentDiff(res.data.evaluation.adjustedDifficulty);
+      }
+
+      window.__nextQuestion    = res.data.nextQuestion;
+      window.__nextQuestionNum = questionNumber + 1;
+
+      // AI speaks a reaction first, then show evaluation card
+      if (res.data.spokenReaction) {
+        speakText(res.data.spokenReaction, () => {
+          if (res.data.isLastQuestion || !res.data.nextQuestion) {
+            setPhase("lastEvaluated");
+          } else {
+            setPhase("evaluated");
+          }
+        });
+      } else {
+        if (res.data.isLastQuestion || !res.data.nextQuestion) {
+          setPhase("lastEvaluated");
+        } else {
+          setPhase("evaluated");
+        }
+      }
     } catch {
-      setEvaluation({ score: 5, feedback: "Could not evaluate — check your connection.", strengths: "Attempted the question", improvement: "Ensure stable internet for AI evaluation", adjustedDifficulty: currentDiff });
+      setEvaluation({
+        score: 5, feedback: "Could not evaluate — check your connection.",
+        strengths: "Attempted the question", improvement: "Ensure stable internet",
+        adjustedDifficulty: currentDiff,
+      });
       setPhase("evaluated");
+      window.__nextQuestion = null;
     } finally {
       setIsSubmitting(false);
     }
+  }, [sessionId, currentQuestion, currentDiff, questionNumber, isSubmitting, stopMic]);
+
+  /* ════════════ NEXT QUESTION ════════════ */
+  const goNextQuestion = () => {
+    const next = window.__nextQuestion;
+    window.__nextQuestion = null;
+    if (!next) { setPhase("finished"); return; }
+    setQuestionNumber(n => n + 1);
+    setPhase("answering");
+    setCurrentQuestion(next);
   };
 
-  /* ═══════════════ GET HINT ═══════════════ */
+  /* ════════════ HINT ════════════ */
   const getHint = async () => {
-    if (hintsLeft <= 0 || hintUsedThisQ) return;
+    if (hintsLeft <= 0 || hintUsedThisQ || isSubmitting) return;
     setHintLoading(true);
     try {
-      const res = await API.post("/live-interview/hint", { sessionId, question: questions[currentQ], topic: session.topic, role: session.role });
+      const res = await API.post("/live-interview/hint", {
+        sessionId, question: currentQuestion,
+        topic: session.topic, role: session.role,
+      });
       setHint(res.data.hint);
       setHintsLeft(res.data.hintsLeft);
       setHintUsedThisQ(true);
     } catch {
       setHint("Think about the core concepts and break the problem into smaller parts.");
-      setHintsLeft((h) => Math.max(0, h - 1));
+      setHintsLeft(h => Math.max(0, h - 1));
       setHintUsedThisQ(true);
     } finally {
       setHintLoading(false);
     }
   };
 
-  /* ═══════════════ NEXT QUESTION ═══════════════ */
-  const nextQuestion = () => {
-    if (currentQ + 1 < questions.length) setCurrentQ((q) => q + 1);
-    else { setAnsweredAll(true); clearInterval(timerRef.current); }
-  };
-
-  /* ═══════════════ USE FOLLOW-UP ═══════════════ */
-  const useFollowUp = () => {
-    if (!followUp) return;
-    setQuestions((prev) => { const next = [...prev]; next.splice(currentQ + 1, 0, followUp); return next; });
-    setShowFollowUp(false);
-    nextQuestion();
-  };
-
-  /* ═══════════════ FINISH ═══════════════ */
+  /* ════════════ FINISH ════════════ */
   const finishInterview = async () => {
     setIsFinishing(true);
+    mediaStreamRef.current?.getTracks().forEach(t => t.stop());
+    window.speechSynthesis?.cancel();
     try {
-      const res = await API.post("/live-interview/finish", { sessionId });
-      setSummary(res.data.summary);
-      mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
-    } catch {
-      setSummary({ avgScore: 0, overallFeedback: "Session complete.", totalQuestions: questions.length, questions: [] });
-    } finally {
-      setIsFinishing(false);
-    }
+      await API.post("/live-interview/finish", { sessionId });
+    } catch {}
+    setIsFinishing(false);
+    navigate(`/mock/live/report/${sessionId}`, {
+      state: { violation, role: session?.role, topic: session?.topic, difficulty: session?.difficulty }
+    });
   };
-
-  /* ═══════════════ TIMER EXPIRED AUTO-SUBMIT ═══════════════ */
-  useEffect(() => {
-    if (timedOut && phase === "answering") submitAnswer(true);
-  }, [timedOut]);
 
   const formatTime = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
   const timerDanger = timeLeft <= 15;
   const timerWarn   = timeLeft <= 30 && !timerDanger;
 
   /* ════════════════════════════════════════════════
-     RENDER: PERMISSION GATE FIRST
-     Interview is completely blocked until allowed
+     RENDERS
   ════════════════════════════════════════════════ */
+
   if (!permissionGranted) {
+    return <PermissionGate onGranted={handlePermissionGranted} onDenied={() => navigate("/mock")} />;
+  }
+
+  /* ── VIOLATION SCREEN ── */
+  if (violation) {
+    const msgs = {
+      camera_off:  { icon: "📷", title: "Camera Turned Off", desc: "You turned off your camera during the interview." },
+      mic_off:     { icon: "🎤", title: "Microphone Turned Off", desc: "You turned off your microphone during the interview." },
+      tab_switch:  { icon: "🖥️", title: "Tab Switch Detected", desc: "You switched away from the interview tab." },
+    };
+    const m = msgs[violation];
     return (
-      <PermissionGate
-        onGranted={handlePermissionGranted}
-        onDenied={() => navigate("/mock")}
-      />
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: "var(--bg-primary)" }}>
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-md">
+          <div className="card p-10 rounded-[2.5rem] text-center border" style={{ borderColor: "rgba(244,63,94,0.4)" }}>
+            <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-5 text-4xl"
+                 style={{ backgroundColor: "rgba(244,63,94,0.1)" }}>{m.icon}</div>
+            <h2 className="text-2xl font-black mb-2" style={{ color: "#f43f5e" }}>Interview Terminated</h2>
+            <p className="text-sm font-medium mb-5" style={{ color: "var(--text-secondary)" }}>{m.desc}</p>
+            <div className="p-4 rounded-2xl mb-6 border text-left space-y-2" style={{ backgroundColor: "rgba(244,63,94,0.05)", borderColor: "rgba(244,63,94,0.2)" }}>
+              <p className="text-xs font-black uppercase tracking-widest" style={{ color: "#f43f5e" }}>⚠️ Violation Recorded</p>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                This attempt has been flagged for <strong style={{ color: "var(--text-primary)" }}>interview integrity violation</strong>.
+                All devices must remain active throughout the interview.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-xs font-bold px-2 py-1 rounded-lg" style={{ backgroundColor: "rgba(244,63,94,0.1)", color: "#f43f5e" }}>
+                  Questions answered: {questionNumber - 1}/{totalQuestions}
+                </span>
+                <span className="text-xs font-bold px-2 py-1 rounded-lg" style={{ backgroundColor: "rgba(244,63,94,0.1)", color: "#f43f5e" }}>
+                  Terminated early
+                </span>
+              </div>
+            </div>
+            <button onClick={finishInterview} disabled={isFinishing}
+              className="w-full py-4 rounded-2xl text-white font-black text-base active:scale-95 mb-3 disabled:opacity-60"
+              style={{ backgroundColor: "#f43f5e" }}>
+              {isFinishing ? <><FiLoader className="animate-spin" size={16} /> Generating Report...</> : "📊 View Interview Report"}
+            </button>
+            <button onClick={() => navigate("/mock")}
+              className="w-full py-3 rounded-2xl font-bold text-sm border hover:bg-white/5"
+              style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
+              Back to Mock Interview
+            </button>
+          </div>
+        </motion.div>
+      </div>
     );
   }
 
-  /* ─────────────── LOADING SESSION ─────────────── */
-  if (!session || questions.length === 0) {
+  if (!session || !currentQuestion) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4"
            style={{ backgroundColor: "var(--bg-primary)" }}>
         <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-black text-xl"
              style={{ backgroundColor: "var(--accent)" }}>AI</div>
         <FiLoader className="w-10 h-10 animate-spin" style={{ color: "var(--accent)" }} />
-        <p className="font-bold text-sm" style={{ color: "var(--text-secondary)" }}>
-          Loading interview session...
-        </p>
+        <p className="font-bold text-sm" style={{ color: "var(--text-secondary)" }}>Preparing your interview...</p>
       </div>
     );
   }
 
-  /* ─────────────── SUMMARY SCREEN ─────────────── */
-  if (summary) {
-    const avg = summary.avgScore;
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6"
-           style={{ backgroundColor: "var(--bg-primary)" }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                    className="max-w-2xl w-full space-y-5">
-          <div className="card p-10 text-center rounded-[2.5rem]">
-            <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 text-white"
-                 style={{ backgroundColor: "var(--accent)" }}>
-              <FiAward size={36} />
-            </div>
-            <h2 className="text-4xl font-black mb-1" style={{ color: "var(--text-primary)" }}>Interview Complete!</h2>
-            <p className="font-medium mb-6" style={{ color: "var(--text-secondary)" }}>
-              {session.role} · {session.topic} · {session.difficulty}
-            </p>
-            <div className="text-8xl font-black tracking-tighter mb-1" style={{ color: scoreColor(avg) }}>
-              {avg}<span className="text-3xl opacity-40">/10</span>
-            </div>
-            <p className="font-black text-lg mb-1" style={{ color: scoreColor(avg) }}>{scoreLabel(avg)}</p>
-            <p className="text-sm mb-2" style={{ color: "var(--text-secondary)" }}>
-              {summary.totalQuestions} questions · {summary.hintsUsed ?? 0} hints used
-            </p>
-            <div className="h-2 rounded-full mx-auto max-w-xs mb-8" style={{ backgroundColor: "var(--border-color)" }}>
-              <div className="h-full rounded-full transition-all duration-1000"
-                   style={{ width: `${avg * 10}%`, backgroundColor: scoreColor(avg) }} />
-            </div>
-            {summary.overallFeedback && (
-              <div className="p-5 rounded-2xl text-left mb-8"
-                   style={{ backgroundColor: "var(--bg-primary)", borderLeft: "4px solid var(--accent)" }}>
-                <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-primary)" }}>
-                  {summary.overallFeedback}
-                </p>
-              </div>
-            )}
-            <div className="flex gap-4">
-              <button onClick={() => navigate("/history")}
-                className="flex-1 py-4 rounded-2xl border font-bold hover:bg-white/5"
-                style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}>
-                View History
-              </button>
-              <button onClick={() => navigate("/mock")}
-                className="flex-1 py-4 rounded-2xl text-white font-bold active:scale-95"
-                style={{ backgroundColor: "var(--accent)" }}>
-                New Interview
-              </button>
-            </div>
-          </div>
 
-          {summary.questions?.length > 0 && (
-            <div className="card rounded-[2rem] overflow-hidden">
-              <div className="p-5 border-b" style={{ borderColor: "var(--border-color)" }}>
-                <h3 className="font-black" style={{ color: "var(--text-primary)" }}>Question Breakdown</h3>
-              </div>
-              <div className="divide-y" style={{ borderColor: "var(--border-color)" }}>
-                {summary.questions.map((q, i) => (
-                  <div key={i} className="p-5">
-                    <div className="flex items-start justify-between gap-4 mb-1">
-                      <p className="font-bold text-sm flex-1" style={{ color: "var(--text-primary)" }}>
-                        Q{i + 1}: {q.question}
-                      </p>
-                      <span className="font-black flex-shrink-0 text-lg" style={{ color: scoreColor(q.aiScore) }}>
-                        {q.aiScore ?? "—"}/10
-                      </span>
-                    </div>
-                    {q.aiFeedback && (
-                      <p className="text-xs leading-relaxed mt-1" style={{ color: "var(--text-secondary)" }}>
-                        {q.aiFeedback}
-                      </p>
-                    )}
-                    {q.hintUsed && (
-                      <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mt-1 inline-block"
-                            style={{ backgroundColor: "rgba(245,158,11,0.1)", color: "#f59e0b" }}>
-                        Hint used
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </div>
-    );
-  }
+  const ds = diffStyle[currentDiff] || diffStyle.Medium;
+  const isEvaluating  = phase === "evaluating";
+  const isEvaluated   = phase === "evaluated" || phase === "lastEvaluated";
+  const isAnswering   = phase === "answering";
+  const isLastEval    = phase === "lastEvaluated";
+  const isFinished    = phase === "finished";
 
-  /* ─────────────── ALL ANSWERED ─────────────── */
-  if (answeredAll) {
+  /* ── FINISHED (last question evaluated) ── */
+  if (isFinished) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6"
-           style={{ backgroundColor: "var(--bg-primary)" }}>
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: "var(--bg-primary)" }}>
         <div className="max-w-md w-full card p-10 text-center rounded-[2.5rem]">
           <FiCheckCircle size={48} className="mx-auto mb-6" style={{ color: "#10b981" }} />
           <h2 className="text-3xl font-black mb-3" style={{ color: "var(--text-primary)" }}>All Done!</h2>
           <p className="font-medium mb-8" style={{ color: "var(--text-secondary)" }}>
-            You answered all {questions.length} questions. Ready for your AI report?
+            You answered all {totalQuestions} questions. Ready for your AI report?
           </p>
           <button onClick={finishInterview} disabled={isFinishing}
-            className="w-full py-5 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 disabled:opacity-60 transition-all active:scale-95"
+            className="w-full py-5 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 disabled:opacity-60 active:scale-95"
             style={{ backgroundColor: "var(--accent)" }}>
-            {isFinishing
-              ? <><FiLoader className="animate-spin" /> Generating AI Report...</>
-              : <><FiAward /> Get Full AI Feedback</>}
+            {isFinishing ? <><FiLoader className="animate-spin" /> Generating Report...</> : <><FiAward /> Get Full AI Feedback</>}
           </button>
         </div>
       </div>
     );
   }
 
-  /* ─────────────── MAIN INTERVIEW ─────────────── */
-  const ds = diffStyle[currentDiff] || diffStyle.Medium;
-
   return (
-    <div className="min-h-screen flex flex-col font-sans"
-         style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
+    <div className="min-h-screen flex flex-col font-sans" style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}>
 
       {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 h-1 z-50" style={{ backgroundColor: "var(--border-color)" }}>
-        <motion.div className="h-full" animate={{ width: `${(currentQ / questions.length) * 100}%` }}
+        <motion.div className="h-full" animate={{ width: `${((questionNumber - 1) / totalQuestions) * 100}%` }}
                     transition={{ duration: 0.5 }} style={{ backgroundColor: "var(--accent)" }} />
       </div>
 
@@ -1330,25 +1085,19 @@ export default function LiveInterview() {
                style={{ backgroundColor: "var(--accent)" }}>AI</div>
           <div>
             <p className="font-black text-sm" style={{ color: "var(--text-primary)" }}>{session.role}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-secondary)" }}>
-              {session.topic}
-            </p>
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-secondary)" }}>{session.topic}</p>
           </div>
           <span className="ml-2 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest border"
-                style={{ backgroundColor: ds.bg, borderColor: ds.border, color: ds.color }}>
-            {currentDiff}
-          </span>
+                style={{ backgroundColor: ds.bg, borderColor: ds.border, color: ds.color }}>{currentDiff}</span>
         </div>
-
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl border text-xs font-black"
                style={{ borderColor: "var(--border-color)", color: hintsLeft > 0 ? "#f59e0b" : "var(--text-secondary)" }}>
-            <FiZap size={12} />
-            {hintsLeft} hint{hintsLeft !== 1 ? "s" : ""}
+            <FiZap size={12} /> {hintsLeft} hint{hintsLeft !== 1 ? "s" : ""}
           </div>
           <span className="text-xs font-black px-3 py-1.5 rounded-full border"
                 style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
-            {currentQ + 1}/{questions.length}
+            {questionNumber}/{totalQuestions}
           </span>
           <button onClick={() => { mediaStreamRef.current?.getTracks().forEach(t => t.stop()); navigate("/mock"); }}
                   className="p-2 rounded-xl hover:bg-white/5" style={{ color: "var(--text-secondary)" }}>
@@ -1359,59 +1108,110 @@ export default function LiveInterview() {
 
       <main className="flex-1 px-6 py-6 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        {/* LEFT COLUMN */}
+        {/* LEFT */}
         <div className="lg:col-span-7 space-y-4">
 
-          {/* Video — always shows since permission was granted */}
-          <div className="relative rounded-[2rem] overflow-hidden border shadow-2xl"
+          {/* Video */}
+          <div className="relative rounded-[2rem] overflow-hidden border shadow-2xl aspect-video"
                style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}>
-            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md">
-              <div className={`w-2 h-2 rounded-full ${listening ? "bg-rose-500 animate-pulse" : "bg-emerald-500"}`} />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white">
-                {listening ? "Recording" : "Ready"}
-              </span>
+
+            <video ref={attachVideo} autoPlay muted playsInline className="w-full h-full object-cover bg-slate-900" />
+
+            {/* Status badge */}
+            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md max-w-[85%]">
+              {isSpeaking ? (
+                <>
+                  <span className="flex gap-0.5 items-end h-4 shrink-0">
+                    {[1,2,3,4].map(i => (
+                      <span key={i} className="w-0.5 rounded-full bg-indigo-400"
+                            style={{ height: `${8 + i * 4}px`, animation: `pulse ${0.4 + i * 0.1}s ease-in-out infinite alternate` }} />
+                    ))}
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300 shrink-0">Alex</span>
+                </>
+              ) : isAnswering && listening ? (
+                <>
+                  <span className="flex gap-0.5 items-end h-4 shrink-0">
+                    {[1,2,3,4,5].map(i => (
+                      <span key={i} className="w-0.5 rounded-full bg-rose-400"
+                            style={{ height: `${6 + i * 3}px`, animation: `pulse ${0.3 + i * 0.08}s ease-in-out infinite alternate` }} />
+                    ))}
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-rose-300 shrink-0">Listening</span>
+                </>
+              ) : isEvaluating ? (
+                <>
+                  <FiLoader size={10} className="animate-spin text-amber-400 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-amber-300 shrink-0">Thinking...</span>
+                </>
+              ) : (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white shrink-0">Ready</span>
+                </>
+              )}
             </div>
 
-            <video ref={videoRef} autoPlay muted playsInline
-                   className="w-full aspect-video object-cover bg-slate-900" />
-
+            {/* Silence countdown overlay */}
             <AnimatePresence>
-              {!listening && phase === "answering" && !timedOut && !isSubmitting && (
+              {silenceCountdown !== null && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
-                  <p className="text-white font-bold text-lg max-w-xs text-center px-6">
-                    Press <span className="text-indigo-300">Start Answer</span> and speak clearly
-                  </p>
+                            className="absolute bottom-4 left-0 right-0 flex justify-center">
+                  <div className="px-4 py-2 rounded-full bg-black/70 backdrop-blur-md flex items-center gap-2">
+                    <span className="text-white font-black text-sm">Submitting in</span>
+                    <span className="text-2xl font-black tabular-nums" style={{ color: "var(--accent)" }}>{silenceCountdown}</span>
+                    <button onClick={() => { clearTimeout(silenceRef.current); setSilenceCountdown(null); }}
+                            className="text-xs text-white/60 hover:text-white ml-1 underline">cancel</button>
+                  </div>
                 </motion.div>
               )}
-              {timedOut && phase === "answering" && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className="absolute inset-0 bg-rose-900/60 backdrop-blur-[2px] flex items-center justify-center">
-                  <p className="text-white font-black text-xl">⏰ Time's Up!</p>
+            </AnimatePresence>
+
+            {/* AI Speaking overlay — shows what Alex is saying */}
+            <AnimatePresence>
+              {isSpeaking && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="absolute inset-x-0 bottom-0 p-4"
+                            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)" }}>
+                  <div className="flex items-start gap-2">
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0 mt-0.5"
+                         style={{ backgroundColor: "var(--accent)" }}>A</div>
+                    <p className="text-white/90 text-sm font-medium leading-relaxed line-clamp-3">{aiSpeechText}</p>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Transcript */}
-          <div className="card p-5 min-h-[90px]">
+          {/* Live transcript */}
+          <div className="card p-5 min-h-[100px] relative">
             <div className="flex items-center gap-2 mb-2" style={{ color: "var(--text-secondary)" }}>
               <FiMessageSquare size={13} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Live Transcript</span>
-              {listening && (
+              <span className="text-[10px] font-black uppercase tracking-widest">Your Answer</span>
+              {isAnswering && listening && (
                 <span className="ml-auto flex items-center gap-1 text-rose-400 text-[10px] font-black">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-                  Recording
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" /> Live
+                </span>
+              )}
+              {isAnswering && !listening && !isSpeaking && !isSubmitting && (
+                <span className="ml-auto text-[10px] font-bold" style={{ color: "var(--text-secondary)" }}>
+                  Mic starts after AI speaks
                 </span>
               )}
             </div>
             <p className={`text-base font-medium leading-relaxed ${!answerText ? "opacity-20" : ""}`}
                style={{ color: "var(--text-primary)" }}>
-              {answerText || "Your speech will appear here in real-time..."}
+              {answerText || "Your speech will appear here automatically..."}
             </p>
+            {/* Word count */}
+            {answerText && (
+              <span className="absolute bottom-3 right-4 text-[10px] font-bold" style={{ color: "var(--text-secondary)" }}>
+                {answerText.trim().split(/\s+/).length} words
+              </span>
+            )}
           </div>
 
-          {/* Hint card */}
+          {/* Hint */}
           <AnimatePresence>
             {hint && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -1426,7 +1226,7 @@ export default function LiveInterview() {
             )}
           </AnimatePresence>
 
-          {/* AI Evaluation */}
+          {/* AI Evaluation card */}
           <AnimatePresence>
             {evaluation && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -1435,69 +1235,52 @@ export default function LiveInterview() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <FiTrendingUp size={15} style={{ color: "var(--accent)" }} />
-                    <span className="font-black text-sm uppercase tracking-widest" style={{ color: "var(--text-primary)" }}>
-                      AI Evaluation
-                    </span>
+                    <span className="font-black text-sm uppercase tracking-widest" style={{ color: "var(--text-primary)" }}>AI Evaluation</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-4xl font-black" style={{ color: scoreColor(evaluation.score) }}>
-                      {evaluation.score}
-                    </span>
+                    <span className="text-4xl font-black" style={{ color: scoreColor(evaluation.score) }}>{evaluation.score}</span>
                     <span className="text-sm" style={{ color: "var(--text-secondary)" }}>/10</span>
                   </div>
                 </div>
                 <div className="h-2 rounded-full mb-4" style={{ backgroundColor: "var(--border-color)" }}>
-                  <motion.div className="h-full rounded-full"
-                    initial={{ width: 0 }} animate={{ width: `${evaluation.score * 10}%` }}
-                    transition={{ duration: 0.8 }}
+                  <motion.div className="h-full rounded-full" initial={{ width: 0 }}
+                    animate={{ width: `${evaluation.score * 10}%` }} transition={{ duration: 0.8 }}
                     style={{ backgroundColor: scoreColor(evaluation.score) }} />
                 </div>
-                <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--text-primary)" }}>
-                  {evaluation.feedback}
-                </p>
-                <div className="grid grid-cols-2 gap-3 mb-3">
-                  <div className="p-3 rounded-xl"
-                       style={{ backgroundColor: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}>
+                <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--text-primary)" }}>{evaluation.feedback}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl" style={{ backgroundColor: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}>
                     <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">✓ Strength</p>
                     <p className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>{evaluation.strengths}</p>
                   </div>
-                  <div className="p-3 rounded-xl"
-                       style={{ backgroundColor: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
+                  <div className="p-3 rounded-xl" style={{ backgroundColor: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
                     <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">↑ Improve</p>
                     <p className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>{evaluation.improvement}</p>
                   </div>
                 </div>
-                {evaluation.adjustedDifficulty !== session.difficulty && (
-                  <div className="flex items-center gap-2 text-xs font-bold"
-                       style={{ color: evaluation.score >= 8 ? "#10b981" : "#f43f5e" }}>
-                    {evaluation.score >= 8
-                      ? <><FiTrendingUp size={12} /> Difficulty increased to {evaluation.adjustedDifficulty}</>
-                      : <><FiTrendingDown size={12} /> Difficulty adjusted to {evaluation.adjustedDifficulty}</>}
-                  </div>
-                )}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* RIGHT COLUMN */}
+        {/* RIGHT */}
         <div className="lg:col-span-5 flex flex-col gap-4">
 
-          {/* Timer */}
-          <div className={`card p-4 flex items-center justify-between rounded-2xl border transition-all ${timerDanger ? "animate-pulse" : ""}`}
-               style={{
-                 borderColor: timerDanger ? "rgba(244,63,94,0.4)" : timerWarn ? "rgba(245,158,11,0.3)" : "var(--border-color)",
-                 backgroundColor: timerDanger ? "rgba(244,63,94,0.05)" : "var(--bg-card)",
-               }}>
-            <div className="flex items-center gap-2"
-                 style={{ color: timerDanger ? "#f43f5e" : timerWarn ? "#f59e0b" : "var(--text-secondary)" }}>
+          {/* AI Status Card — replaces timer for natural flow */}
+          <div className="card p-4 flex items-center justify-between rounded-2xl border"
+               style={{ borderColor: isSpeaking ? "rgba(99,102,241,0.4)" : isAnswering && listening ? "rgba(244,63,94,0.3)" : "var(--border-color)" }}>
+            <div className="flex items-center gap-2" style={{ color: isSpeaking ? "var(--accent)" : isAnswering && listening ? "#f43f5e" : "var(--text-secondary)" }}>
               <FiClock size={16} />
-              <span className="text-xs font-black uppercase tracking-widest">Time Left</span>
+              <span className="text-xs font-black uppercase tracking-widest">
+                {isSpeaking ? "Alex is speaking" : isAnswering && listening ? "Your turn" : phase === "evaluating" ? "Thinking..." : "Ready"}
+              </span>
             </div>
-            <span className="text-3xl font-black tabular-nums"
-                  style={{ color: timerDanger ? "#f43f5e" : timerWarn ? "#f59e0b" : "var(--text-primary)" }}>
-              {formatTime(timeLeft)}
-            </span>
+            {/* Show subtle timer only in danger zone */}
+            {timerDanger && timerActive && (
+              <span className="text-2xl font-black tabular-nums animate-pulse" style={{ color: "#f43f5e" }}>
+                {formatTime(timeLeft)}
+              </span>
+            )}
           </div>
 
           {/* Question card */}
@@ -1507,16 +1290,13 @@ export default function LiveInterview() {
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-4">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--accent)" }}>
-                  Question {currentQ + 1} of {questions.length}
+                  Question {questionNumber} of {totalQuestions}
                 </p>
                 <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase border"
-                      style={{ backgroundColor: ds.bg, borderColor: ds.border, color: ds.color }}>
-                  {currentDiff}
-                </span>
+                      style={{ backgroundColor: ds.bg, borderColor: ds.border, color: ds.color }}>{currentDiff}</span>
               </div>
-              <h3 className="text-xl font-black leading-snug tracking-tight mb-6"
-                  style={{ color: "var(--text-primary)" }}>
-                {questions[currentQ]}
+              <h3 className="text-xl font-black leading-snug tracking-tight mb-6" style={{ color: "var(--text-primary)" }}>
+                {currentQuestion}
               </h3>
               <div className="h-1 w-12 rounded-full" style={{ backgroundColor: "var(--accent)" }} />
             </div>
@@ -1524,32 +1304,37 @@ export default function LiveInterview() {
 
           {/* Controls */}
           <div className="space-y-3">
-            {phase === "answering" && !timedOut && (
+
+            {/* ANSWERING phase — mic is automatic, show status + hint */}
+            {isAnswering && (
               <>
-                {!listening ? (
-                  <button onClick={startListening}
-                    className="w-full py-4 rounded-2xl flex items-center justify-center gap-3 text-white font-black transition-all active:scale-[0.98] shadow-xl"
-                    style={{ backgroundColor: "var(--accent)" }}>
-                    <FiMic size={20} /> Start Answer
-                  </button>
-                ) : (
-                  <button onClick={stopListening}
-                    className="w-full py-4 rounded-2xl flex items-center justify-center gap-3 bg-rose-600 hover:bg-rose-500 text-white font-black transition-all active:scale-[0.98]">
-                    <FiMicOff size={20} /> Stop Recording
+                {/* Mic status — informational, no button needed */}
+                <div className={`w-full py-4 rounded-2xl flex items-center justify-center gap-3 font-black text-sm border transition-all`}
+                     style={{
+                       borderColor: isSpeaking ? "rgba(99,102,241,0.3)" : listening ? "rgba(244,63,94,0.3)" : "var(--border-color)",
+                       backgroundColor: isSpeaking ? "rgba(99,102,241,0.05)" : listening ? "rgba(244,63,94,0.05)" : "var(--bg-card)",
+                       color: isSpeaking ? "var(--accent)" : listening ? "#f43f5e" : "var(--text-secondary)",
+                     }}>
+                  {isSpeaking ? (
+                    <><FiLoader className="animate-spin" size={16} /> AI is reading the question...</>
+                  ) : listening ? (
+                    <><span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" /> Mic is ON — speak your answer</>
+                  ) : (
+                    <><FiMic size={16} /> Mic starts after AI finishes speaking</>
+                  )}
+                </div>
+
+                {/* Manual submit if they want to finish early */}
+                {answerText.trim().split(/\s+/).length >= 5 && listening && (
+                  <button onClick={() => submitAnswer(answerRef.current)}
+                    className="w-full py-3 rounded-2xl font-black text-sm border transition-all active:scale-95 flex items-center justify-center gap-2"
+                    style={{ backgroundColor: "rgba(16,185,129,0.08)", borderColor: "rgba(16,185,129,0.3)", color: "#10b981" }}>
+                    <FiCheckCircle size={15} /> Done Answering
                   </button>
                 )}
 
-                {answerText && !listening && (
-                  <button onClick={() => submitAnswer(false)} disabled={isSubmitting}
-                    className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-sm uppercase tracking-widest border transition-all disabled:opacity-60"
-                    style={{ backgroundColor: "rgba(16,185,129,0.1)", borderColor: "rgba(16,185,129,0.3)", color: "#10b981" }}>
-                    {isSubmitting
-                      ? <><FiLoader className="animate-spin" /> Evaluating...</>
-                      : <><FiCheckCircle /> Submit for AI Review</>}
-                  </button>
-                )}
-
-                {!hintUsedThisQ && hintsLeft > 0 && (
+                {/* Hint */}
+                {!hintUsedThisQ && hintsLeft > 0 && !isSpeaking && (
                   <button onClick={getHint} disabled={hintLoading}
                     className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-black text-sm border transition-all disabled:opacity-60"
                     style={{ borderColor: "rgba(245,158,11,0.3)", color: "#f59e0b", backgroundColor: "rgba(245,158,11,0.05)" }}>
@@ -1561,67 +1346,52 @@ export default function LiveInterview() {
               </>
             )}
 
-            {phase === "evaluated" && (
+            {/* EVALUATING */}
+            {isEvaluating && (
+              <div className="w-full py-4 rounded-2xl flex items-center justify-center gap-3 font-black text-sm border"
+                   style={{ borderColor: "rgba(99,102,241,0.3)", backgroundColor: "rgba(99,102,241,0.05)", color: "var(--accent)" }}>
+                <FiLoader className="animate-spin" size={16} /> AI is evaluating your answer...
+              </div>
+            )}
+
+            {/* EVALUATED — show next question button */}
+            {isEvaluated && (
               <>
-                {followUp && !showFollowUp && (
-                  <button onClick={() => setShowFollowUp(true)}
-                    className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm border transition-all"
-                    style={{ borderColor: "rgba(129,140,248,0.3)", color: "var(--accent)", backgroundColor: "rgba(99,102,241,0.05)" }}>
-                    <FiZap size={14} /> Add AI Follow-up Question
+                {isLastEval ? (
+                  <button onClick={() => setPhase("finished")}
+                    className="w-full py-4 rounded-2xl text-white font-black flex items-center justify-center gap-3 active:scale-95 shadow-xl"
+                    style={{ backgroundColor: "var(--accent)" }}>
+                    <FiAward size={20} /> Finish Interview
+                  </button>
+                ) : (
+                  <button onClick={goNextQuestion}
+                    className="w-full py-4 rounded-2xl text-white font-black flex items-center justify-center gap-3 active:scale-95 shadow-xl"
+                    style={{ backgroundColor: "var(--accent)" }}>
+                    <FiArrowRight size={20} /> Next Question
                   </button>
                 )}
-
-                {showFollowUp && followUp && (
-                  <div className="card p-4 rounded-2xl border"
-                       style={{ borderColor: "rgba(129,140,248,0.3)", backgroundColor: "rgba(99,102,241,0.05)" }}>
-                    <p className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: "var(--accent)" }}>
-                      Follow-up Question
-                    </p>
-                    <p className="text-sm font-medium mb-3" style={{ color: "var(--text-primary)" }}>{followUp}</p>
-                    <div className="flex gap-2">
-                      <button onClick={useFollowUp}
-                        className="flex-1 py-2 rounded-xl text-white font-bold text-xs"
-                        style={{ backgroundColor: "var(--accent)" }}>
-                        Add to Interview
-                      </button>
-                      <button onClick={() => setShowFollowUp(false)}
-                        className="py-2 px-4 rounded-xl font-bold text-xs border"
-                        style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}>
-                        Skip
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <button onClick={nextQuestion}
-                  className="w-full py-4 rounded-2xl flex items-center justify-center gap-3 text-white font-black transition-all active:scale-[0.98] shadow-xl"
-                  style={{ backgroundColor: "var(--accent)" }}>
-                  {currentQ + 1 < questions.length
-                    ? <><FiArrowRight size={20} /> Next Question</>
-                    : <><FiAward size={20} /> Finish Interview</>}
-                </button>
               </>
             )}
           </div>
 
-          {/* Replay + tip row */}
-          <div className="flex items-center justify-between gap-3">
-            <button
-              onClick={() => speakQuestion(questions[currentQ])}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-black transition-all hover:bg-white/5 active:scale-95"
-              style={{ borderColor: "var(--border-color)", color: isSpeaking ? "var(--accent)" : "var(--text-secondary)" }}
-              title="Replay question">
-              {isSpeaking
-                ? <><span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse inline-block" /> Speaking...</>
-                : <>🔊 Replay</>}
-            </button>
-            <p className="text-[10px] font-bold uppercase tracking-tight text-right flex-1"
-               style={{ color: "var(--text-secondary)" }}>
-              💡 {evaluation ? "Review feedback then continue" : "Speak clearly · Be specific"}
-            </p>
-          </div>
+          {/* Tip */}
+          <p className="text-[10px] font-bold uppercase tracking-tight text-center px-4" style={{ color: "var(--text-secondary)" }}>
+            {phase === "intro"     ? "🤝 Alex is introducing the interview" :
+             isSpeaking            ? "🎧 Listen carefully" :
+             isAnswering && listening ? "🎙️ Speak naturally · Pause to submit" :
+             isEvaluating          ? "⏳ Alex is reviewing your answer" :
+             isEvaluated           ? "💡 Review feedback then continue" :
+             "✨ Preparing next question"}
+          </p>
         </div>
       </main>
+
+      <style>{`
+        @keyframes pulse {
+          from { transform: scaleY(0.4); }
+          to   { transform: scaleY(1.2); }
+        }
+      `}</style>
     </div>
   );
 }

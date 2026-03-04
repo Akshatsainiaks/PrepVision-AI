@@ -2433,7 +2433,7 @@ export default function Profile() {
   const fileInputRef = useRef(null);
   const avatarMenuRef = useRef(null);
   const hasFetched = useRef(false);
-  const isUploading = useRef(false); // ✅ guards double upload trigger
+  const isUploading = useRef(false);
 
   useEffect(() => {
     if (hasFetched.current) return;
@@ -2457,13 +2457,22 @@ export default function Profile() {
         setShowAvatarMenu(false);
       }
     };
-    if (showAvatarMenu) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    if (showAvatarMenu)
+      document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [showAvatarMenu]);
 
   if (!profile) return <ProfileSkeleton />;
 
-  // ✅ Fixed: guard double call + explicit multipart header
+  // ✅ Proper Case Name
+  const formattedName =
+    profile.name
+      ?.toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ") || "User";
+
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) return;
@@ -2476,7 +2485,7 @@ export default function Profile() {
     try {
       setUploading(true);
       const res = await API.post("/users/avatar", formData, {
-        headers: { "Content-Type": "multipart/form-data" }, // ✅ fix "no file uploaded"
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       setProfile((prev) => ({ ...prev, avatar: res.data.avatar }));
@@ -2490,7 +2499,6 @@ export default function Profile() {
     }
   };
 
-  // ✅ NEW: Remove avatar
   const handleRemoveAvatar = async () => {
     if (!profile.avatar) return;
     setShowAvatarMenu(false);
@@ -2538,8 +2546,6 @@ export default function Profile() {
         >
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative" ref={avatarMenuRef}>
-
-              {/* AVATAR CIRCLE */}
               <div
                 onClick={() => setShowAvatarMenu((p) => !p)}
                 className="group relative w-32 h-32 rounded-full overflow-hidden
@@ -2554,7 +2560,7 @@ export default function Profile() {
                   <img src={profile.avatar} alt="avatar" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-4xl font-black text-[var(--text-secondary)]">
-                    {profile.name?.charAt(0)}
+                    {formattedName.charAt(0)}
                   </span>
                 )}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
@@ -2562,13 +2568,11 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* DROPDOWN MENU */}
               {showAvatarMenu && (
                 <div
                   className="absolute left-1/2 -translate-x-1/2 mt-4 w-52 rounded-2xl shadow-2xl z-50 p-2 border border-[var(--border-color)]"
                   style={{ backgroundColor: "var(--bg-card)" }}
                 >
-                  {/* View — only if avatar exists */}
                   {profile.avatar && (
                     <button
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
@@ -2578,7 +2582,6 @@ export default function Profile() {
                     </button>
                   )}
 
-                  {/* Upload / Change */}
                   <button
                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-white/5"
                     onClick={() => { fileInputRef.current?.click(); setShowAvatarMenu(false); }}
@@ -2587,7 +2590,6 @@ export default function Profile() {
                     {profile.avatar ? "Change Avatar" : "Upload Avatar"}
                   </button>
 
-                  {/* Remove — only if avatar exists */}
                   {profile.avatar && (
                     <button
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl hover:bg-rose-500/10 text-rose-400"
@@ -2608,12 +2610,10 @@ export default function Profile() {
               />
             </div>
 
-            {/* USER INFO */}
             <div className="text-center md:text-left">
-              <h3 className="text-3xl font-black tracking-tight">{profile.name}</h3>
+              <h3 className="text-3xl font-black tracking-tight">{formattedName}</h3>
               <p className="font-medium text-lg text-[var(--text-secondary)]">@{profile.username}</p>
 
-              {/* ✅ Followers / Following */}
               <div className="flex justify-center md:justify-start gap-8 mt-5">
                 <div className="flex flex-col">
                   <span className="text-2xl font-black">{profile.followersCount ?? 0}</span>
@@ -2636,7 +2636,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* ACTIONS GRID */}
+        {/* ACTION CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <ActionCard title="Account Security" desc="Update your password and login methods" link="/settings" icon={<FiSettings className="text-blue-400" />} />
           <ActionCard title="Credit Wallet" desc="View token history and balance" link="/credit-history" icon={<FiCreditCard className="text-indigo-400" />} />
@@ -2673,7 +2673,7 @@ export default function Profile() {
               <img src={profile.avatar} alt="preview" className="w-80 h-80 object-cover rounded-2xl" />
             ) : (
               <div className="w-80 h-80 flex items-center justify-center bg-gray-800 rounded-2xl text-white text-5xl font-bold">
-                {profile.name?.charAt(0)}
+                {formattedName.charAt(0)}
               </div>
             )}
           </div>

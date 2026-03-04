@@ -430,133 +430,241 @@
 // }
 
 //dark mode
-import { useEffect, useState } from "react";
-import { X, ArrowRight } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
-import React from "react";
+// import { useEffect, useState } from "react";
+// import { X, ArrowRight } from "lucide-react";
+// import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
+// import React from "react";
 
-const announcements = [
-  {
-    tag: "Content",
-    text: "New questions added! Explore fresh DSA & System Design problems.",
-    link: "/questions",
-    color: "var(--accent)", 
-    glow: "rgba(99, 102, 241, 0.15)"
-  },
-  {
-    tag: "Streak",
-    text: "Don’t break your streak! Practice today & earn more credits.",
-    link: "/mock",
-    color: "#f59e0b", 
-    glow: "rgba(245, 158, 11, 0.15)"
-  },
-  {
-    tag: "Update",
-    text: "AI Voice Practice improved — get clearer feedback now.",
-    link: "/mock",
-    color: "#10b981", 
-    glow: "rgba(16, 185, 129, 0.15)"
-  },
-];
+// const announcements = [
+//   {
+//     tag: "Content",
+//     text: "New questions added! Explore fresh DSA & System Design problems.",
+//     link: "/questions",
+//     color: "var(--accent)", 
+//     glow: "rgba(99, 102, 241, 0.15)"
+//   },
+//   {
+//     tag: "Streak",
+//     text: "Don’t break your streak! Practice today & earn more credits.",
+//     link: "/mock",
+//     color: "#f59e0b", 
+//     glow: "rgba(245, 158, 11, 0.15)"
+//   },
+//   {
+//     tag: "Update",
+//     text: "AI Voice Practice improved — get clearer feedback now.",
+//     link: "/mock",
+//     color: "#10b981", 
+//     glow: "rgba(16, 185, 129, 0.15)"
+//   },
+// ];
+
+// export default function AnnouncementBar() {
+//   const navigate = useNavigate();
+//   const location = useLocation(); // Hook to listen for URL changes
+  
+//   const [visible, setVisible] = useState(
+//     () => sessionStorage.getItem("announcement_closed") !== "true"
+//   );
+  
+//   const [index, setIndex] = useState(0);
+//   const [fade, setFade] = useState(true);
+
+//   // EFFECT 1: Re-check visibility whenever the user navigates
+//   useEffect(() => {
+//     const isClosed = sessionStorage.getItem("announcement_closed") === "true";
+//     setVisible(!isClosed);
+//   }, [location]); // Re-run this check every time the URL changes
+
+//   // EFFECT 2: Handle the rotation animation
+//   useEffect(() => {
+//     if (!visible) return;
+
+//     const timer = setInterval(() => {
+//       setFade(false);
+//       setTimeout(() => {
+//         setIndex((prev) => (prev + 1) % announcements.length);
+//         setFade(true);
+//       }, 500); 
+//     }, 5000);
+
+//     return () => clearInterval(timer);
+//   }, [visible]);
+
+//   if (!visible) return null;
+
+//   const current = announcements[index];
+
+//   return (
+//     <div className="sticky top-[72px] z-30 mx-6 mt-4 group animate-fadeIn">
+//       <div 
+//         className="relative overflow-hidden rounded-2xl border transition-all duration-700 shadow-2xl px-5 py-2.5"
+//         style={{ 
+//           backgroundColor: "var(--bg-card)", 
+//           borderColor: "var(--border-color)",
+//           boxShadow: `0 10px 30px -10px ${current.glow}` 
+//         }}
+//       >
+//         <div 
+//           className="absolute inset-0 opacity-10 transition-all duration-700" 
+//           style={{ background: `linear-gradient(90deg, ${current.color}, transparent 40%)` }}
+//         />
+
+//         <div className="relative flex items-center justify-between gap-4">
+//           <div className="flex items-center gap-5 flex-1 overflow-hidden">
+//             <div 
+//               className="flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all"
+//               style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}
+//             >
+//               <span className="relative flex h-1.5 w-1.5">
+//                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: current.color }}></span>
+//                 <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ backgroundColor: current.color }}></span>
+//               </span>
+//               <span className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-secondary)" }}>Live</span>
+//             </div>
+
+//             <button
+//               onClick={() => navigate(current.link)}
+//               className={`flex items-center gap-3 text-sm transition-all duration-500 transform ${
+//                 fade ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
+//               }`}
+//             >
+//               <span 
+//                 className="font-black text-[10px] uppercase tracking-[0.2em] px-2 py-0.5 rounded-md border"
+//                 style={{ 
+//                   backgroundColor: current.glow, 
+//                   color: current.color, 
+//                   borderColor: `${current.color}20` 
+//                 }}
+//               >
+//                 {current.tag}
+//               </span>
+//               <span className="truncate font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+//                 {current.text}
+//               </span>
+//               <ArrowRight size={14} className="shrink-0 transition-all group-hover:translate-x-1" style={{ color: current.color }} />
+//             </button>
+//           </div>
+
+//           <button
+//             onClick={() => {
+//               sessionStorage.setItem("announcement_closed", "true");
+//               setVisible(false);
+//             }}
+//             className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+//             style={{ color: "var(--text-secondary)" }}
+//             aria-label="Close"
+//           >
+//             <X size={16} />
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+//before is final and change in layout.jsx
+import { useEffect, useState } from "react";
+import { X, ArrowRight, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import React from "react";
 
 export default function AnnouncementBar() {
   const navigate = useNavigate();
-  const location = useLocation(); // Hook to listen for URL changes
-  
-  const [visible, setVisible] = useState(
-    () => sessionStorage.getItem("announcement_closed") !== "true"
-  );
-  
-  const [index, setIndex] = useState(0);
-  const [fade, setFade] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const [animate, setAnimate] = useState(false);
 
-  // EFFECT 1: Re-check visibility whenever the user navigates
+  // Show once per login session
   useEffect(() => {
-    const isClosed = sessionStorage.getItem("announcement_closed") === "true";
-    setVisible(!isClosed);
-  }, [location]); // Re-run this check every time the URL changes
-
-  // EFFECT 2: Handle the rotation animation
-  useEffect(() => {
-    if (!visible) return;
-
-    const timer = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setIndex((prev) => (prev + 1) % announcements.length);
-        setFade(true);
-      }, 500); 
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, [visible]);
+    const isClosed = sessionStorage.getItem("announcement_closed");
+    if (isClosed !== "true") {
+      setVisible(true);
+      setTimeout(() => setAnimate(true), 50);
+    }
+  }, []);
 
   if (!visible) return null;
 
-  const current = announcements[index];
+  const closeAnnouncement = () => {
+    sessionStorage.setItem("announcement_closed", "true");
+    setVisible(false);
+  };
 
   return (
-    <div className="sticky top-[72px] z-30 mx-6 mt-4 group animate-fadeIn">
-      <div 
-        className="relative overflow-hidden rounded-2xl border transition-all duration-700 shadow-2xl px-5 py-2.5"
-        style={{ 
-          backgroundColor: "var(--bg-card)", 
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md transition-opacity duration-500">
+      
+      <div
+        className={`relative w-[92%] max-w-3xl rounded-3xl border p-12 shadow-2xl transition-all duration-500 ${
+          animate ? "opacity-100 scale-100" : "opacity-0 scale-95"
+        }`}
+        style={{
+          background: "linear-gradient(145deg, var(--bg-card), #111827)",
           borderColor: "var(--border-color)",
-          boxShadow: `0 10px 30px -10px ${current.glow}` 
         }}
       >
-        <div 
-          className="absolute inset-0 opacity-10 transition-all duration-700" 
-          style={{ background: `linear-gradient(90deg, ${current.color}, transparent 40%)` }}
-        />
+        {/* Close Button */}
+        <button
+          onClick={closeAnnouncement}
+          className="absolute top-6 right-6 text-[var(--text-secondary)] hover:text-white transition"
+        >
+          <X size={24} />
+        </button>
 
-        <div className="relative flex items-center justify-between gap-4">
-          <div className="flex items-center gap-5 flex-1 overflow-hidden">
-            <div 
-              className="flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all"
-              style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-color)" }}
-            >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: current.color }}></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ backgroundColor: current.color }}></span>
-              </span>
-              <span className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-secondary)" }}>Live</span>
+        {/* Content */}
+        <div className="text-center space-y-8">
+          
+          {/* Icon */}
+          <div className="flex justify-center">
+            <div className="p-4 rounded-full bg-indigo-600/20 animate-pulse">
+              <Sparkles size={36} className="text-indigo-400" />
             </div>
-
-            <button
-              onClick={() => navigate(current.link)}
-              className={`flex items-center gap-3 text-sm transition-all duration-500 transform ${
-                fade ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
-              }`}
-            >
-              <span 
-                className="font-black text-[10px] uppercase tracking-[0.2em] px-2 py-0.5 rounded-md border"
-                style={{ 
-                  backgroundColor: current.glow, 
-                  color: current.color, 
-                  borderColor: `${current.color}20` 
-                }}
-              >
-                {current.tag}
-              </span>
-              <span className="truncate font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
-                {current.text}
-              </span>
-              <ArrowRight size={14} className="shrink-0 transition-all group-hover:translate-x-1" style={{ color: current.color }} />
-            </button>
           </div>
 
-          <button
-            onClick={() => {
-              sessionStorage.setItem("announcement_closed", "true");
-              setVisible(false);
-            }}
-            className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
-            style={{ color: "var(--text-secondary)" }}
-            aria-label="Close"
-          >
-            <X size={16} />
-          </button>
+          {/* Title */}
+          <h2 className="text-4xl font-bold text-[var(--text-primary)]">
+            🚀 What’s New in PrepVisionAI
+          </h2>
+
+          {/* Description */}
+          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
+            We’ve added new DSA & System Design questions, improved AI Voice Practice,
+            and enhanced your daily streak rewards. Stay consistent and level up faster.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            
+            <button
+              onClick={() => {
+                closeAnnouncement();
+                navigate("/questions");
+              }}
+              className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center justify-center gap-2 transition"
+            >
+              Explore Questions <ArrowRight size={16} />
+            </button>
+
+            <button
+              onClick={() => {
+                closeAnnouncement();
+                navigate("/mock");
+              }}
+              className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-semibold flex items-center justify-center gap-2 transition"
+            >
+              Continue Streak 🔥 <ArrowRight size={16} />
+            </button>
+
+            <button
+              onClick={() => {
+                closeAnnouncement();
+                navigate("/mock");
+              }}
+              className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold flex items-center justify-center gap-2 transition"
+            >
+              Try AI Voice <ArrowRight size={16} />
+            </button>
+
+          </div>
         </div>
       </div>
     </div>
