@@ -461,6 +461,96 @@
 // }
 
 //new
+// import React, { createContext, useState, useEffect, useRef } from "react";
+// import { useNavigate } from "react-router-dom";
+// import API from "../api/api";
+// import { tokenStore } from "../api/tokenStore";
+
+// export const AuthContext = createContext();
+
+// export function AuthProvider({ children }) {
+//   const [user, setUser]           = useState(null);
+//   const [loading, setLoading]     = useState(true);
+//   const [isServerOff, setIsServerOff] = useState(false);
+
+//   const navigate    = useNavigate();
+//   const hasLoaded   = useRef(false);
+
+//   const checkServer = async () => {
+//     try {
+//       const base = (import.meta.env.VITE_API_URL || "http://localhost:4000/api").replace("/api", "");
+//       const res = await fetch(`${base}/health`);
+//       return res.ok;
+//     } catch { return false; }
+//   };
+
+//   const loadUser = async () => {
+//     try {
+//       const alive = await checkServer();
+//       if (!alive) { setIsServerOff(true); return; }
+//       setIsServerOff(false);
+
+//       const token = tokenStore.get();
+//       if (!token) return;
+
+//       const res = await API.get("/auth/checkuser");
+//       if (res?.data?.user) {
+//         setUser(res.data.user);
+//       }
+//     } catch (err) {
+//       if (!err.response) setIsServerOff(true);
+//     }
+//   };
+
+//   // On mount — restore session from sessionStorage or localStorage
+//   useEffect(() => {
+//     if (hasLoaded.current) return;
+//     hasLoaded.current = true;
+
+//     const init = async () => {
+//       setLoading(true);
+//       const saved = sessionStorage.getItem("_at") || localStorage.getItem("token");
+//       if (saved) {
+//         tokenStore.set(saved);
+//         await loadUser();
+//       }
+//       setLoading(false);
+//     };
+
+//     init();
+//   }, []);
+
+//   useEffect(() => {
+//     const handleOffline = () => setIsServerOff(true);
+//     window.addEventListener("server-offline", handleOffline);
+//     return () => window.removeEventListener("server-offline", handleOffline);
+//   }, []);
+
+//   const logout = () => {
+//     tokenStore.clear();
+//     try { sessionStorage.removeItem("_at"); } catch {}
+//     try { localStorage.removeItem("token"); } catch {}
+//     try { sessionStorage.removeItem("announcement_closed"); } catch {}
+//     setUser(null);
+//     navigate("/");
+//   };
+
+//   const loginAndLoad = async (token, userFromResponse = null) => {
+//     tokenStore.set(token);
+//     try { sessionStorage.setItem("_at", token); } catch {}
+//     try { localStorage.setItem("token", token); } catch {}
+
+//     if (userFromResponse) setUser(userFromResponse);
+//     await loadUser();
+//   };
+
+//   return (
+//     <AuthContext.Provider value={{ user, setUser, logout, loadUser, loginAndLoad, loading, isServerOff }}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// }
+
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
@@ -469,55 +559,75 @@ import { tokenStore } from "../api/tokenStore";
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser]           = useState(null);
-  const [loading, setLoading]     = useState(true);
+  const [user, setUser]               = useState(null);
+  const [loading, setLoading]         = useState(true);
   const [isServerOff, setIsServerOff] = useState(false);
 
-  const navigate    = useNavigate();
-  const hasLoaded   = useRef(false);
+  const navigate  = useNavigate();
+  const hasLoaded = useRef(false);
 
   const checkServer = async () => {
     try {
       const base = (import.meta.env.VITE_API_URL || "http://localhost:4000/api").replace("/api", "");
-      const res = await fetch(`${base}/health`);
-      return res.ok;
-    } catch { return false; }
-  };
-
-  const loadUser = async () => {
-    try {
-      const alive = await checkServer();
-      if (!alive) { setIsServerOff(true); return; }
-      setIsServerOff(false);
-
-      const token = tokenStore.get();
-      if (!token) return;
-
-      const res = await API.get("/auth/checkuser");
-      if (res?.data?.user) {
-        setUser(res.data.user);
-      }
-    } catch (err) {
-      if (!err.response) setIsServerOff(true);
+      const res = await fetch(`${base}/health`, { method: "GET" });
+      // 304 is also a valid "alive" response — treat anything < 500 as alive
+      return res.status < 500;
+    } catch {
+      return false;
     }
   };
 
-  // On mount — restore session from sessionStorage or localStorage
+  // loadUser is safe to call only when a token is already in the store
+  const loadUser = async () => {
+    const token = tokenStore.get();
+    if (!token) return; // ← guard: never hit /checkuser without a token
+
+    try {
+      const res = await API.get("/auth/checkuser");
+      if (res?.data?.user) {
+        setUser(res.data.user);
+      } else {
+        // Token exists but server doesn't recognise it — clear it
+        logout(false);
+      }
+    } catch (err) {
+      if (!err.response) {
+        setIsServerOff(true);
+      } else if (err.response.status === 401) {
+        // Token is invalid/expired — clear and stay on login
+        logout(false);
+      }
+    }
+  };
+
+  // On mount — one-time session restore
   useEffect(() => {
     if (hasLoaded.current) return;
     hasLoaded.current = true;
 
     const init = async () => {
       setLoading(true);
+
+      const alive = await checkServer();
+      if (!alive) {
+        setIsServerOff(true);
+        setLoading(false);
+        return; // ← stop here, don't attempt auth calls
+      }
+
+      setIsServerOff(false);
+
       const saved = sessionStorage.getItem("_at") || localStorage.getItem("token");
       if (saved) {
         tokenStore.set(saved);
-        await loadUser();
+        await loadUser(); // only called when we have a token AND server is up
       }
+
       setLoading(false);
     };
 
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -526,13 +636,14 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener("server-offline", handleOffline);
   }, []);
 
-  const logout = () => {
+  // navigate param: pass false to suppress navigation (internal cleanup use)
+  const logout = (shouldNavigate = true) => {
     tokenStore.clear();
     try { sessionStorage.removeItem("_at"); } catch {}
     try { localStorage.removeItem("token"); } catch {}
     try { sessionStorage.removeItem("announcement_closed"); } catch {}
     setUser(null);
-    navigate("/");
+    if (shouldNavigate) navigate("/");
   };
 
   const loginAndLoad = async (token, userFromResponse = null) => {
@@ -540,12 +651,17 @@ export function AuthProvider({ children }) {
     try { sessionStorage.setItem("_at", token); } catch {}
     try { localStorage.setItem("token", token); } catch {}
 
-    if (userFromResponse) setUser(userFromResponse);
-    await loadUser();
+    if (userFromResponse) {
+      setUser(userFromResponse); // use the user from login response directly
+    } else {
+      await loadUser(); // fallback: fetch from server
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, loadUser, loginAndLoad, loading, isServerOff }}>
+    <AuthContext.Provider
+      value={{ user, setUser, logout, loadUser, loginAndLoad, loading, isServerOff }}
+    >
       {children}
     </AuthContext.Provider>
   );
